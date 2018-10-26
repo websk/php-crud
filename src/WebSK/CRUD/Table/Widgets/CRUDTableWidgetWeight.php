@@ -50,7 +50,7 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
 
         $o = '';
         $o .= '<form style="display: inline;" method="post">';
-        $o .= Operations::operationCodeHiddenField(CRUDTable::OPERATION_SWAP_MODEL_WEIGHT);
+        $o .= Operations::operationCodeHiddenField(CRUDTable::OPERATION_SWAP_ENTITY_WEIGHT);
         $o .= '<input type="hidden" name="' . self::FORMFIELD_CONTEXT_FIELDS_NAME . '" value="' .
             Sanitize::sanitizeAttrValue(implode(',', array_keys($this->getContextFieldsArr()))) . '">';
 

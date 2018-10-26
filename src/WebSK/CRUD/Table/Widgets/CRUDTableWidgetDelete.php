@@ -46,7 +46,7 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
 
         $o = '';
         $o .= '<form style="display: inline;" method="post">';
-        $o .= Operations::operationCodeHiddenField(CRUDTable::OPERATION_DELETE_MODEL);
+        $o .= Operations::operationCodeHiddenField(CRUDTable::OPERATION_DELETE_ENTITY);
         $o .= '<input type="hidden" name="' . self::FIELD_CLASS_NAME . '" ' .
             'value="' . Sanitize::sanitizeAttrValue(get_class($obj)) . '">';
         $o .= '<input type="hidden" name="' . self::FIELD_OBJECT_ID . '" ' .

@@ -26,10 +26,10 @@ class CRUDTable
 {
     const KEY_LIST_COLUMNS = 'LIST_COLUMNS';
 
-    const OPERATION_ADD_MODEL = 'OPERATION_ADD_MODEL';
-    const OPERATION_DELETE_MODEL = 'OPERATION_DELETE_MODEL';
-    const OPERATION_SWAP_MODEL_WEIGHT = 'OPERATION_SWAP_MODEL_WEIGHT';
-    const OPERATION_UPDATE_MODEL_FIELD = 'OPERATION_UPDATE_MODEL_FIELD';
+    const OPERATION_ADD_ENTITY = 'OPERATION_ADD_ENTITY';
+    const OPERATION_DELETE_ENTITY = 'OPERATION_DELETE_ENTITY';
+    const OPERATION_SWAP_ENTITY_WEIGHT = 'OPERATION_SWAP_ENTITY_WEIGHT';
+    const OPERATION_UPDATE_ENTITY_FIELD = 'OPERATION_UPDATE_ENTITY_FIELD';
 
     const FILTERS_POSITION_LEFT = 'FILTERS_POSITION_LEFT';
     const FILTERS_POSITION_RIGHT = 'FILTERS_POSITION_RIGHT';
@@ -40,15 +40,15 @@ class CRUDTable
     const FIELD_CRUDTABLE_ID = 'crudtable_id';
     const FIELD_FIELD_NAME = 'field_name';
     const FIELD_FIELD_VALUE = 'field_value';
-    const FIELD_MODEL_ID = 'model_id';
+    const FIELD_ENTITY_ID = 'entity_id';
 
     const FIELD_NAME_CRUD_TABLE_ID = '_FIELD_NAME_CRUD_TABLE_ID';
-    const FIELD_NAME_MODEL_CLASS_NAME = '_FIELD_NAME_MODEL_CLASS_NAME';
+    const FIELD_NAME_ENTITY_CLASS_NAME = '_FIELD_NAME_ENTITY_CLASS_NAME';
 
     /** @var CRUD */
     protected $crud;
     /** @var string */
-    protected $model_class_name;
+    protected $entity_class_name;
     /** @var CRUDForm */
     protected $create_form_obj;
     /** @var InterfaceCRUDTableColumn[] */
@@ -67,7 +67,7 @@ class CRUDTable
     /**
      * CRUDTable constructor.
      * @param CRUD $crud
-     * @param string $model_class_name
+     * @param string $entity_class_name
      * @param CRUDForm $create_form_obj
      * @param InterfaceCRUDTableColumn[] $column_obj_arr
      * @param InterfaceCRUDTableFilter[] $filters_arr
@@ -78,7 +78,7 @@ class CRUDTable
      */
     public function __construct(
         CRUD $crud,
-        string $model_class_name,
+        string $entity_class_name,
         CRUDForm $create_form_obj = null,
         array $column_obj_arr,
         array $filters_arr = [],
@@ -88,7 +88,7 @@ class CRUDTable
         bool $display_total_rows_count = false
     ) {
         $this->crud = $crud;
-        $this->model_class_name = $model_class_name;
+        $this->entity_class_name = $entity_class_name;
         $this->create_form_obj = $create_form_obj;
         $this->column_obj_arr = $column_obj_arr;
         $this->filters_arr = $filters_arr;
@@ -182,7 +182,7 @@ class CRUDTable
 
             $objs_ids_arr = $this->crud->getObjIdsArrForClassName(
                 $request,
-                $this->model_class_name,
+                $this->entity_class_name,
                 $this->filters_arr,
                 $this->order_by,
                 $page_size,
@@ -192,7 +192,7 @@ class CRUDTable
             );
 
             foreach ($objs_ids_arr as $obj_id) {
-                $obj_obj = $this->crud->createAndLoadObject($this->model_class_name, $obj_id);
+                $obj_obj = $this->crud->createAndLoadObject($this->entity_class_name, $obj_id);
                 echo '<tr>';
                 foreach ($this->column_obj_arr as $column_obj) {
                     Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
@@ -266,12 +266,12 @@ class CRUDTable
 
         $operation_code = $request->getParsedBodyParam(Operations::FIELD_NAME_OPERATION_CODE);
         switch ($operation_code) {
-            case self::OPERATION_DELETE_MODEL:
-                return $this->deleteModelOperation($request, $response);
-            case self::OPERATION_SWAP_MODEL_WEIGHT:
-                return $this->swapModelWeightOperation($request, $response);
-            case self::OPERATION_UPDATE_MODEL_FIELD:
-                return $this->updateModelFieldOperation($request, $response);
+            case self::OPERATION_DELETE_ENTITY:
+                return $this->deleteEntityOperation($request, $response);
+            case self::OPERATION_SWAP_ENTITY_WEIGHT:
+                return $this->swapEntityWeightOperation($request, $response);
+            case self::OPERATION_UPDATE_ENTITY_FIELD:
+                return $this->updateEntityFieldOperation($request, $response);
         }
 
         return null;
@@ -283,17 +283,17 @@ class CRUDTable
      * @return Response
      * @throws \Exception
      */
-    public function deleteModelOperation(Request $request, Response $response): Response
+    public function deleteEntityOperation(Request $request, Response $response): Response
     {
-        // @TODO: do not pass DB table name in form - pass crud table id instead, get model class name from crud table
-        // @TODO: also check model owner
-        $model_class_name = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_CLASS_NAME);
-        Assert::assert($model_class_name);
+        // @TODO: do not pass DB table name in form - pass crud table id instead, get entity class name from crud table
+        // @TODO: also check entity owner
+        $entity_class_name = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_CLASS_NAME);
+        Assert::assert($entity_class_name);
 
-        $model_id = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_OBJECT_ID);
-        Assert::assert($model_id);
+        $entity_id = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_OBJECT_ID);
+        Assert::assert($entity_id);
 
-        $this->crud->deleteObject($model_class_name, $model_id);
+        $this->crud->deleteObject($entity_class_name, $entity_id);
 
         $redirect_url = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_REDIRECT_AFTER_DELETE_URL, '');
         if ($redirect_url != '') {
@@ -309,17 +309,17 @@ class CRUDTable
      * @return Response
      * @throws \Exception
      */
-    public function swapModelWeightOperation(Request $request, Response $response): Response
+    public function swapEntityWeightOperation(Request $request, Response $response): Response
     {
-        // @TODO: do not pass DB table name in form - pass crud table id instead, get model class name from crud table
-        // @TODO: also check model owner
-        $model_class_name = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_CLASS_NAME);
-        Assert::assert($model_class_name);
+        // @TODO: do not pass DB table name in form - pass crud table id instead, get entity class name from crud table
+        // @TODO: also check entity owner
+        $entity_class_name = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_CLASS_NAME);
+        Assert::assert($entity_class_name);
 
-        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($model_class_name, InterfaceWeight::class);
+        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceWeight::class);
 
-        $model_id = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_OBJECT_ID);
-        Assert::assert($model_id);
+        $entity_id = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_OBJECT_ID);
+        Assert::assert($entity_id);
 
         $context_fields_names_str = $request->getParsedBodyParam(
             CRUDTableWidgetWeight::FORMFIELD_CONTEXT_FIELDS_NAME,
@@ -335,7 +335,7 @@ class CRUDTable
             $context_arr[$context_field_name] = NullablePostFields::optionalFieldValue($request, $context_field_name);
         }
 
-        $this->crud->swapWeights($model_class_name, $model_id, $context_arr);
+        $this->crud->swapWeights($entity_class_name, $entity_id, $context_arr);
 
         return $response->withRedirect($request->getUri());
     }
@@ -347,7 +347,7 @@ class CRUDTable
      * @throws \Exception
      * @throws \ReflectionException
      */
-    public function updateModelFieldOperation(Request $request, Response $response): ?Response
+    public function updateEntityFieldOperation(Request $request, Response $response): ?Response
     {
         $table_id_from_request = $request->getParsedBodyParam(CRUDTable::FIELD_CRUDTABLE_ID, '');
         // проверяем, что операция выполняется для таблицы из запроса, потому что класс модели мы берем из таблицы
@@ -355,22 +355,22 @@ class CRUDTable
             return  null;
         }
 
-        $model_field_name = $request->getParsedBodyParam(CRUDTable::FIELD_FIELD_NAME);
-        Assert::assert(!is_null($model_field_name));
+        $entity_field_name = $request->getParsedBodyParam(CRUDTable::FIELD_FIELD_NAME);
+        Assert::assert(!is_null($entity_field_name));
 
         $value = $request->getParsedBodyParam(CRUDTable::FIELD_FIELD_VALUE);
         Assert::assert(!is_null($value));
 
-        $model_id = $request->getParsedBodyParam(CRUDTable::FIELD_MODEL_ID);
-        Assert::assert(!is_null($model_id));
+        $entity_id = $request->getParsedBodyParam(CRUDTable::FIELD_ENTITY_ID);
+        Assert::assert(!is_null($entity_id));
 
         // @TODO: owner check!!!
 
-        $obj = $this->crud->createAndLoadObject($this->model_class_name, $model_id);
+        $obj = $this->crud->createAndLoadObject($this->entity_class_name, $entity_id);
 
         $reflect = new \ReflectionClass($obj);
 
-        $property_obj = $reflect->getProperty($model_field_name);
+        $property_obj = $reflect->getProperty($entity_field_name);
         $property_obj->setAccessible(true);
         $property_obj->setValue($obj, $value);
 
