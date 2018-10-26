@@ -1,0 +1,232 @@
+<?php
+
+namespace WebSK\CRUD;
+
+use Slim\Http\Request;
+
+/**
+ * Class Pager
+ * @package WebSK\CRUD
+ */
+class Pager
+{
+    /**
+     * @param string $table_index_on_page
+     * @return string
+     */
+    protected static function pageSizeFormFieldName(string $table_index_on_page): string
+    {
+        return 'table_' . $table_index_on_page . '_page_size';
+    }
+
+    /**
+     * @param string $table_index_on_page
+     * @return string
+     */
+    protected static function pageOffsetFormFieldName(string $table_index_on_page): string
+    {
+        return 'table_' . $table_index_on_page . '_' . 'page_offset';
+    }
+
+    /**
+     * @param Request $request
+     * @param string $table_index_on_page
+     * @return int
+     */
+    public static function getPageOffset(Request $request, string $table_index_on_page): int
+    {
+        $page_offset = 0;
+        $page_offset_param = $request->getParam(self::pageOffsetFormFieldName($table_index_on_page), null);
+        if (is_null($page_offset_param)) {
+            return $page_offset;
+        }
+
+        $page_offset = intval($page_offset_param);
+        if ($page_offset < 0) {
+            $page_offset = 0;
+        }
+        return $page_offset;
+    }
+
+    /**
+     * @param Request $request
+     * @param string $table_index_on_page
+     * @param int $default_page_size
+     * @return int
+     */
+    public static function getPageSize(Request $request, string $table_index_on_page, int $default_page_size = 30): int
+    {
+        $page_size_param = $request->getParam(self::pageSizeFormFieldName($table_index_on_page), null);
+        if (is_null($page_size_param)) {
+            return $default_page_size;
+        }
+
+        $page_size = intval($page_size_param);
+        if ($page_size < 1) {
+            return $default_page_size;
+        }
+        if ($page_size > 1000) {
+            return $default_page_size;
+        }
+
+        return $page_size;
+    }
+
+    /**
+     * @param Request $request
+     * @param string $table_index_on_page
+     * @return int
+     */
+    protected static function getNextPageStart(Request $request, string $table_index_on_page): int
+    {
+        $start = self::getPageOffset($request, $table_index_on_page);
+        $page_size = self::getPageSize($request, $table_index_on_page);
+        return $start + $page_size;
+    }
+
+    /**
+     * @param Request $request
+     * @param string $table_index_on_page
+     * @return int
+     */
+    protected static function getPrevPageStart(Request $request, string $table_index_on_page): int
+    {
+        $start = self::getPageOffset($request, $table_index_on_page);
+        $page_size = self::getPageSize($request, $table_index_on_page);
+        return $start - $page_size;
+    }
+
+    /**
+     * @param Request $request
+     * @param string $table_index_on_page
+     * @return bool
+     */
+    protected static function hasPrevPage(Request $request, string $table_index_on_page): bool
+    {
+        $start = self::getPageOffset($request, $table_index_on_page);
+
+        if ($start > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Request $request
+     * @param string $table_index_on_page
+     * @param int $elements_count Количество элементов на текущей странице. Если меньше размера страницы - значит,
+     * следующей страницы нет. Если null - значит оно не передано (т.е. неизвестно),
+     * при этом считаем что следующая страница есть.
+     * @return bool
+     */
+    protected static function hasNextPage(Request $request, string $table_index_on_page, int $elements_count): bool
+    {
+        if (is_null($elements_count)) {
+            return true;
+        }
+
+        $page_size = self::getPageSize($request, $table_index_on_page);
+
+        if ($elements_count < $page_size) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * "Дальше" рисуется всегда, если параметр $elements_count не передан
+     *
+     * @param Request $request
+     * @param string $table_index_on_page
+     * @param int|null $elements_count
+     * @param bool $display_total_rows_count
+     * @param int $total_rows_count
+     * @return string
+     */
+    public static function renderPager(
+        Request $request,
+        string $table_index_on_page,
+        int $elements_count = null,
+        bool $display_total_rows_count = false,
+        int $total_rows_count = 0
+    ): string {
+        $pager_needed = false;
+        if (self::hasPrevPage($request, $table_index_on_page)) {
+            $pager_needed = true;
+        }
+
+        if (is_null($elements_count) ||
+            self::hasNextPage($request, $table_index_on_page, $elements_count) ||
+            $display_total_rows_count
+        ) {
+            $pager_needed = true;
+        }
+
+        $html = '<ul class="pagination" data-page-size="' .
+            self::getPageSize($request, $table_index_on_page) . '" data-page-offset="' .
+            self::getPageOffset($request, $table_index_on_page) . '">';
+
+        if ($pager_needed) {
+            $request_query_params_arr = $request->getQueryParams();
+            if (self::hasPrevPage($request, $table_index_on_page)) {
+                $first_page_query_params_arr = $request_query_params_arr;
+                $first_page_query_params_arr[self::pageOffsetFormFieldName($table_index_on_page)] = 0;
+                $first_page_query_params_arr[self::pageSizeFormFieldName($table_index_on_page)] =
+                    self::getPageSize($request, $table_index_on_page);
+                $html .= '<li><a data-page-offset="0" href="?' .
+                    http_build_query($first_page_query_params_arr) .
+                    '"><span class="glyphicon glyphicon-home"></span> 0-' .
+                    self::getPageSize($request, $table_index_on_page) .
+                    '</a></li>';
+
+                $previous_page_query_params_arr = $request_query_params_arr;
+                $previous_page_query_params_arr[self::pageOffsetFormFieldName($table_index_on_page)] =
+                    self::getPrevPageStart($request, $table_index_on_page);
+                $previous_page_query_params_arr[self::pageSizeFormFieldName($table_index_on_page)] =
+                    self::getPageSize($request, $table_index_on_page);
+
+                $html .= '<li><a data-page-offset="' . self::getPrevPageStart($request, $table_index_on_page) .
+                    '" href="?' . http_build_query($previous_page_query_params_arr) .
+                    '"><span class="glyphicon glyphicon-arrow-left"></span> ' .
+                    self::getPrevPageStart($request, $table_index_on_page) . '-' .
+                    (self::getPrevPageStart($request, $table_index_on_page) + self::getPageSize($request, $table_index_on_page)) .
+                    '</a></li>';
+            } else {
+                $html .= '<li class="disabled"><a href="#"><span class="glyphicon glyphicon-home"></span></a></li>';
+                $html .= '<li class="disabled"><a href="#"><span class="glyphicon glyphicon-arrow-left"></span></a></li>';
+            }
+
+            $html .= '<li class="active"><a data-page-offset="' .
+                self::getPageOffset($request, $table_index_on_page) .
+                '" href="#">' . self::getPageOffset($request, $table_index_on_page) . '-' .
+                (self::getPageOffset($request, $table_index_on_page) + self::getPageSize($request, $table_index_on_page)) .
+                '</a></li>';
+
+            if (!$elements_count || self::hasNextPage($request, $table_index_on_page, $elements_count)) {
+                $next_page_query_params_arr = $request_query_params_arr;
+                $next_page_query_params_arr[self::pageOffsetFormFieldName($table_index_on_page)] =
+                    self::getNextPageStart($request, $table_index_on_page);
+                $next_page_query_params_arr[self::pageSizeFormFieldName($table_index_on_page)] =
+                    self::getPageSize($request, $table_index_on_page);
+
+                $html .= '<li><a data-page-offset="' . self::getNextPageStart($request, $table_index_on_page) .
+                    '" class="next-page" href="?' . http_build_query($next_page_query_params_arr) . '">' .
+                    self::getNextPageStart($request, $table_index_on_page) . '-' .
+                    (self::getNextPageStart($request, $table_index_on_page) + self::getPageSize($request, $table_index_on_page)) .
+                    ' <span class="glyphicon glyphicon-arrow-right"></span></a></a></li>';
+            } else {
+                $html .= '<li class="disabled"><a href="#"><span class="glyphicon glyphicon-arrow-right"></span></a></li>';
+            }
+
+            if ($display_total_rows_count) {
+                $html .= '<li class="disabled"><a href="#">Всего записей: ' . $total_rows_count . '</a></li>';
+            }
+        }
+
+        $html .= "</ul>";
+
+        return $html;
+    }
+}

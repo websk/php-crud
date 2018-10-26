@@ -1,0 +1,14 @@
+{
+  "name": "websk/php-crud",
+  "require": {
+    "slim/slim": "^3.0",
+    "websk/php-utils": "dev-master",
+    "websk/php-entity": "dev-master",
+    "o-log/php-html": "1.11"
+  },
+  "autoload": {
+    "psr-4": {
+      "": "src/"
+    }
+  }
+}
