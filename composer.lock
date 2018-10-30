@@ -468,12 +468,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/websk/php-entity.git",
-                "reference": "56367f46f815de501da94ef362b4268645f86af9"
+                "reference": "f91ecb6676135c1422890d120aedd08d3c8e5986"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websk/php-entity/zipball/56367f46f815de501da94ef362b4268645f86af9",
-                "reference": "56367f46f815de501da94ef362b4268645f86af9",
+                "url": "https://api.github.com/repos/websk/php-entity/zipball/f91ecb6676135c1422890d120aedd08d3c8e5986",
+                "reference": "f91ecb6676135c1422890d120aedd08d3c8e5986",
                 "shasum": ""
             },
             "require": {
@@ -489,7 +489,7 @@
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
-            "time": "2018-10-23T14:20:18+00:00"
+            "time": "2018-10-30T08:20:16+00:00"
         },
         {
             "name": "websk/php-utils",

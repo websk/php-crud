@@ -129,15 +129,10 @@ class CRUD
     ): array {
         CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
 
-        Assert::assert(!empty($entity_class_name::DB_TABLE_NAME));
-        $db_table_name = $entity_class_name::DB_TABLE_NAME;
-
         Assert::assert(!empty($entity_class_name::ENTITY_REPOSITORY_CONTAINER_ID));
 
-        /** @var BaseEntityRepository $entity_repository_service */
-        $entity_repository_service = $this->container->get($entity_class_name::ENTITY_REPOSITORY_CONTAINER_ID);
-
-        $db_id_field_name = CRUDFieldsAccess::getIdFieldName($entity_class_name);
+        /** @var BaseEntityRepository $entity_repository */
+        $entity_repository = $this->container->get($entity_class_name::ENTITY_REPOSITORY_CONTAINER_ID);
 
         $query_param_values_arr = array();
 
@@ -168,18 +163,22 @@ class CRUD
             }
         }
 
+        $db_id_field_name = $entity_repository->getIdFieldName();
+
         if ($order_by == '') { //@TODO sanitize $order_by
             $order_by = $db_id_field_name;
         }
 
-        $obj_ids_arr = $entity_repository_service->getDbService()->readColumn(
+        $db_table_name = $entity_repository->getTableName();
+
+        $obj_ids_arr = $entity_repository->getDbService()->readColumn(
             'select ' . $db_id_field_name . ' from ' . $db_table_name . ' where ' . $where .
             ' order by ' . $order_by . ' limit ' . intval($page_size) . ' offset ' . intval($start),
             $query_param_values_arr
         );
 
         if ($execute_total_rows_count_query) {
-            $total_rows_count = $entity_repository_service->getDbService()->readField(
+            $total_rows_count = $entity_repository->getDbService()->readField(
                 'select count(*) from ' . $db_table_name . ' where ' . $where,
                 $query_param_values_arr
             );

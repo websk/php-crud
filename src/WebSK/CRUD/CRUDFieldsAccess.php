@@ -26,16 +26,16 @@ class CRUDFieldsAccess
     }
 
     /**
-     * @param string $model_class_name
+     * @param string $entity_class_name
      * @return string
      */
-    public static function getIdFieldName(string $model_class_name): string
+    public static function getIdFieldName(string $entity_class_name): string
     {
-        if (defined($model_class_name . '::DB_ID_FIELD_NAME')) {
-            return $model_class_name::DB_ID_FIELD_NAME;
-        } else {
-            return 'id';
+        if (defined($entity_class_name . '::DB_ID_FIELD_NAME')) {
+            return $entity_class_name::DB_ID_FIELD_NAME;
         }
+
+        return 'id';
     }
 
     /**
