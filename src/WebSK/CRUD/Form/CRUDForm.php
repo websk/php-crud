@@ -138,12 +138,14 @@ class CRUDForm
             $form_element_id = $this->form_unique_id;
         }
 
+        $obj_id_value = CRUDFieldsAccess::getObjId($this->obj) ?: '';
+
         $html = '';
         $html .= Operations::operationCodeHiddenField($this->operation_code);
         $html .= '<input type="hidden" name="' . self::FIELD_CLASS_NAME . '" '.
             'value="' . Sanitize::sanitizeAttrValue(get_class($this->obj)) . '">';
         $html .= '<input type="hidden" name="' . self::FIELD_OBJECT_ID . '" '.
-            'value="' . Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($this->obj)) . '">';
+            'value="' . Sanitize::sanitizeAttrValue($obj_id_value) . '">';
         $html .= '<input type="hidden" name="' . self::FIELD_REDIRECT_URL . '" '.
             'value="' . Sanitize::sanitizeAttrValue($this->url_to_redirect_after_save) . '">';
         $html .= '<input type="hidden" name="' . self::FIELD_REDIRECT_URL_GET_PARAMS . '" '.
