@@ -2,8 +2,8 @@
   "name": "websk/php-crud",
   "require": {
     "slim/slim": "^3.0",
-    "websk/php-utils": "dev-master",
-    "websk/php-entity": "dev-master",
+    "websk/php-utils": "1.0.*",
+    "websk/php-entity": "1.0.*",
     "o-log/php-html": "1.11"
   },
   "autoload": {

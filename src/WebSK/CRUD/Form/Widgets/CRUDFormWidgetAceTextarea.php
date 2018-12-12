@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Form\Widgets;
 
-use Websk\Utils\Sanitize;
+use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
