@@ -36,20 +36,8 @@ class CRUDFormWidgetDateTime implements InterfaceCRUDFormWidget
     /** @inheritdoc */
     public function html($obj, CRUD $crud): string
     {
-        static $CRUDFormWidgetDateTime_include_script;
-
         $field_name = $this->getFieldName();
         $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
-
-        /* @TODO Нужно изменить на нах CDN */
-        $script = '';
-        if (!isset($CRUDFormWidgetDateTime_include_script)) {
-            $script = '<script src="/assets/libraries/moment/moment.min.js"></script>
-						<script src="/assets/libraries/moment/ru.js"></script>
-				<link rel="stylesheet" href="/assets/libraries/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
-				<script src="/assets/libraries/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>';
-            $CRUDFormWidgetDateTime_include_script = false;
-        }
 
         $is_required_str = '';
         if ($this->is_required) {
@@ -132,7 +120,7 @@ class CRUDFormWidgetDateTime implements InterfaceCRUDFormWidget
 
         $html .= '</div>';
 
-        return $script . $html;
+        return $html;
     }
 
     /**
