@@ -4,7 +4,8 @@
     "slim/slim": "^3.0",
     "websk/php-utils": "1.0.*",
     "websk/php-entity": "1.0.*",
-    "o-log/php-html": "1.11"
+    "o-log/php-html": "1.11",
+    "o-log/php-utils": "1.11"
   },
   "autoload": {
     "psr-4": {

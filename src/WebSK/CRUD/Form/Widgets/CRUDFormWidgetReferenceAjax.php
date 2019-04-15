@@ -2,7 +2,6 @@
 
 namespace WebSK\CRUD\Form\Widgets;
 
-use OLOG\BT\BT;
 use OLOG\Preloader;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
@@ -115,7 +114,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
 
         $html .= '</div>';
 
-        $html .= BT::modal($choose_form_element_id, 'Выбрать');
+        $html .= self::modal($choose_form_element_id, 'Выбрать');
 
         ob_start(); ?>
 
@@ -168,6 +167,30 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
 
         <?php
         $html .= ob_get_clean();
+
+        return $html;
+    }
+
+    /**
+     * @param $modal_element_id
+     * @param $title
+     * @param string $contents_html
+     * @return string
+     */
+    protected static function modal($modal_element_id, $title, $contents_html = ''){
+        $html = '<div class="modal fade" id="' . $modal_element_id . '" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
+		<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		<span aria-hidden="true">&times;</span>
+		</button>
+		<h4 class="modal-title">' . $title . '</h4>
+		</div>
+		<div class="modal-body">' . $contents_html . '</div>
+		</div>
+		</div>
+		</div>';
 
         return $html;
     }
