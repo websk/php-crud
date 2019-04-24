@@ -31,7 +31,7 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
      */
     public function __construct(
         string $button_text = '',
-        string $button_class_str = 'btn btn-xs btn-default btn-sm fa fa-trash-o fa-lg text-danger fa-fw',
+        string $button_class_str = 'btn btn-default btn-sm',
         string $redirect_after_delete_url = ''
     ) {
         $this->setButtonClassStr($button_class_str);
@@ -58,7 +58,7 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
         }
 
         $o .= '<button class="' . Sanitize::sanitizeAttrValue($this->getButtonClassStr()) . '" ' .
-            'type="submit" onclick="return window.confirm(\'Удалить?\');">' .
+            'type="submit" onclick="return window.confirm(\'Удалить?\');"><span class="fa fa-trash-o fa-lg text-danger fa-fw"></span>' .
             Sanitize::sanitizeTagContent($this->getButtonText()) . '</button>';
 
         $o .= '</form>';
