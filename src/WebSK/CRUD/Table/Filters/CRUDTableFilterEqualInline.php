@@ -64,7 +64,8 @@ class CRUDTableFilterEqualInline implements InterfaceCRUDTableFilterVisible
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterUniqId(),
             'id' => $this->getFilterUniqId(),
-            'value' => $request->getParam($this->getFilterUniqId(), '')
+            'value' => $request->getParam($this->getFilterUniqId(), ''),
+            'class' => 'form-control'
         ], '');
 
         ob_start();

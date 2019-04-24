@@ -31,7 +31,7 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
      */
     public function __construct(
         string $button_text = '',
-        string $button_class_str = 'btn btn-xs btn-default glyphicon glyphicon-remove',
+        string $button_class_str = 'btn btn-xs btn-default btn-sm fa fa-trash-o fa-lg text-danger fa-fw',
         string $redirect_after_delete_url = ''
     ) {
         $this->setButtonClassStr($button_class_str);
