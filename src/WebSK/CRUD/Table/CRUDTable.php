@@ -476,7 +476,7 @@ class CRUDTable
 
             if ($create_form_html != '') {
                 $create_form_element_id = 'collapse_' . rand(1, 999999);
-                echo MagnificPopup::button($create_form_element_id, 'btn btn-sm btn-default pull-right', 'Создать');
+                echo MagnificPopup::button($create_form_element_id, 'btn btn-sm btn-primary pull-right', '<span class="glyphicon glyphicon-plus"></span> Создать');
                 echo MagnificPopup::popupHtml($create_form_element_id, $create_form_html);
             }
         });
