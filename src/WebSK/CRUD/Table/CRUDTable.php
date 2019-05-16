@@ -455,11 +455,11 @@ class CRUDTable
                     //@TODO check class implements InterfaceCRUDTableFilter
 
                     if ($filter_obj instanceof InterfaceCRUDTableFilterVisible) {
-                        echo '<div style="display: inline-block;margin-right: 10px;">';
+                        echo '<div style="display: inline-block; margin-right: 10px;">';
 
                         if ($filter_obj->getTitle()) {
-                            echo '<span style="display: inline-block;margin-right: 5px;">' .
-                                $filter_obj->getTitle() . '</span>';
+                            echo '<label style="display: inline-block; margin-top: 5px; margin-right: 5px;">' .
+                                $filter_obj->getTitle() . '</label>';
                         }
 
                         echo '<span style="display: inline-block;">' . $filter_obj->getHtml($request) . '</span>';

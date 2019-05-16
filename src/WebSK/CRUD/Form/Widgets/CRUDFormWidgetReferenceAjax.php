@@ -97,7 +97,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
             $html .= '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#' .
                 $choose_form_element_id . '"><span class="glyphicon glyphicon-folder-open"></span></button>';
             $html .= '<button type="button" id="' . Sanitize::sanitizeAttrValue($select_element_id) . '_btn_is_null" ' .
-                'class="btn btn-default btn-sm"><span class="fa fa-trash-o fa-lg text-danger fa-fw"></span></button>';
+                'class="btn btn-default"><span class="fa fa-trash-o fa-lg text-danger fa-fw"></span></button>';
             $html .= '</span>';
         }
 

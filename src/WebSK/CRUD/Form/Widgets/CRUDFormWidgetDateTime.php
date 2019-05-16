@@ -93,7 +93,7 @@ class CRUDFormWidgetDateTime implements InterfaceCRUDFormWidget
                 <label class="form-control-static">
                     <input id="<?= $uniqid ?>___is_null" type="checkbox" value="1"
                            name="<?= Sanitize::sanitizeAttrValue($field_name) ?>___is_null" <?= $is_null_checked ?>>
-                    NULL
+                    Нет значения
                 </label>
             </div>
             <script>

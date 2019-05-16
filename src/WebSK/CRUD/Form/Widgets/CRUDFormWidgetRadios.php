@@ -109,7 +109,7 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
             <label class="radio-inline">
                 <input id="<?= $uniqid ?>___is_null" type="checkbox" value="1"
                        name="<?= Sanitize::sanitizeAttrValue($input_name) ?>___is_null" <?= $is_null_checked ?>>
-                NULL
+                Нет значения
             </label>
             <script>
                 (function () {
