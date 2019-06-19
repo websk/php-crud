@@ -41,7 +41,7 @@ class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
         if (!isset($CRUDFormWidgetTimestamp_include_script)) {
             $script = '
 								<script src="/assets/libraries/moment/moment.min.js"></script>
-								<script src="/assets/libraries/moment/ru.js"></script>
+								<script src="/assets/libraries/moment/moment.ru.min.js"></script>
 				<link rel="stylesheet" href="/assets/libraries/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
 								<script src="/assets/libraries/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 			';

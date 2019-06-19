@@ -13,15 +13,16 @@ class CRUDTableFilterEqualInvisible implements InterfaceCRUDTableFilterInvisible
 {
     /** @var string */
     protected $field_name;
+
     /** @var string */
     protected $filter_value;
 
     /**
      * CRUDTableFilterEqualInvisible constructor.
-     * @param $field_name
-     * @param $filter_value
+     * @param string $field_name
+     * @param string|null $filter_value
      */
-    public function __construct($field_name, $filter_value)
+    public function __construct(string $field_name, ?string $filter_value)
     {
         $this->setFieldName($field_name);
         $this->setFilterValue($filter_value);
@@ -61,17 +62,17 @@ class CRUDTableFilterEqualInvisible implements InterfaceCRUDTableFilterInvisible
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getFilterValue(): string
+    public function getFilterValue(): ?string
     {
         return $this->filter_value;
     }
 
     /**
-     * @param string $filter_value
+     * @param string|null $filter_value
      */
-    public function setFilterValue(string $filter_value): void
+    public function setFilterValue(?string $filter_value): void
     {
         $this->filter_value = $filter_value;
     }
