@@ -18,11 +18,16 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
 
     /** @var string */
     protected $redirect_after_delete_url;
+
     /** @var string */
     protected $button_text;
+
     /** @var string */
     protected $button_class_str;
-
+    
+    /** @var string */
+    protected $form_action_url = '';
+    
     /**
      * CRUDTableWidgetDelete constructor.
      * @param string $button_text
@@ -32,11 +37,13 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
     public function __construct(
         string $button_text = '',
         string $button_class_str = 'btn btn-default btn-sm',
-        string $redirect_after_delete_url = ''
+        string $redirect_after_delete_url = '',
+        string $form_action_url = ''
     ) {
         $this->setButtonClassStr($button_class_str);
         $this->setButtonText($button_text);
         $this->setRedirectAfterDeleteUrl($redirect_after_delete_url);
+        $this->setFormActionUrl($form_action_url);
     }
 
     /** @inheritdoc */
@@ -45,7 +52,7 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
         Assert::assert($obj);
 
         $o = '';
-        $o .= '<form style="display: inline;" method="post">';
+        $o .= '<form style="display: inline;" method="post"' . ($this->getFormActionUrl() ? ' action=" ' . $this->getFormActionUrl() .  '"' : '') . '>';
         $o .= Operations::operationCodeHiddenField(CRUDTable::OPERATION_DELETE_ENTITY);
         $o .= '<input type="hidden" name="' . self::FIELD_CLASS_NAME . '" ' .
             'value="' . Sanitize::sanitizeAttrValue(get_class($obj)) . '">';
@@ -113,4 +120,20 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
     {
         $this->button_class_str = $button_class_str;
     }
+
+    /**
+     * @return string
+     */
+    public function getFormActionUrl(): string
+    {
+        return $this->form_action_url;
+    }
+
+    /**
+     * @param string $form_action_url
+     */
+    public function setFormActionUrl(string $form_action_url): void
+    {
+        $this->form_action_url = $form_action_url;
+    }    
 }
