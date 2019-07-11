@@ -45,11 +45,19 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
     /** @inheritdoc */
     public function html($obj, CRUD $crud): string
     {
+        static $CRUDFormWidgetAceTextarea_include_script;
+
         $field_name = $this->getFieldName();
         $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
 
-        $editor_element_id = 'editor_' . time() . '_' . rand(1, 999999);
         $html = '';
+
+        if (!isset($CRUDFormWidgetAceTextarea_include_script)) {
+            $html .= '<script src="/assets/libraries/ace/ace.js" type="text/javascript" charset="utf-8"></script>';
+            $CRUDFormWidgetAceTextarea_include_script = false;
+        }
+
+        $editor_element_id = 'editor_' . time() . '_' . Sanitize::sanitizeAttrValue($field_name) . rand(1, 999999);
 
         $html .= '
             <style>
@@ -69,19 +77,16 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
         $html .= '<textarea id="' . $editor_element_id . '_target" name="' . Sanitize::sanitizeAttrValue($field_name) .
             '" style="display: none;">' . Sanitize::sanitizeTagContent($field_value) . '</textarea>';
 
-        // @TODO: multiple insertion!!!!
-        $html .= '<script src="/assets/libraries/ace/ace.js" '.
-            'type="text/javascript" charset="utf-8"></script>
-            <script>
-            var editor = ace.edit("' . $editor_element_id . '");
-            editor.setOption("maxLines", "Infinity");
+        $html .= '<script>
+            var editor' . $editor_element_id . ' = ace.edit("' . $editor_element_id . '");
+            editor' . $editor_element_id . '.setOption("maxLines", "Infinity");
             
-            editor.getSession().setMode(' . json_encode($this->getAceMode()) . ');
-            editor.getSession().setUseWorker(' . json_encode($this->getAceUseWorker()) . ');
+            editor' . $editor_element_id . '.getSession().setMode(' . json_encode($this->getAceMode()) . ');
+            editor' . $editor_element_id . '.getSession().setUseWorker(' . json_encode($this->getAceUseWorker()) . ');
 
-            editor.getSession().on("change", function() {
+            editor' . $editor_element_id . '.getSession().on("change", function() {
                 var target = document.getElementById("' . $editor_element_id . '_target");
-                target.innerHTML = editor.getSession().getValue();
+                target.innerHTML = editor' . $editor_element_id . '.getSession().getValue();
             });
             </script>';
 
