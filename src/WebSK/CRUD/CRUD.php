@@ -38,13 +38,14 @@ class CRUD
     /**
      * CRUDTable constructor.
      * @param string $entity_class_name
-     * @param CRUDForm $create_form_obj
+     * @param null|CRUDForm $create_form_obj
      * @param InterfaceCRUDTableColumn[] $column_obj_arr
      * @param InterfaceCRUDTableFilter[] $filters_arr
      * @param string $order_by
      * @param string $table_id
      * @param string $filters_position
      * @param bool $display_total_rows_count
+     * @param int $page_size
      * @return CRUDTable
      */
     public function createTable(
@@ -55,7 +56,8 @@ class CRUD
         string $order_by = '',
         string $table_id = '',
         string $filters_position = CRUDTable::FILTERS_POSITION_NONE,
-        bool $display_total_rows_count = false
+        bool $display_total_rows_count = false,
+        int $page_size = 30
     ): CRUDTable {
         return new CRUDTable(
             $this,
@@ -66,7 +68,8 @@ class CRUD
             $order_by,
             $table_id,
             $filters_position,
-            $display_total_rows_count
+            $display_total_rows_count,
+            $page_size
         );
     }
 
@@ -75,30 +78,36 @@ class CRUD
      * @param string $form_unique_id
      * @param $obj
      * @param InterfaceCRUDFormRow[] $element_obj_arr
-     * @param string $url_to_redirect_after_save
+     * @param string $url_to_redirect_after_operation
      * @param array $redirect_get_params_arr
      * @param string $operation_code
      * @param bool $hide_submit_button
+     * @param string $submit_button_title
+     * @param string $submit_button_class
      * @return CRUDForm
      */
     public function createForm(
         string $form_unique_id,
         $obj,
         array $element_obj_arr,
-        string $url_to_redirect_after_save = '',
+        string $url_to_redirect_after_operation = '',
         array $redirect_get_params_arr = [],
         string $operation_code = CRUDForm::OPERATION_SAVE_EDITOR_FORM,
-        bool $hide_submit_button = false
+        bool $hide_submit_button = false,
+        string $submit_button_title = 'Сохранить',
+        string $submit_button_class = 'btn btn-primary'
     ): CRUDForm {
         return new CRUDForm(
             $this,
             $form_unique_id,
             $obj,
             $element_obj_arr,
-            $url_to_redirect_after_save,
+            $url_to_redirect_after_operation,
             $redirect_get_params_arr,
             $operation_code,
-            $hide_submit_button
+            $hide_submit_button,
+            $submit_button_title,
+            $submit_button_class
         );
     }
 
@@ -179,7 +188,7 @@ class CRUD
 
         if ($execute_total_rows_count_query) {
             $total_rows_count = $entity_repository->getDbService()->readField(
-                'select count(*) from ' . $db_table_name . ' where ' . $where,
+                'select count(' . $db_id_field_name . ') from ' . $db_table_name . ' where ' . $where,
                 $query_param_values_arr
             );
         }

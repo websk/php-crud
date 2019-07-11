@@ -47,34 +47,46 @@ class CRUDTable
 
     /** @var CRUD */
     protected $crud;
+
     /** @var string */
     protected $entity_class_name;
+
     /** @var CRUDForm */
     protected $create_form_obj;
+
     /** @var InterfaceCRUDTableColumn[] */
     protected $column_obj_arr;
+
     /** @var InterfaceCRUDTableFilter[] */
     protected $filters_arr;
+
     /** @var string */
     protected $order_by = '';
+
     /** @var string */
     protected $table_id = '';
+
     /** @var string */
     protected $filters_position = self::FILTERS_POSITION_NONE;
+
     /** @var bool */
     protected $display_total_rows_count = false;
+
+    /** @var int */
+    protected $page_size;
 
     /**
      * CRUDTable constructor.
      * @param CRUD $crud
      * @param string $entity_class_name
-     * @param CRUDForm $create_form_obj
+     * @param null|CRUDForm $create_form_obj
      * @param InterfaceCRUDTableColumn[] $column_obj_arr
      * @param InterfaceCRUDTableFilter[] $filters_arr
      * @param string $order_by
      * @param string $table_id
      * @param string $filters_position
      * @param bool $display_total_rows_count
+     * @param int $page_size
      */
     public function __construct(
         CRUD $crud,
@@ -85,7 +97,8 @@ class CRUDTable
         string $order_by = '',
         string $table_id = '',
         string $filters_position = self::FILTERS_POSITION_NONE,
-        bool $display_total_rows_count = false
+        bool $display_total_rows_count = false,
+        int $page_size = 30
     ) {
         $this->crud = $crud;
         $this->entity_class_name = $entity_class_name;
@@ -96,6 +109,7 @@ class CRUDTable
         $this->table_id = $table_id;
         $this->filters_position = $filters_position;
         $this->display_total_rows_count = $display_total_rows_count;
+        $this->page_size = $page_size;
     }
 
     /**
@@ -176,7 +190,7 @@ class CRUDTable
 
             echo '<tbody>';
 
-            $page_size = Pager::getPageSize($request, $this->table_id);
+            $page_size = Pager::getPageSize($request, $this->table_id, $this->page_size);
             $offset = Pager::getPageOffset($request, $this->table_id);
             $total_rows_count = 0;
 
@@ -224,7 +238,8 @@ class CRUDTable
                 $this->table_id,
                 count($objs_ids_arr),
                 $this->display_total_rows_count,
-                $total_rows_count
+                $total_rows_count,
+                $this->page_size
             );
 
             echo '</div>';

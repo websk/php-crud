@@ -15,22 +15,39 @@ class CRUDFormWidgetInput implements InterfaceCRUDFormWidget
 {
     /** @var string */
     protected $field_name;
+
     /** @var bool */
     protected $show_null_checkbox;
+
     /** @var bool */
     protected $is_required;
+
+    /** @var bool */
+    protected $disabled;
+
+    /** @var bool */
+    protected $disable_autocomplete = false;
 
     /**
      * CRUDFormWidgetInput constructor.
      * @param string $field_name
      * @param bool $show_null_checkbox
      * @param bool $is_required
+     * @param bool $disabled
+     * @param bool $disable_autocomplete
      */
-    public function __construct(string $field_name, bool $show_null_checkbox = false, bool $is_required = false)
-    {
+    public function __construct(
+        string $field_name,
+        bool $show_null_checkbox = false,
+        bool $is_required = false,
+        bool $disabled = false,
+        bool $disable_autocomplete = false
+    ) {
         $this->setFieldName($field_name);
         $this->setShowNullCheckbox($show_null_checkbox);
         $this->setIsRequired($is_required);
+        $this->setDisabled($disabled);
+        $this->setDisableAutocomplete($disable_autocomplete);
     }
 
     /** @inheritdoc */
@@ -47,11 +64,24 @@ class CRUDFormWidgetInput implements InterfaceCRUDFormWidget
         $uniqid = uniqid('CRUDFormWidgetInput_');
         $input_cols = $this->isShowNullCheckbox() ? '10' : '12';
 
+        $disabled = '';
+        if ($this->isDisabled()) {
+            $disabled = ' disabled';
+        }
+
+        $disable_autocomplete = '';
+        if ($this->isDisableAutocomplete()) {
+            $disable_autocomplete = ' autocomplete="off"';
+        }
+
         $html = '';
         $html .= '<div class="row">';
         $html .= '<div class="col-sm-' . $input_cols . '">';
         $html .= '<input id="' . $uniqid . '_input" name="' . Sanitize::sanitizeAttrValue($field_name) . '" ' .
-            $is_required_str . ' class="form-control" value="' . Sanitize::sanitizeAttrValue($field_value) . '"/>';
+            $is_required_str .
+            $disabled .
+            $disable_autocomplete .
+            ' class="form-control" value="' . Sanitize::sanitizeAttrValue($field_value) . '"/>';
         $html .= '</div>';
 
         if ($this->isShowNullCheckbox()) {
@@ -64,7 +94,7 @@ class CRUDFormWidgetInput implements InterfaceCRUDFormWidget
                 <label class="form-control-static">
                     <input id="<?= $uniqid ?>___is_null" type="checkbox" value="1"
                            name="<?= Sanitize::sanitizeAttrValue($field_name) ?>___is_null" <?= $is_null_checked ?>>
-                    Нет значения
+                    NULL
                 </label>
             </div>
             <script>
@@ -138,5 +168,37 @@ class CRUDFormWidgetInput implements InterfaceCRUDFormWidget
     public function setIsRequired(bool $is_required): void
     {
         $this->is_required = $is_required;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisabled(): bool
+    {
+        return $this->disabled;
+    }
+
+    /**
+     * @param bool $disabled
+     */
+    public function setDisabled(bool $disabled): void
+    {
+        $this->disabled = $disabled;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisableAutocomplete(): bool
+    {
+        return $this->disable_autocomplete;
+    }
+
+    /**
+     * @param bool $disable_autocomplete
+     */
+    public function setDisableAutocomplete(bool $disable_autocomplete): void
+    {
+        $this->disable_autocomplete = $disable_autocomplete;
     }
 }

@@ -134,6 +134,15 @@ class CRUDTableScript
                             if ($tr.find("a").length == 0) {
                                 return false;
                             }
+
+                            if ($tr.find("input:checkbox").length > 0) {
+                                return false;
+                            }
+
+                            if ($tr.find("input:radio").length > 0) {
+                                return false;
+                            }
+
                             // Проверка на наличие только одной ссылки
                             if (($tr.find("a").length > 1)) {
                                 return false;

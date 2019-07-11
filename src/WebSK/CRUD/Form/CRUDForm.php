@@ -2,6 +2,9 @@
 
 namespace WebSK\CRUD\Form;
 
+use OLOG\CheckClassInterfaces;
+use OLOG\Url;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Assert;
 use OLOG\HTML;
 use OLOG\Operations;
@@ -19,6 +22,7 @@ use WebSK\CRUD\CRUDFieldsAccess;
 class CRUDForm
 {
     const OPERATION_SAVE_EDITOR_FORM = 'OPERATION_SAVE_EDITOR_FORM';
+    const OPERATION_DELETE_ENTITY = 'OPERATION_DELETE_ENTITY';
 
     const FIELD_CLASS_NAME = '_FIELD_CLASS_NAME';
     const FIELD_OBJECT_ID = '_FIELD_OBJECT_ID';
@@ -33,7 +37,7 @@ class CRUDForm
     /** @var InterfaceCRUDFormRow[] */
     protected $element_obj_arr;
     /** @var string */
-    protected $url_to_redirect_after_save = '';
+    protected $url_to_redirect_after_operation = '';
     /** @var array */
     protected $redirect_get_params_arr = [];
     /** @var string */
@@ -43,35 +47,47 @@ class CRUDForm
     /** @var bool */
     protected $hide_submit_button = false;
 
+    /** @var string */
+    protected $submit_button_title = 'Сохранить';
+
+    /** @var string */
+    protected $submit_button_class = '';
+
     /**
      * CRUDForm constructor.
      * @param CRUD $crud
      * @param string $form_unique_id
      * @param $obj
-     * @param InterfaceCRUDFormRow[] $element_obj_arr
-     * @param string $url_to_redirect_after_save
+     * @param array $element_obj_arr
+     * @param string $url_to_redirect_after_operation
      * @param array $redirect_get_params_arr
      * @param string $operation_code
      * @param bool $hide_submit_button
+     * @param string $submit_button_title
+     * @param string $submit_button_class
      */
     public function __construct(
         CRUD $crud,
         string $form_unique_id,
         $obj,
         array $element_obj_arr,
-        string $url_to_redirect_after_save = '',
+        string $url_to_redirect_after_operation = '',
         array $redirect_get_params_arr = [],
         string $operation_code = self::OPERATION_SAVE_EDITOR_FORM,
-        bool $hide_submit_button = false
+        bool $hide_submit_button = false,
+        string $submit_button_title = 'Сохранить',
+        string $submit_button_class = 'btn btn-primary'
     ) {
         $this->crud = $crud;
         $this->form_unique_id = $form_unique_id;
         $this->obj = $obj;
         $this->element_obj_arr = $element_obj_arr;
-        $this->url_to_redirect_after_save = $url_to_redirect_after_save;
+        $this->url_to_redirect_after_operation = $url_to_redirect_after_operation;
         $this->redirect_get_params_arr = $redirect_get_params_arr;
         $this->operation_code = $operation_code;
         $this->hide_submit_button = $hide_submit_button;
+        $this->submit_button_title = $submit_button_title;
+        $this->submit_button_class = $submit_button_class;
     }
 
     /**
@@ -94,11 +110,26 @@ class CRUDForm
 
         $operation_code = $request->getParsedBodyParam(Operations::FIELD_NAME_OPERATION_CODE);
 
-        if ($operation_code != CRUDForm::OPERATION_SAVE_EDITOR_FORM) {
-            return null;
+        switch ($operation_code) {
+            case self::OPERATION_DELETE_ENTITY:
+                return $this->deleteEntityOperation($request, $response);
+            case self::OPERATION_SAVE_EDITOR_FORM:
+                return $this->saveEditorFormOperation($request, $response);
         }
 
+        return $response->withRedirect($request->getUri());
+    }
+
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     * @throws \ReflectionException
+     */
+    protected function saveEditorFormOperation(Request $request, Response $response): Response
+    {
         $url_to_redirect_after_save = $request->getParsedBodyParam(CRUDForm::FIELD_REDIRECT_URL, '');
+        $url_to_redirect_after_save = parse_url($url_to_redirect_after_save,  PHP_URL_PATH);
         $redirect_get_params_str = $request->getParsedBodyParam(CRUDForm::FIELD_REDIRECT_URL_GET_PARAMS, '');
         $redirect_get_params_arr = [];
         parse_str($redirect_get_params_str, $redirect_get_params_arr);
@@ -124,7 +155,47 @@ class CRUDForm
         return $response->withRedirect($request->getUri());
     }
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     * @throws \Exception
+     */
+    protected function deleteEntityOperation(Request $request, Response $response): Response
+    {
+        $entity_class_name = get_class($this->obj);
+        Assert::assert($entity_class_name);
 
+        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
+
+        $entity_id = $this->obj->getId();
+        Assert::assert($entity_id);
+
+        $this->crud->deleteObject($entity_class_name, $entity_id);
+
+        $url_to_redirect_after_delete = $request->getParsedBodyParam(CRUDForm::FIELD_REDIRECT_URL, '');
+        $url_to_redirect_after_delete = parse_url($url_to_redirect_after_delete,  PHP_URL_PATH);
+        if ($url_to_redirect_after_delete != '') {
+            $redirect_get_params_str = $request->getParsedBodyParam(CRUDForm::FIELD_REDIRECT_URL_GET_PARAMS, '');
+            $redirect_get_params_arr = [];
+            parse_str($redirect_get_params_str, $redirect_get_params_arr);
+
+            $redirect_url = $url_to_redirect_after_delete;
+
+            $params_arr = [];
+            foreach ($redirect_get_params_arr as $param => $value) {
+                $params_arr[$param] = $value;
+            }
+
+            if (!empty($redirect_get_params_arr)) {
+                $redirect_url = $redirect_url . '?' . http_build_query($params_arr);
+            }
+
+            return $response->withRedirect($redirect_url);
+        }
+
+        return $response->withRedirect($request->getUri());
+    }
 
     /**
      * ид объекта может быть пустым - тогда при сохранении формы создаст новый объект
@@ -138,16 +209,14 @@ class CRUDForm
             $form_element_id = $this->form_unique_id;
         }
 
-        $obj_id_value = CRUDFieldsAccess::getObjId($this->obj) ?: '';
-
         $html = '';
         $html .= Operations::operationCodeHiddenField($this->operation_code);
         $html .= '<input type="hidden" name="' . self::FIELD_CLASS_NAME . '" '.
             'value="' . Sanitize::sanitizeAttrValue(get_class($this->obj)) . '">';
         $html .= '<input type="hidden" name="' . self::FIELD_OBJECT_ID . '" '.
-            'value="' . Sanitize::sanitizeAttrValue($obj_id_value) . '">';
+            'value="' . Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($this->obj)) . '">';
         $html .= '<input type="hidden" name="' . self::FIELD_REDIRECT_URL . '" '.
-            'value="' . Sanitize::sanitizeAttrValue($this->url_to_redirect_after_save) . '">';
+            'value="' . Sanitize::sanitizeAttrValue($this->url_to_redirect_after_operation) . '">';
         $html .= '<input type="hidden" name="' . self::FIELD_REDIRECT_URL_GET_PARAMS . '" '.
             'value="' . Sanitize::sanitizeAttrValue(http_build_query($this->redirect_get_params_arr)) . '">';
         $html .= '<input type="hidden" name="' . self::FIELD_FORM_ID . '" '.
@@ -161,7 +230,7 @@ class CRUDForm
         $html .= '<div class="row">';
         $html .= '<div class="col-sm-8 col-sm-offset-4">';
         if (!$this->hide_submit_button) {
-            $html .= '<button style="width: 100%" type="submit" class="btn btn-primary">Сохранить</button>';
+            $html .= '<button style="width: 100%" type="submit" class="' . $this->submit_button_class . '">' . $this->submit_button_title . '</button>';
         }
         $html .= '</div>';
         $html .= '</div>';
@@ -170,9 +239,9 @@ class CRUDForm
             'id' => $form_element_id,
             'class' => 'form-horizontal',
             'role' => 'form',
+            'action' => Url::getCurrentUrl(), // Иначе при поиске из CRUDFormWidgetReferenceAjax window.location изменяется
             'method' => 'post'
         ], $html);
-
 
         // Загрузка скриптов
         $form_html .= CRUDFormScript::getHtml($form_element_id);
