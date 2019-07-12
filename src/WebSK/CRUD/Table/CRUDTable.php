@@ -17,6 +17,7 @@ use WebSK\CRUD\NullablePostFields;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDelete;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetWeight;
 use WebSK\CRUD\Pager;
+use WebSK\Utils\Messages;
 
 /**
  * Class CRUDTable
@@ -309,6 +310,8 @@ class CRUDTable
         Assert::assert($entity_id);
 
         $this->crud->deleteObject($entity_class_name, $entity_id);
+
+        Messages::setMessage('Удаление выполнено успешно');
 
         $redirect_url = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_REDIRECT_AFTER_DELETE_URL, '');
         if ($redirect_url != '') {

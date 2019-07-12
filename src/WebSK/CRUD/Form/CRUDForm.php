@@ -8,6 +8,7 @@ use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Assert;
 use OLOG\HTML;
 use OLOG\Operations;
+use WebSK\Utils\Messages;
 use WebSK\Utils\Sanitize;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -136,6 +137,8 @@ class CRUDForm
 
         $obj = $this->crud->saveOrUpdateObjectFromFormRequest($this->obj, $request);
 
+        Messages::setMessage('Изменения сохранены');
+
         if ($url_to_redirect_after_save != '') {
             $redirect_url = $url_to_redirect_after_save;
             $redirect_url = $this->crud->compile($redirect_url, ['this' => $obj]);
@@ -172,6 +175,8 @@ class CRUDForm
         Assert::assert($entity_id);
 
         $this->crud->deleteObject($entity_class_name, $entity_id);
+
+        Messages::setMessage('Удаление выполнено успешно');
 
         $url_to_redirect_after_delete = $request->getParsedBodyParam(CRUDForm::FIELD_REDIRECT_URL, '');
         $url_to_redirect_after_delete = parse_url($url_to_redirect_after_delete,  PHP_URL_PATH);
