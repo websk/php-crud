@@ -2,13 +2,13 @@
 
 namespace WebSK\CRUD;
 
-use WebSK\Entity\BaseEntityService;
+use WebSK\Entity\EntityRepository;
+use WebSK\Entity\EntityService;
+use WebSK\Entity\WeightService;
 use WebSK\Utils\Assert;
 use OLOG\CheckClassInterfaces;
 use Psr\Container\ContainerInterface;
 use Slim\Http\Request;
-use WebSK\Entity\BaseEntityRepository;
-use WebSK\Entity\BaseWeightService;
 use WebSK\Entity\InterfaceEntity;
 use WebSK\Entity\InterfaceWeight;
 use WebSK\CRUD\Form\CRUDForm;
@@ -19,6 +19,10 @@ use WebSK\CRUD\Table\InterfaceCRUDTableFilter;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterInvisible;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
+/**
+ * Class CRUD
+ * @package WebSK\CRUD
+ */
 class CRUD
 {
     const NULL_STRING = 'NULLSTRING';
@@ -140,7 +144,7 @@ class CRUD
 
         Assert::assert(!empty($entity_class_name::ENTITY_REPOSITORY_CONTAINER_ID));
 
-        /** @var BaseEntityRepository $entity_repository */
+        /** @var EntityRepository $entity_repository */
         $entity_repository = $this->container->get($entity_class_name::ENTITY_REPOSITORY_CONTAINER_ID);
 
         $query_param_values_arr = array();
@@ -261,7 +265,7 @@ class CRUD
      */
     public function createAndLoadObject(string $entity_class_name, int $entity_id)
     {
-        /** @var BaseEntityService $entity_service */
+        /** @var EntityService $entity_service */
         $entity_service = $this->getEntityServiceByClassName($entity_class_name);
 
         return $entity_service->getById($entity_id);
@@ -304,7 +308,7 @@ class CRUD
         $obj = $this->createAndLoadObject($entity_class_name, $entity_id);
 
         $entity_service = $this->getEntityServiceByClassName($entity_class_name);
-        Assert::assert($entity_service instanceof BaseWeightService);
+        Assert::assert($entity_service instanceof WeightService);
         $entity_service->swapWeights($obj, $context_arr);
     }
 
@@ -320,14 +324,14 @@ class CRUD
 
     /**
      * @param string $entity_class_name
-     * @return BaseEntityService
+     * @return EntityService
      * @throws \Exception
      */
     protected function getEntityServiceByClassName(string $entity_class_name)
     {
         Assert::assert(!empty($entity_class_name::ENTITY_SERVICE_CONTAINER_ID));
 
-        /** @var BaseEntityService $entity_service */
+        /** @var EntityService $entity_service */
         $entity_service = $this->container->get($entity_class_name::ENTITY_SERVICE_CONTAINER_ID);
 
         return $entity_service;
@@ -403,7 +407,7 @@ class CRUD
      * @throws \Exception
      * @throws \ReflectionException
      */
-    public static function getReplacement($obj, string $obj_field_name): string
+    protected static function getReplacement($obj, string $obj_field_name): string
     {
         Assert::assert($obj);
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dae4a42a7f1abab89a4b0a12b35ea7a8",
+    "content-hash": "43f99c1158340054de1aeeb933f7d399",
     "packages": [
         {
             "name": "container-interop/container-interop",
@@ -623,6 +623,36 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "time": "2019-07-12T10:36:28+00:00"
+        },
+        {
+            "name": "websk/php-view",
+            "version": "1.0.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/websk/php-view.git",
+                "reference": "b2bcdf93887d7de1d7442f7d054f6a1d50fbfa9f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/websk/php-view/zipball/b2bcdf93887d7de1d7442f7d054f6a1d50fbfa9f",
+                "reference": "b2bcdf93887d7de1d7442f7d054f6a1d50fbfa9f",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "psr/container": "^1.0",
+                "websk/php-config": "1.0.*",
+                "websk/php-slim": "1.0.*",
+                "websk/php-utils": "1.0.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "time": "2019-04-18T14:02:00+00:00"
         }
     ],
     "packages-dev": [],

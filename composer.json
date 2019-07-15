@@ -2,8 +2,11 @@
   "name": "websk/php-crud",
   "require": {
     "slim/slim": "^3.0",
+    "websk/php-cache": "1.1.*",
+    "websk/php-db": "1.2.*",
     "websk/php-utils": "1.0.*",
     "websk/php-entity": "1.0.*",
+    "websk/php-view": "1.0.*",
     "o-log/php-html": "1.11",
     "ext-json": "*"
   },

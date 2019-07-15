@@ -21,6 +21,9 @@ class CRUDServiceProvider
         return $container[self::CRUD_CONTAINER_ID];
     }
 
+    /**
+     * @param ContainerInterface $container
+     */
     public static function register(ContainerInterface $container)
     {
         $container[self::CRUD_CONTAINER_ID] = function (ContainerInterface $container) {

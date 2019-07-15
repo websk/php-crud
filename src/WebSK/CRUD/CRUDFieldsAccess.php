@@ -21,8 +21,9 @@ class CRUDFieldsAccess
         Assert::assert($obj);
 
         $obj_class_name = get_class($obj);
-        $obj_id_field_name = CRUDFieldsAccess::getIdFieldName($obj_class_name);
-        return CRUDFieldsAccess::getObjectFieldValue($obj, $obj_id_field_name);
+        $obj_id_field_name = self::getIdFieldName($obj_class_name);
+
+        return self::getObjectFieldValue($obj, $obj_id_field_name);
     }
 
     /**
@@ -36,6 +37,18 @@ class CRUDFieldsAccess
         }
 
         return 'id';
+    }
+
+    public static function objectHasProperty($obj, $field_name)
+    {
+        $obj_class_name = get_class($obj);
+        $reflect = new \ReflectionClass($obj_class_name);
+        foreach ($reflect->getProperties() as $prop_obj) {
+            if ($prop_obj->getName() == $field_name) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
