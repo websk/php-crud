@@ -4,6 +4,10 @@ namespace WebSK\CRUD\Form;
 
 use OLOG\Preloader;
 
+/**
+ * Class CRUDFormScript
+ * @package WebSK\CRUD\Form
+ */
 class CRUDFormScript
 {
     /**
@@ -123,5 +127,26 @@ class CRUDFormScript
         ob_start();
         self::render($form_id);
         return ob_get_clean();
+    }
+
+    /**
+     * @return string
+     */
+    public static function includeBootstrapDateTimeScripts()
+    {
+        static $CRUD_form_bootstrap_date_time_include_script;
+
+        $script = '';
+        if (!isset($CRUD_form_bootstrap_date_time_include_script)) {
+            $script = '
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/ru.js"></script>
+				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"/>
+				<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+			';
+            $CRUD_form_bootstrap_date_time_include_script = false;
+        }
+
+        return $script;
     }
 }

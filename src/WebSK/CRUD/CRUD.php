@@ -2,6 +2,7 @@
 
 namespace WebSK\CRUD;
 
+use Closure;
 use WebSK\Entity\EntityRepository;
 use WebSK\Entity\EntityService;
 use WebSK\Entity\WeightService;
@@ -80,7 +81,7 @@ class CRUD
      * @param string $form_unique_id
      * @param $obj
      * @param InterfaceCRUDFormRow[] $element_obj_arr
-     * @param string $url_to_redirect_after_operation
+     * @param string|Closure $url_to_redirect_after_operation
      * @param array $redirect_get_params_arr
      * @param string $operation_code
      * @param bool $hide_submit_button
@@ -92,7 +93,7 @@ class CRUD
         string $form_unique_id,
         $obj,
         array $element_obj_arr,
-        string $url_to_redirect_after_operation = '',
+        $url_to_redirect_after_operation = '',
         array $redirect_get_params_arr = [],
         string $operation_code = CRUDForm::OPERATION_SAVE_EDITOR_FORM,
         bool $hide_submit_button = false,

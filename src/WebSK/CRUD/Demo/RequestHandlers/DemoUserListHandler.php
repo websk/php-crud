@@ -7,17 +7,17 @@ use Slim\Http\Response;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUDServiceProvider;
 use WebSK\CRUD\Demo\CRUDDemoRoutes;
-use WebSK\CRUD\Demo\CRUDDemoServiceProvider;
 use WebSK\CRUD\Demo\DemoUser;
 use WebSK\CRUD\Form\CRUDFormRow;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\CRUDTableColumn;
 use WebSK\CRUD\Table\Filters\CRUDTableFilterLikeInline;
+use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDatetime;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDelete;
-use WebSK\CRUD\Table\Widgets\CRUDTableWidgetHtml;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetText;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetTextWithLink;
+use WebSK\CRUD\Table\Widgets\CRUDTableWidgetTimestamp;
 use WebSK\Slim\RequestHandlers\BaseHandler;
 use WebSK\Slim\Router;
 use WebSK\Views\BreadcrumbItemDTO;
@@ -51,7 +51,9 @@ class DemoUserListHandler extends BaseHandler
                     new CRUDFormRow('Фамилия', new CRUDFormWidgetInput(DemoUser::_LAST_NAME)),
                     new CRUDFormRow('Email', new CRUDFormWidgetInput(DemoUser::_EMAIL))
                 ],
-                $this->pathFor(CRUDDemoRoutes::ROUTE_NAME_USER_EDIT, ['user_id' => '{this->' . DemoUser::_ID . '}'])
+                function(DemoUser $user_obj) {
+                    return Router::pathFor(CRUDDemoRoutes::ROUTE_NAME_USER_EDIT, ['user_id' => $user_obj->getId()]);
+                }
             ),
             [
                 new CRUDTableColumn('ID', new CRUDTableWidgetText(DemoUser::_ID)),
@@ -67,6 +69,14 @@ class DemoUserListHandler extends BaseHandler
                 new CRUDTableColumn(
                     'Email',
                     new CRUDTableWidgetText(DemoUser::_EMAIL)
+                ),
+                new CRUDTableColumn(
+                    'Дата рождения',
+                    new CRUDTableWidgetDatetime(DemoUser::_BIRTHDAY, 'd.m.Y')
+                ),
+                new CRUDTableColumn(
+                    'Создано',
+                    new CRUDTableWidgetTimestamp(DemoUser::_CREATED_AT_TS)
                 ),
                 new CRUDTableColumn('', new CRUDTableWidgetDelete())
             ],

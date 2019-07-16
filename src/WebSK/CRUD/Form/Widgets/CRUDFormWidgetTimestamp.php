@@ -2,11 +2,16 @@
 
 namespace WebSK\CRUD\Form\Widgets;
 
+use WebSK\CRUD\Form\CRUDFormScript;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
 
+/**
+ * Class CRUDFormWidgetTimestamp
+ * @package WebSK\CRUD\Form\Widgets
+ */
 class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
 {
     /** @var string */
@@ -29,24 +34,16 @@ class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
         $this->setIsRequired($is_required);
     }
 
+    /**
+     * @param object $obj
+     * @param CRUD $crud
+     * @return string
+     * @throws \ReflectionException
+     */
     public function html($obj, CRUD $crud): string
     {
-        static $CRUDFormWidgetTimestamp_include_script;
-
         $field_name = $this->getFieldName();
         $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
-
-        /* @TODO Нужно изменить на нах CDN */
-        $script = '';
-        if (!isset($CRUDFormWidgetTimestamp_include_script)) {
-            $script = '
-								<script src="/assets/libraries/moment/moment.min.js"></script>
-								<script src="/assets/libraries/moment/moment.ru.min.js"></script>
-				<link rel="stylesheet" href="/assets/libraries/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
-								<script src="/assets/libraries/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
-			';
-            $CRUDFormWidgetTimestamp_include_script = false;
-        }
 
         $is_required_str = '';
         if ($this->is_required) {
@@ -128,6 +125,8 @@ class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
         }
 
         $html .= '</div>';
+
+        $script = CRUDFormScript::includeBootstrapDateTimeScripts();
 
         return $script . $html;
     }

@@ -2,6 +2,7 @@
 
 namespace WebSK\CRUD\Form\Widgets;
 
+use WebSK\CRUD\Form\CRUDFormScript;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
@@ -120,7 +121,9 @@ class CRUDFormWidgetDateTime implements InterfaceCRUDFormWidget
 
         $html .= '</div>';
 
-        return $html;
+        $script = CRUDFormScript::includeBootstrapDateTimeScripts();
+
+        return $script . $html;
     }
 
     /**

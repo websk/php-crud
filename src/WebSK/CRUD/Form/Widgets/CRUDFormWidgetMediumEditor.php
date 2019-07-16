@@ -54,13 +54,9 @@ class CRUDFormWidgetMediumEditor implements InterfaceCRUDFormWidget
         $uniqid = $this->getUniqid();
         if (!isset($CRUDFormWidgetMediumEditor_include_script)) {
             $script = '
-                <script src="/assets/libraries/medium-editor/medium-editor.min.js"></script>
-				<link rel="stylesheet" 
-				href="/assets/libraries/medium-editor/medium-editor.min.css" 
-				type="text/css" media="screen" charset="utf-8">
-				<link rel="stylesheet" 
-				href="/assets/libraries/medium-editor/default.min.css" 
-				type="text/css" media="screen" charset="utf-8">';
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-editor/5.23.3/js/medium-editor.min.js"></script>
+				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/medium-editor/5.23.3/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8"/>
+				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/medium-editor/5.23.3/css/themes/default.min.css" type="text/css" media="screen" charset="utf-8"/>';
             $CRUDFormWidgetMediumEditor_include_script = false;
         }
 

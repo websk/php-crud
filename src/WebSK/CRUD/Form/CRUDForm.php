@@ -2,6 +2,7 @@
 
 namespace WebSK\CRUD\Form;
 
+use Closure;
 use OLOG\CheckClassInterfaces;
 use OLOG\Url;
 use WebSK\CRUD\CRUDCompiler;
@@ -61,7 +62,7 @@ class CRUDForm
      * @param string $form_unique_id
      * @param $obj
      * @param array $element_obj_arr
-     * @param string $url_to_redirect_after_operation
+     * @param string|Closure $url_to_redirect_after_operation
      * @param array $redirect_get_params_arr
      * @param string $operation_code
      * @param bool $hide_submit_button
@@ -73,7 +74,7 @@ class CRUDForm
         string $form_unique_id,
         $obj,
         array $element_obj_arr,
-        string $url_to_redirect_after_operation = '',
+        $url_to_redirect_after_operation = '',
         array $redirect_get_params_arr = [],
         string $operation_code = self::OPERATION_SAVE_EDITOR_FORM,
         bool $hide_submit_button = false,
@@ -85,6 +86,7 @@ class CRUDForm
         $this->obj = $obj;
         $this->element_obj_arr = $element_obj_arr;
         $this->url_to_redirect_after_operation = $url_to_redirect_after_operation;
+        $this->url_to_redirect_after_operation = CRUDCompiler::fieldValueOrCallableResult($this->url_to_redirect_after_operation, $obj);
         $this->redirect_get_params_arr = $redirect_get_params_arr;
         $this->operation_code = $operation_code;
         $this->hide_submit_button = $hide_submit_button;
