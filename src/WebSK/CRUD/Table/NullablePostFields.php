@@ -1,6 +1,6 @@
 <?php
 
-namespace WebSK\CRUD;
+namespace WebSK\CRUD\Table;
 
 use WebSK\Utils\Sanitize;
 use Slim\Http\Request;

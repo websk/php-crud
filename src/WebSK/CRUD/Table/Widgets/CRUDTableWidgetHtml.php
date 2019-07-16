@@ -2,7 +2,9 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
+use Closure;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
 /**
@@ -11,14 +13,14 @@ use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
  */
 class CRUDTableWidgetHtml implements InterfaceCRUDTableWidget
 {
-    /** @var string */
+    /** @var string|Closure */
     protected $html;
 
     /**
      * CRUDTableWidgetHtml constructor.
-     * @param string $html
+     * @param string|Closure $html
      */
-    public function __construct(string $html)
+    public function __construct($html)
     {
         $this->setHtml($html);
     }
@@ -26,21 +28,21 @@ class CRUDTableWidgetHtml implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html($obj, CRUD $crud): string
     {
-        return $crud->compile($this->getHtml(), ['this' => $obj]);
+        return CRUDCompiler::fieldValueOrCallableResult($this->getHtml(), $obj);
     }
 
     /**
-     * @return string
+     * @return string|Closure
      */
-    public function getHtml(): string
+    public function getHtml()
     {
         return $this->html;
     }
 
     /**
-     * @param string $html
+     * @param string|Closure $html
      */
-    public function setHtml(string $html): void
+    public function setHtml($html): void
     {
         $this->html = $html;
     }

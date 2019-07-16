@@ -4,6 +4,7 @@ namespace WebSK\CRUD\Form;
 
 use OLOG\CheckClassInterfaces;
 use OLOG\Url;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Assert;
 use OLOG\HTML;
@@ -141,11 +142,11 @@ class CRUDForm
 
         if ($url_to_redirect_after_save != '') {
             $redirect_url = $url_to_redirect_after_save;
-            $redirect_url = $this->crud->compile($redirect_url, ['this' => $obj]);
+            $redirect_url = CRUDCompiler::fieldValueOrCallableResult($redirect_url, $obj);
 
             $params_arr = [];
             foreach ($redirect_get_params_arr as $param => $value) {
-                $params_arr[$param] = $this->crud->compile($value, ['this' => $obj]);
+                $params_arr[$param] = CRUDCompiler::fieldValueOrCallableResult($value, $obj);
             }
 
             if (!empty($redirect_get_params_arr)) {
@@ -203,7 +204,7 @@ class CRUDForm
     }
 
     /**
-     * ид объекта может быть пустым - тогда при сохранении формы создаст новый объект
+     * ID объекта может быть пустым, тогда при сохранении формы создается новый объект
      * @return string
      * @throws \Exception
      */

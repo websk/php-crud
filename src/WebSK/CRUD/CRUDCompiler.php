@@ -2,6 +2,8 @@
 
 namespace WebSK\CRUD;
 
+use Closure;
+
 /**
  * Class CRUDCompiler
  * @package WebSK\CRUD
@@ -9,25 +11,29 @@ namespace WebSK\CRUD;
 class CRUDCompiler
 {
     /**
-     * @param $fieldname_or_callable
-     * @param $obj
+     * @param string|Closure $fieldname_or_closure
+     * @param object $obj
      * @return mixed
      */
-    public static function fieldValueOrCallableResult($fieldname_or_callable, $obj)
+    public static function fieldValueOrCallableResult($fieldname_or_closure, $obj)
     {
-        if (self::isClosure($fieldname_or_callable)) {
-            return $fieldname_or_callable($obj);
+        if (self::isClosure($fieldname_or_closure)) {
+            return $fieldname_or_closure($obj);
         }
 
-        if (CRUDFieldsAccess::objectHasProperty($obj, $fieldname_or_callable)) {
-            return CRUDFieldsAccess::getObjectFieldValue($obj, $fieldname_or_callable);
+        if (CRUDFieldsAccess::objectHasProperty($obj, $fieldname_or_closure)) {
+            return CRUDFieldsAccess::getObjectFieldValue($obj, $fieldname_or_closure);
         }
 
-        return $fieldname_or_callable;
+        return $fieldname_or_closure;
     }
 
-    public static function isClosure($t)
+    /**
+     * @param string|Closure $closure
+     * @return bool
+     */
+    public static function isClosure($closure)
     {
-        return is_object($t) && ($t instanceof \Closure);
+        return is_object($closure) && ($closure instanceof \Closure);
     }
 }

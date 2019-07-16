@@ -2,8 +2,10 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
+use Closure;
 use WebSK\CRUD\CRUD;
 use OLOG\HTML;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
 /**
@@ -12,20 +14,22 @@ use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
  */
 class CRUDTableWidgetHtmlWithLink implements InterfaceCRUDTableWidget
 {
-    /** @var string */
+    /** @var string|Closure */
     protected $html;
-    /** @var string */
+
+    /** @var string|Closure */
     protected $link;
+
     /** @var string */
     protected $classes_str;
 
     /**
      * CRUDTableWidgetHtmlWithLink constructor.
-     * @param string $html
-     * @param string $link
+     * @param string|Closure $html
+     * @param string|Closure $link
      * @param string $classes_str
      */
-    public function __construct(string $html, string $link, string $classes_str = '')
+    public function __construct($html, $link, string $classes_str = '')
     {
         $this->setHtml($html);
         $this->setLink($link);
@@ -35,9 +39,9 @@ class CRUDTableWidgetHtmlWithLink implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html($obj, CRUD $crud): string
     {
-        $url = $crud->compile($this->getLink(), ['this' => $obj]);
+        $url = CRUDCompiler::fieldValueOrCallableResult($this->getLink(), $obj);
 
-        $html = $crud->compile($this->getHtml(), ['this' => $obj]);
+        $html = CRUDCompiler::fieldValueOrCallableResult($this->getHtml(), $obj);
         $html = trim($html);
 
         if ($html == '') {
@@ -48,33 +52,33 @@ class CRUDTableWidgetHtmlWithLink implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @return string
+     * @return string|Closure
      */
-    public function getHtml(): string
+    public function getHtml()
     {
         return $this->html;
     }
 
     /**
-     * @param string $html
+     * @param string|Closure $html
      */
-    public function setHtml(string $html): void
+    public function setHtml($html): void
     {
         $this->html = $html;
     }
 
     /**
-     * @return string
+     * @return string|Closure
      */
-    public function getLink(): string
+    public function getLink()
     {
         return $this->link;
     }
 
     /**
-     * @param string $link
+     * @param string|Closure $link
      */
-    public function setLink(string $link): void
+    public function setLink($link): void
     {
         $this->link = $link;
     }

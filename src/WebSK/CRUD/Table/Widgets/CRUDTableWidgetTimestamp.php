@@ -2,7 +2,9 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
+use Closure;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
@@ -12,17 +14,18 @@ use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
  */
 class CRUDTableWidgetTimestamp implements InterfaceCRUDTableWidget
 {
-    /** @var string */
+    /** @var string|Closure */
     protected $timestamp;
+
     /** @var string */
     protected $format;
 
     /**
      * CRUDTableWidgetTimestamp constructor.
-     * @param string $timestamp
+     * @param string|Closure $timestamp
      * @param string $format
      */
-    public function __construct(string $timestamp, string $format = "Y-m-d H:i:s")
+    public function __construct($timestamp, string $format = "Y-m-d H:i:s")
     {
         $this->setTimestamp($timestamp);
         $this->setFormat($format);
@@ -31,8 +34,8 @@ class CRUDTableWidgetTimestamp implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html($obj, CRUD $crud): string
     {
-        $timestamp = $crud->compile($this->getTimestamp(), ['this' => $obj]);
-        if(is_null($timestamp)) {
+        $timestamp = CRUDCompiler::fieldValueOrCallableResult($this->getTimestamp(), $obj);
+        if (is_null($timestamp)) {
             return '';
         }
         $date = date($this->getFormat(), $timestamp);
@@ -40,17 +43,17 @@ class CRUDTableWidgetTimestamp implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @return string
+     * @return string|Closure
      */
-    public function getTimestamp(): string
+    public function getTimestamp()
     {
         return $this->timestamp;
     }
 
     /**
-     * @param string $timestamp
+     * @param string|Closure $timestamp
      */
-    public function setTimestamp(string $timestamp): void
+    public function setTimestamp($timestamp): void
     {
         $this->timestamp = $timestamp;
     }

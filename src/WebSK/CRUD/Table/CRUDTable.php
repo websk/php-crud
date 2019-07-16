@@ -13,7 +13,7 @@ use WebSK\Entity\InterfaceWeight;
 use WebSK\Utils\HTTP;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Form\CRUDForm;
-use WebSK\CRUD\NullablePostFields;
+use WebSK\CRUD\Table\NullablePostFields;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDelete;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetWeight;
 use WebSK\CRUD\Pager;

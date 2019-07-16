@@ -9,12 +9,18 @@ use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
+/**
+ * Class CRUDTableWidgetTextEditor
+ * @package WebSK\CRUD\Table\Widgets
+ */
 class CRUDTableWidgetTextEditor implements InterfaceCRUDTableWidget
 {
     /** @var string */
     protected $field_name;
+
     /** @var string */
     protected $text;
+
     /** @var string */
     protected $crudtable_id;
 

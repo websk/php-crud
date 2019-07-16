@@ -29,7 +29,7 @@ class Pager
     }
 
     /**
-     * @param Request $request
+     * @param Request $request3
      * @param string $table_index_on_page
      * @return int
      */

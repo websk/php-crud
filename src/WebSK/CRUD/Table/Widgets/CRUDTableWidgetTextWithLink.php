@@ -2,7 +2,9 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
+use Closure;
 use OLOG\HTML;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
@@ -13,23 +15,27 @@ use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
  */
 class CRUDTableWidgetTextWithLink implements InterfaceCRUDTableWidget
 {
-    /** @var string */
+    /** @var string|Closure */
     protected $text;
-    /** @var string */
+
+    /** @var string|Closure */
     protected $link;
+
     /** @var string */
     protected $classes_str;
+
     /** @var string */
     protected $target = '';
+
     /** @var string */
     protected $rel = '';
 
     /** @inheritdoc */
     public function html($obj, CRUD $crud): string
     {
-        $url = $crud->compile($this->getLink(), ['this' => $obj]);
+        $url = CRUDCompiler::fieldValueOrCallableResult($this->getLink(), $obj);
 
-        $text = $crud->compile($this->getText(), ['this' => $obj]);
+        $text = CRUDCompiler::fieldValueOrCallableResult($this->getText(), $obj);
         if (trim($text) == '') {
             $text = '#EMPTY#';
         }
@@ -55,14 +61,19 @@ class CRUDTableWidgetTextWithLink implements InterfaceCRUDTableWidget
 
     /**
      * CRUDTableWidgetTextWithLink constructor.
-     * @param string $text
-     * @param string $link
+     * @param string|Closure $text
+     * @param string|Closure $link
      * @param string $classes_str
      * @param string $target
      * @param string $rel
      */
-    public function __construct(string $text, string $link, string $classes_str = '', string $target = '', string $rel = '')
-    {
+    public function __construct(
+        $text,
+        $link,
+        string $classes_str = '',
+        string $target = '',
+        string $rel = ''
+    ) {
         $this->setText($text);
         $this->setLink($link);
         $this->setClassesStr($classes_str);
@@ -71,33 +82,33 @@ class CRUDTableWidgetTextWithLink implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @return string
+     * @return string|Closure
      */
-    public function getText(): string
+    public function getText()
     {
         return $this->text;
     }
 
     /**
-     * @param string $text
+     * @param string|Closure $text
      */
-    public function setText(string $text): void
+    public function setText($text): void
     {
         $this->text = $text;
     }
 
     /**
-     * @return string
+     * @return Closure|string
      */
-    public function getLink(): string
+    public function getLink()
     {
         return $this->link;
     }
 
     /**
-     * @param string $link
+     * @param Closure|string $link
      */
-    public function setLink(string $link): void
+    public function setLink($link): void
     {
         $this->link = $link;
     }

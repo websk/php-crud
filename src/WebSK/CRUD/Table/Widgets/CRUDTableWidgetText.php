@@ -2,7 +2,9 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
+use Closure;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
@@ -12,10 +14,14 @@ use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
  */
 class CRUDTableWidgetText implements InterfaceCRUDTableWidget
 {
-    /** @var string */
+    /** @var string|Closure */
     protected $text;
 
-    public function __construct(string $text)
+    /**
+     * CRUDTableWidgetText constructor.
+     * @param string|Closure $text
+     */
+    public function __construct($text)
     {
         $this->setText($text);
     }
@@ -23,22 +29,23 @@ class CRUDTableWidgetText implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html($obj, CRUD $crud): string
     {
-        $html = $crud->compile($this->getText(), ['this' => $obj]);
+        $html = CRUDCompiler::fieldValueOrCallableResult($this->getText(), $obj);
+
         return Sanitize::sanitizeTagContent($html);
     }
 
     /**
-     * @return string
+     * @return string|Closure
      */
-    public function getText(): string
+    public function getText()
     {
         return $this->text;
     }
 
     /**
-     * @param string $text
+     * @param string|Closure $text
      */
-    public function setText(string $text): void
+    public function setText($text): void
     {
         $this->text = $text;
     }

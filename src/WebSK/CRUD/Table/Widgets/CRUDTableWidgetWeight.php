@@ -2,12 +2,13 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\Utils\Assert;
 use WebSK\CRUD\CRUD;
 use OLOG\Operations;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUDFieldsAccess;
-use WebSK\CRUD\NullablePostFields;
+use WebSK\CRUD\Table\NullablePostFields;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
@@ -21,8 +22,10 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
 
     /** @var array */
     protected $context_fields_arr = [];
+
     /** @var string */
     protected $button_text;
+
     /** @var string */
     protected $button_class_str;
 
@@ -55,7 +58,7 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
             Sanitize::sanitizeAttrValue(implode(',', array_keys($this->getContextFieldsArr()))) . '">';
 
         foreach ($this->getContextFieldsArr() as $context_field_name => $context_field_value) {
-            $context_field_value = $crud->compile($context_field_value, ['this' => $obj]);
+            $context_field_value = CRUDCompiler::fieldValueOrCallableResult($context_field_value, $obj);
             $o .= NullablePostFields::hiddenFieldHtml($context_field_name, $context_field_value);
         }
 
@@ -63,7 +66,7 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
         $o .= '<input type="hidden" name="_id" value="' .
             Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($obj)) . '">';
 
-        $o .= '<button class="' . $this->getButtonClassStr() . '" type="submit">' . $this->getButtonText() .'</button>';
+        $o .= '<button class="' . $this->getButtonClassStr() . '" type="submit">' . $this->getButtonText() . '</button>';
 
         $o .= '</form>';
 

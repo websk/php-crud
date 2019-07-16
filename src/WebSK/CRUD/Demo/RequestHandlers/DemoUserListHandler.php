@@ -7,6 +7,7 @@ use Slim\Http\Response;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUDServiceProvider;
 use WebSK\CRUD\Demo\CRUDDemoRoutes;
+use WebSK\CRUD\Demo\CRUDDemoServiceProvider;
 use WebSK\CRUD\Demo\DemoUser;
 use WebSK\CRUD\Form\CRUDFormRow;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
@@ -18,6 +19,7 @@ use WebSK\CRUD\Table\Widgets\CRUDTableWidgetHtml;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetText;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetTextWithLink;
 use WebSK\Slim\RequestHandlers\BaseHandler;
+use WebSK\Slim\Router;
 use WebSK\Views\BreadcrumbItemDTO;
 use WebSK\Views\LayoutDTO;
 use WebSK\Views\PhpRender;
@@ -26,7 +28,7 @@ use WebSK\Views\PhpRender;
  * Class UserListHandler
  * @package WebSK\CRUD\Demo\RequestHandlers
  */
-class UserListHandler extends BaseHandler
+class DemoUserListHandler extends BaseHandler
 {
     const FILTER_EMAIL = 'user_email';
     const FILTER_NAME = 'user_name';
@@ -52,23 +54,19 @@ class UserListHandler extends BaseHandler
                 $this->pathFor(CRUDDemoRoutes::ROUTE_NAME_USER_EDIT, ['user_id' => '{this->' . DemoUser::_ID . '}'])
             ),
             [
-                new CRUDTableColumn('ID', new CRUDTableWidgetText('{this->' . DemoUser::_ID . '}')),
-                new CRUDTableColumn(
-                    'Логотип',
-                    new CRUDTableWidgetHtml(
-                        '{this->getImageHTML()}'
-                    )
-                ),
+                new CRUDTableColumn('ID', new CRUDTableWidgetText(DemoUser::_ID)),
                 new CRUDTableColumn(
                     'Имя',
                     new CRUDTableWidgetTextWithLink(
-                        '{this->' . DemoUser::_NAME . '}',
-                        $this->pathFor(CRUDDemoRoutes::ROUTE_NAME_USER_EDIT, ['user_id' => '{this->' . DemoUser::_ID . '}'])
+                        DemoUser::_NAME,
+                        function(DemoUser $user_obj) {
+                            return Router::pathFor(CRUDDemoRoutes::ROUTE_NAME_USER_EDIT, ['user_id' => $user_obj->getId()]);
+                        }
                     )
                 ),
                 new CRUDTableColumn(
                     'Email',
-                    new CRUDTableWidgetText('{this->' . DemoUser::_EMAIL . '}')
+                    new CRUDTableWidgetText(DemoUser::_EMAIL)
                 ),
                 new CRUDTableColumn('', new CRUDTableWidgetDelete())
             ],
@@ -93,10 +91,10 @@ class UserListHandler extends BaseHandler
         $layout_dto->setContentHtml($content_html);
 
         $breadcrumbs_arr = [
-            new BreadcrumbItemDTO('Главная', '/admin'),
+            new BreadcrumbItemDTO('Главная', '/'),
         ];
         $layout_dto->setBreadcrumbsDtoArr($breadcrumbs_arr);
 
-        return PhpRender::renderLayout($response, ConfWrapper::value('layout.admin'), $layout_dto);
+        return PhpRender::renderLayout($response, ConfWrapper::value('layout.main'), $layout_dto);
     }
 }

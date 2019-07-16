@@ -2,7 +2,9 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
+use Closure;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
@@ -12,15 +14,16 @@ use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
  */
 class CRUDTableWidgetOptions implements InterfaceCRUDTableWidget
 {
-    /** @var string */
+    /** @var string|Closure */
     protected $value;
+
     /** @var array */
     protected $options_arr;
 
     /** @inheritdoc */
     public function html($obj, CRUD $crud): string
     {
-        $value = $crud->compile($this->getValue(), ['this' => $obj]);
+        $value = CRUDCompiler::fieldValueOrCallableResult($this->getValue(), $obj);
 
         $html = "UNDEFINED";
         $options_arr = $this->getOptionsArr();
@@ -42,17 +45,17 @@ class CRUDTableWidgetOptions implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @return string
+     * @return string|Closure
      */
-    public function getValue(): string
+    public function getValue()
     {
         return $this->value;
     }
 
     /**
-     * @param string $value
+     * @param string|Closure $value
      */
-    public function setValue(string $value): void
+    public function setValue($value): void
     {
         $this->value = $value;
     }

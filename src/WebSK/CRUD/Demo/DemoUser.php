@@ -26,28 +26,35 @@ class DemoUser extends Entity
     /** @var string */
     protected $last_name = '';
 
-    /** @var string */
-    protected $birthday = '';
-
-    /** @var string */
-    protected $phone = '';
-
     const _EMAIL = 'email';
     /** @var string */
     protected $email = '';
 
+    const _BIRTHDAY = 'birthday';
+    /** @var string */
+    protected $birthday = '';
+
+    const _PHONE = 'phone';
+    /** @var string */
+    protected $phone = '';
+
+    const _CITY = 'city';
     /** @var string */
     protected $city = '';
 
+    const _ADDRESS = 'address';
     /** @var string */
     protected $address = '';
 
+    const _COMPANY = 'company';
     /** @var string */
     protected $company = '';
 
+    const _COMMENT = 'comment';
     /** @var string */
     protected $comment = '';
 
+    const _PHOTO = 'photo';
     /** @var string */
     protected $photo = '';
 
@@ -213,19 +220,6 @@ class DemoUser extends Entity
     public function setPhoto(string $photo): void
     {
         $this->photo = $photo;
-    }
-
-    /**
-     * Путь к фото
-     * @return string
-     */
-    public function getPhotoPath()
-    {
-        if (!$this->getPhoto()) {
-            return '';
-        }
-
-        return 'user/'. $this->getPhoto();
     }
 
     /**

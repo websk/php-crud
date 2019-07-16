@@ -2,7 +2,9 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
+use Closure;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
@@ -12,17 +14,18 @@ use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
  */
 class CRUDTableWidgetDatetime implements InterfaceCRUDTableWidget
 {
-    /** @var string */
+    /** @var string|Closure */
     protected $datetime;
+
     /** @var string */
     protected $format;
 
     /**
      * CRUDTableWidgetDatetime constructor.
-     * @param string $datetime
+     * @param string|Closure $datetime
      * @param string $format
      */
-    public function __construct(string $datetime, $format = "d.m.Y H:i:s")
+    public function __construct($datetime, $format = "d.m.Y H:i:s")
     {
         $this->setDatetime($datetime);
         $this->setFormat($format);
@@ -31,24 +34,25 @@ class CRUDTableWidgetDatetime implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html($obj, CRUD $crud): string
     {
-        $datetime = $crud->compile($this->getDatetime(), ['this' => $obj]);
+        $datetime = CRUDCompiler::fieldValueOrCallableResult($this->getDatetime(), $obj);
         $date_obj = new \DateTime($datetime);
         $date = $date_obj->format($this->getFormat());
+
         return Sanitize::sanitizeTagContent($date);
     }
 
     /**
-     * @return string
+     * @return string|Closure
      */
-    public function getDatetime(): string
+    public function getDatetime()
     {
         return $this->datetime;
     }
 
     /**
-     * @param string $datetime
+     * @param string|Closure $datetime
      */
-    public function setDatetime(string $datetime): void
+    public function setDatetime($datetime): void
     {
         $this->datetime = $datetime;
     }

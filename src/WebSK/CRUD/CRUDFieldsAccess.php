@@ -11,6 +11,8 @@ use WebSK\Entity\InterfaceEntity;
  */
 class CRUDFieldsAccess
 {
+    const DEFAULT_ID_FIELD_NAME = 'id';
+
     /**
      * @param object $obj
      * @return mixed
@@ -36,7 +38,7 @@ class CRUDFieldsAccess
             return $entity_class_name::DB_ID_FIELD_NAME;
         }
 
-        return 'id';
+        return self::DEFAULT_ID_FIELD_NAME;
     }
 
     public static function objectHasProperty($obj, $field_name)
@@ -77,6 +79,7 @@ class CRUDFieldsAccess
         );
 
         $field_prop_obj->setAccessible(true);
+
         return $field_prop_obj->getValue($obj);
     }
 

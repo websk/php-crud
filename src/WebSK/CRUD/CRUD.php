@@ -25,8 +25,6 @@ use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
  */
 class CRUD
 {
-    const NULL_STRING = 'NULLSTRING';
-
     /** @var ContainerInterface */
     protected $container;
 
@@ -335,95 +333,5 @@ class CRUD
         $entity_service = $this->container->get($entity_class_name::ENTITY_SERVICE_CONTAINER_ID);
 
         return $entity_service;
-    }
-
-    /**
-     * компиляция строки: разворачивание обращений к полям объектов
-     * @param string $str
-     * @param array $data
-     * @return string
-     * @throws \Exception
-     * @throws \ReflectionException
-     */
-    public function compile(string $str, array $data): ?string
-    {
-        // @TODO: clean and finish
-
-        $matches = [];
-
-        // сначала подставляем значения в самых внутренних фигурных скобках,
-        // потом которые снаружи, и так пока все скобки не будут заменены
-        // поддерживается два вида выражений:
-        // - {obj->field} заменяется на значение поля field объекта obj. obj - это ключ массива data,
-        // т.е. здесь можно использовать такие строки, которые передаются сюда вызывающими функциями
-        // -- обычно виджеты передают объект, который показывается в виджете, с именем this
-        // - {class_name.id->field} заменяется на значение поля field объекта класса class_name с идентификатором id
-        while (preg_match('@{([^}{]+)}@', $str, $matches)) {
-            $expression = $matches[1];
-            $replacement = 'UNKNOWN_EXPRESSION';
-
-            $magic_matches = [];
-            if (preg_match('@^(\w+)\->([\w()]+)$@', $expression, $magic_matches)) {
-                $obj_key_in_data = $magic_matches[1];
-                $obj_field_name = $magic_matches[2];
-
-                $obj = $data[$obj_key_in_data];
-
-                $replacement = self::getReplacement($obj, $obj_field_name);
-            }
-
-            if (preg_match('@^([\w\\\\]+)\.(\w+)->([\w()]+)$@', $expression, $magic_matches)) {
-                $class_name = $magic_matches[1];
-                $obj_id = $magic_matches[2];
-                $obj_field_name = $magic_matches[3];
-
-                if ($obj_id != self::NULL_STRING) { // TODO: review?
-                    $obj = $this->createAndLoadObject($class_name, $obj_id);
-                    $replacement = self::getReplacement($obj, $obj_field_name);
-                } else {
-                    // пустая строка для случаев типа '{' . Sport::class . '.{this->sport_id}->title}'
-                    // и this->sport_id не установленно
-                    $replacement = '';
-                }
-            }
-
-            // здесь заменяем только первое вхождение, потому что выше мы обрабатывали только первое вхождение
-            // если не сделать это ограничение - вот такое выражение
-            // new \VitrinaTV\CRUD\Table\Widgets\CRUDTableWidgetText('{this->video_width}x{this->video_height}'))
-            // выдаст "video_width Х video_width"
-            // т.е. для прочитает первые скобки, а потом два заменит на результат и первые, и вторые
-            $str = preg_replace('@{([^}{]+)}@', $replacement, $str, 1);
-        }
-        if (self::NULL_STRING == $str) {
-            return null;
-        }
-        return $str;
-    }
-
-    /**
-     * @param object $obj
-     * @param string $obj_field_name
-     * @return string
-     * @throws \Exception
-     * @throws \ReflectionException
-     */
-    protected static function getReplacement($obj, string $obj_field_name): string
-    {
-        Assert::assert($obj);
-
-        $matches = [];
-        // имя поля заканчивается скобками - значит это имя метода
-        if (preg_match('@^(\w+)\(\)$@', $obj_field_name, $matches)) {
-            $method_name = $matches[1];
-            Assert::assert(method_exists($obj, $method_name));
-            $replacement = call_user_func([$obj, $method_name]);
-        } else {
-            $replacement = CRUDFieldsAccess::getObjectFieldValue($obj, $obj_field_name);
-        }
-        if (is_null($replacement)) {
-            $replacement = self::NULL_STRING;
-        }
-
-        return $replacement;
     }
 }
