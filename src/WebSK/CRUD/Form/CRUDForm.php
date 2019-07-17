@@ -86,7 +86,6 @@ class CRUDForm
         $this->obj = $obj;
         $this->element_obj_arr = $element_obj_arr;
         $this->url_to_redirect_after_operation = $url_to_redirect_after_operation;
-        $this->url_to_redirect_after_operation = CRUDCompiler::fieldValueOrCallableResult($this->url_to_redirect_after_operation, $obj);
         $this->redirect_get_params_arr = $redirect_get_params_arr;
         $this->operation_code = $operation_code;
         $this->hide_submit_button = $hide_submit_button;
@@ -132,17 +131,15 @@ class CRUDForm
      */
     protected function saveEditorFormOperation(Request $request, Response $response): Response
     {
-        $url_to_redirect_after_save = $request->getParsedBodyParam(CRUDForm::FIELD_REDIRECT_URL, '');
-        $url_to_redirect_after_save = parse_url($url_to_redirect_after_save,  PHP_URL_PATH);
-        $redirect_get_params_str = $request->getParsedBodyParam(CRUDForm::FIELD_REDIRECT_URL_GET_PARAMS, '');
-        $redirect_get_params_arr = [];
-        parse_str($redirect_get_params_str, $redirect_get_params_arr);
+        $url_to_redirect_after_save = $this->url_to_redirect_after_operation;
 
         $obj = $this->crud->saveOrUpdateObjectFromFormRequest($this->obj, $request);
 
         Messages::setMessage('Изменения сохранены');
 
         if ($url_to_redirect_after_save != '') {
+            $redirect_get_params_arr = $this->redirect_get_params_arr;
+
             $redirect_url = $url_to_redirect_after_save;
             $redirect_url = CRUDCompiler::fieldValueOrCallableResult($redirect_url, $obj);
 
@@ -177,22 +174,22 @@ class CRUDForm
         $entity_id = $this->obj->getId();
         Assert::assert($entity_id);
 
+        $obj = $this->crud->saveOrUpdateObjectFromFormRequest($this->obj, $request);
+
         $this->crud->deleteObject($entity_class_name, $entity_id);
 
         Messages::setMessage('Удаление выполнено успешно');
 
-        $url_to_redirect_after_delete = $request->getParsedBodyParam(CRUDForm::FIELD_REDIRECT_URL, '');
-        $url_to_redirect_after_delete = parse_url($url_to_redirect_after_delete,  PHP_URL_PATH);
+        $url_to_redirect_after_delete = $this->url_to_redirect_after_operation;
         if ($url_to_redirect_after_delete != '') {
-            $redirect_get_params_str = $request->getParsedBodyParam(CRUDForm::FIELD_REDIRECT_URL_GET_PARAMS, '');
-            $redirect_get_params_arr = [];
-            parse_str($redirect_get_params_str, $redirect_get_params_arr);
+            $redirect_get_params_arr = $this->redirect_get_params_arr;
 
             $redirect_url = $url_to_redirect_after_delete;
+            $redirect_url = CRUDCompiler::fieldValueOrCallableResult($redirect_url, $obj);
 
             $params_arr = [];
             foreach ($redirect_get_params_arr as $param => $value) {
-                $params_arr[$param] = $value;
+                $params_arr[$param] = CRUDCompiler::fieldValueOrCallableResult($value, $obj);
             }
 
             if (!empty($redirect_get_params_arr)) {
@@ -223,10 +220,6 @@ class CRUDForm
             'value="' . Sanitize::sanitizeAttrValue(get_class($this->obj)) . '">';
         $html .= '<input type="hidden" name="' . self::FIELD_OBJECT_ID . '" '.
             'value="' . Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($this->obj)) . '">';
-        $html .= '<input type="hidden" name="' . self::FIELD_REDIRECT_URL . '" '.
-            'value="' . Sanitize::sanitizeAttrValue($this->url_to_redirect_after_operation) . '">';
-        $html .= '<input type="hidden" name="' . self::FIELD_REDIRECT_URL_GET_PARAMS . '" '.
-            'value="' . Sanitize::sanitizeAttrValue(http_build_query($this->redirect_get_params_arr)) . '">';
         $html .= '<input type="hidden" name="' . self::FIELD_FORM_ID . '" '.
             'value="' . Sanitize::sanitizeAttrValue($this->form_unique_id) . '">';
 
