@@ -326,7 +326,7 @@ class CRUD
      * @return EntityService
      * @throws \Exception
      */
-    protected function getEntityServiceByClassName(string $entity_class_name)
+    public function getEntityServiceByClassName(string $entity_class_name)
     {
         Assert::assert(!empty($entity_class_name::ENTITY_SERVICE_CONTAINER_ID));
 

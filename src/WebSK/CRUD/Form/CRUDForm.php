@@ -131,12 +131,16 @@ class CRUDForm
      */
     protected function saveEditorFormOperation(Request $request, Response $response): Response
     {
-        $url_to_redirect_after_save = $this->url_to_redirect_after_operation;
+        $entity_class_name = get_class($this->obj);
+        Assert::assert($entity_class_name);
+
+        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
 
         $obj = $this->crud->saveOrUpdateObjectFromFormRequest($this->obj, $request);
 
         Messages::setMessage('Изменения сохранены');
 
+        $url_to_redirect_after_save = $this->url_to_redirect_after_operation;
         if ($url_to_redirect_after_save != '') {
             $redirect_get_params_arr = $this->redirect_get_params_arr;
 
@@ -174,7 +178,8 @@ class CRUDForm
         $entity_id = $this->obj->getId();
         Assert::assert($entity_id);
 
-        $obj = $this->crud->saveOrUpdateObjectFromFormRequest($this->obj, $request);
+        $entity_service = $this->crud->getEntityServiceByClassName($entity_class_name);
+        $obj = $entity_service->getById($entity_id);
 
         $this->crud->deleteObject($entity_class_name, $entity_id);
 
