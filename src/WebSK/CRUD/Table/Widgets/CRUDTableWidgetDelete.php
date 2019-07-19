@@ -65,7 +65,7 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
         }
 
         $o .= '<button class="' . Sanitize::sanitizeAttrValue($this->getButtonClassStr()) . '" ' .
-            'type="submit" onclick="return window.confirm(\'Удалить?\');"><span class="fa fa-trash-o fa-lg text-danger fa-fw"></span>' .
+            'type="submit" onclick="return window.confirm(\'Удалить?\');"><span class="fa fa-trash fa-lg text-danger fa-fw"></span>' .
             Sanitize::sanitizeTagContent($this->getButtonText()) . '</button>';
 
         $o .= '</form>';
