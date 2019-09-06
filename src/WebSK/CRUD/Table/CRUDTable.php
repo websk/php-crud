@@ -13,7 +13,6 @@ use WebSK\Entity\InterfaceWeight;
 use WebSK\Utils\HTTP;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Form\CRUDForm;
-use WebSK\CRUD\Table\NullablePostFields;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDelete;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetWeight;
 use WebSK\CRUD\Pager;
@@ -45,6 +44,8 @@ class CRUDTable
 
     const FIELD_NAME_CRUD_TABLE_ID = '_FIELD_NAME_CRUD_TABLE_ID';
     const FIELD_NAME_ENTITY_CLASS_NAME = '_FIELD_NAME_ENTITY_CLASS_NAME';
+
+    const CSV_COLUMN_DELIMITER = ';';
 
     /** @var CRUD */
     protected $crud;
@@ -258,6 +259,83 @@ class CRUDTable
         $html .= CRUDTableScript::getHtml($table_container_element_id, $request->getUri()->getPath());
 
         return $html;
+    }
+
+    /**
+     * @param Request $request
+     * @param string $column_delimiter
+     * @return string
+     */
+    public function csv(Request $request, string $column_delimiter = self::CSV_COLUMN_DELIMITER)
+    {
+        $tsv = '';
+        $total_rows_count = 0;
+
+        $objs_ids_arr = $this->crud->getObjIdsArrForClassName(
+            $request,
+            $this->entity_class_name,
+            $this->filters_arr,
+            $this->order_by,
+            100000,
+            0,
+            $this->display_total_rows_count,
+            $total_rows_count
+        );
+
+        $has_nonempty_th = false;
+        foreach ($this->column_obj_arr as $column_obj) {
+            Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
+            if ($column_obj->getTitle() != '') {
+                $has_nonempty_th = true;
+            }
+        }
+
+        if ($has_nonempty_th) {
+            $row_html = '';
+            foreach ($this->column_obj_arr as $column_obj) {
+                Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
+                $row_html .= $this->csvCellRender((string) $column_obj->getTitle(), $column_delimiter);
+            }
+            $tsv .= $this->csvRowRender($row_html);
+        }
+
+        foreach ($objs_ids_arr as $obj_id) {
+            $row_html = '';
+            $obj_obj = $this->crud->createAndLoadObject($this->entity_class_name, $obj_id);
+
+            foreach ($this->column_obj_arr as $column_obj) {
+                Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
+
+                $widget_obj = $column_obj->getWidgetObj();
+                Assert::assert($widget_obj);
+                Assert::assert($widget_obj instanceof InterfaceCRUDTableWidget);
+                $row_html .= $this->csvCellRender($widget_obj->html($obj_obj, $this->crud), $column_delimiter);
+            }
+            $tsv .= $this->csvRowRender($row_html);
+        }
+
+        return $tsv;
+    }
+
+    /**
+     * @param string $str
+     * @param string $column_delimiter
+     * @return string
+     */
+    protected function csvCellRender(string $str, string $column_delimiter): string
+    {
+        $str = mb_ereg_replace('[\R\t]', ' ', $str);
+        return $str . $column_delimiter;
+    }
+
+    /**
+     * @param string $str
+     * @return string
+     */
+    protected function csvRowRender(string $str): string
+    {
+        $str = mb_ereg_replace('\R', ' ', $str);
+        return $str . "\r\n";
     }
 
     /**
