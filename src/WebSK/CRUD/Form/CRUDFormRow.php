@@ -37,8 +37,6 @@ class CRUDFormRow implements InterfaceCRUDFormRow
 
         $required = false; // TODO
 
-        //$editor_context_obj = CRUDController::getEditorContext();
-
         $html .= '<div class="form-group ' . ($required ? 'required' : '') . '">';
         $html .= '<label class="col-sm-4 text-right control-label">' . $this->getTitle() . '</label>';
 
