@@ -22,7 +22,7 @@ return [
             ]
         ],
         'layout' => [
-            'main' => '/var/www/php-auth/views/layouts/layout.main.tpl.php'
+            'main' => '/var/www/php-crud/views/layouts/layout.main.tpl.php'
         ],
         'log_path' => '/var/www/log',
         'tmp_path' => '/var/www/tmp',

@@ -6,6 +6,7 @@ use Closure;
 use OLOG\CheckClassInterfaces;
 use OLOG\Url;
 use WebSK\CRUD\CRUDCompiler;
+use WebSK\CRUD\FileManager;
 use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Assert;
 use OLOG\HTML;
@@ -26,6 +27,7 @@ class CRUDForm
 {
     const OPERATION_SAVE_EDITOR_FORM = 'OPERATION_SAVE_EDITOR_FORM';
     const OPERATION_DELETE_ENTITY = 'OPERATION_DELETE_ENTITY';
+    const OPERATION_UPLOAD_FILE = 'OPERATION_UPLOAD_FILE';
 
     const FIELD_CLASS_NAME = '_FIELD_CLASS_NAME';
     const FIELD_OBJECT_ID = '_FIELD_OBJECT_ID';
@@ -108,7 +110,7 @@ class CRUDForm
 
         $form_id = $request->getParsedBodyParam(self::FIELD_FORM_ID);
         if ($form_id != $this->form_unique_id) {
-            return null;
+            //return null;
         }
 
         $operation_code = $request->getParsedBodyParam(Operations::FIELD_NAME_OPERATION_CODE);
@@ -118,9 +120,83 @@ class CRUDForm
                 return $this->deleteEntityOperation($request, $response);
             case self::OPERATION_SAVE_EDITOR_FORM:
                 return $this->saveEditorFormOperation($request, $response);
+            case self::OPERATION_UPLOAD_FILE:
+                return $this->uploadFileFormOperation($request, $response);
         }
 
         return $response->withRedirect($request->getUri());
+    }
+
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     */
+    protected function uploadFileFormOperation(Request $request, Response $response): Response
+    {
+        $entity_class_name = get_class($this->obj);
+        Assert::assert($entity_class_name);
+
+        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
+
+        $entity_id = $this->obj->getId();
+        Assert::assert($entity_id);
+
+        $entity_service = $this->crud->getEntityServiceByClassName($entity_class_name);
+        $obj = $entity_service->getById($entity_id);
+
+        $old_file_name = '';
+
+        $load_file = $_FILES['load_file'];
+
+        $file_name = $load_file['name'];
+
+        $json_arr['files'][0] = [
+            'name' => $file_name,
+        ];
+
+        $allowed_extensions = ["gif", "jpeg", "jpg", "png"];
+        $allowed_types = ["image/gif", "image/jpeg", "image/jpg", "image/pjpeg", "image/x-png", "image/png"];
+
+        $pathinfo = pathinfo($load_file["name"]);
+
+        if (!in_array($load_file["type"], $allowed_types)) {
+            $json_arr['files'][0]['error'] = 'Тип ' . $load_file["type"] . ' загружаемого файла ' . $file_name . ' не поддерживается ';
+            return $response->withJson($json_arr);
+        }
+
+        $file_extension = mb_strtolower($pathinfo['extension']);
+        if (!in_array($file_extension, $allowed_extensions)) {
+            $json_arr['files'][0]['error'] = 'Формат ' . $file_extension . ' загружаемого файла ' . $file_name . ' не поддерживается ';
+            return $response->withJson($json_arr);
+        }
+
+        if ($load_file["error"] > 0) {
+            $json_arr['files'][0]['error'] = 'Не удалось загрузить файл';
+            return $response->withJson($json_arr);
+        }
+
+        $root_folder = $request->getParsedBodyParam('root_folder');
+        $target_folder = $request->getParsedBodyParam('target_folder');
+
+        $file_manager = new FileManager($root_folder);
+
+        $file_name = $file_manager->storeUploadedFile($load_file["name"], $load_file["tmp_name"], $target_folder);
+
+        if (!$file_name) {
+            $json_arr['files'][0]['error'] = 'Не удалось загрузить файл';
+            return $response->withJson($json_arr);
+        }
+
+        if ($old_file_name) {
+            $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
+        }
+
+        $json_arr['files'][0]['url'] = '/files' . DIRECTORY_SEPARATOR . $target_folder . DIRECTORY_SEPARATOR . $file_name;
+        $json_arr['files'][0]['deleteUrl'] = "#";
+        $json_arr['files'][0]['deleteType'] = "DELETE";
+
+        return $response->withJson($json_arr);
     }
 
     /**

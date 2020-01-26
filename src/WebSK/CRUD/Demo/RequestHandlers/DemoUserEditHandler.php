@@ -14,6 +14,7 @@ use WebSK\CRUD\Form\Widgets\CRUDFormWidgetDate;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTextarea;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTimestamp;
+use WebSK\CRUD\Form\Widgets\CRUDFormWidgetUpload;
 use WebSK\Slim\RequestHandlers\BaseHandler;
 use WebSK\Views\BreadcrumbItemDTO;
 use WebSK\Views\LayoutDTO;
@@ -51,7 +52,8 @@ class DemoUserEditHandler extends BaseHandler
                 new CRUDFormRow('Email', new CRUDFormWidgetInput(DemoUser::_EMAIL)),
                 new CRUDFormRow('Дата рождения', new CRUDFormWidgetDate(DemoUser::_BIRTHDAY)),
                 new CRUDFormRow('Комментарий', new CRUDFormWidgetTextarea(DemoUser::_COMMENT)),
-                new CRUDFormRow('Создано', new CRUDFormWidgetTimestamp(DemoUser::_CREATED_AT_TS))
+                new CRUDFormRow('Создано', new CRUDFormWidgetTimestamp(DemoUser::_CREATED_AT_TS)),
+                new CRUDFormRow('Фото', new CRUDFormWidgetUpload(DemoUser::_PHOTO, 'images' . DIRECTORY_SEPARATOR . 'users'))
             ]
         );
 
