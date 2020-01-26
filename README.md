@@ -8,7 +8,7 @@
 * replace settings and paths
 * create MySQL DB db_demo_crud (or other) 
 * load in MySQL DB dump.sql
-* composer update
+* composer install
 * cd public
 * php -S localhost:8000
 * open http://localhost:8000

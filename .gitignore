@@ -1,3 +1,5 @@
 .idea/
 config/config.php
+public/files
+public/assets
 vendor/
