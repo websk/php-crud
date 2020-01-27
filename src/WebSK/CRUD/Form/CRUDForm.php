@@ -28,12 +28,17 @@ class CRUDForm
     const OPERATION_SAVE_EDITOR_FORM = 'OPERATION_SAVE_EDITOR_FORM';
     const OPERATION_DELETE_ENTITY = 'OPERATION_DELETE_ENTITY';
     const OPERATION_UPLOAD_FILE = 'OPERATION_UPLOAD_FILE';
+    const OPERATION_DELETE_FILE = 'OPERATION_DELETE_FILE';
 
     const FIELD_CLASS_NAME = '_FIELD_CLASS_NAME';
     const FIELD_OBJECT_ID = '_FIELD_OBJECT_ID';
     const FIELD_REDIRECT_URL = '_FIELD_REDIRECT_URL';
     const FIELD_REDIRECT_URL_GET_PARAMS = '_FIELD_REDIRECT_URL_GET_PARAMS';
     const FIELD_FORM_ID = '_FIELD_FORM_ID';
+
+    const FIELD_TARGET_FOLDER = 'target_folder';
+    const FIELD_ROOT_FOLDER = 'root_folder';
+    const FIELD_FIELD_NAME = 'field_name';
 
     /** @var CRUD */
     protected $crud;
@@ -122,9 +127,37 @@ class CRUDForm
                 return $this->saveEditorFormOperation($request, $response);
             case self::OPERATION_UPLOAD_FILE:
                 return $this->uploadFileFormOperation($request, $response);
+            case self::OPERATION_DELETE_FILE:
+                return $this->deleteFileFormOperation($request, $response);
         }
 
         return $response->withRedirect($request->getUri());
+    }
+
+    protected function deleteFileFormOperation(Request $request, Response $response): Response
+    {
+        $entity_class_name = get_class($this->obj);
+        Assert::assert($entity_class_name);
+
+        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
+
+        $entity_id = $this->obj->getId();
+        Assert::assert($entity_id);
+
+        $entity_service = $this->crud->getEntityServiceByClassName($entity_class_name);
+        $obj = $entity_service->getById($entity_id);
+
+        $root_folder = $request->getParsedBodyParam(self::FIELD_ROOT_FOLDER);
+        $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
+        $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
+
+        $file_manager = new FileManager($root_folder);
+
+        $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR . $field_name);
+
+        $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => '']);
+
+        $entity_service->save($obj);
     }
 
     /**
@@ -176,8 +209,8 @@ class CRUDForm
             return $response->withJson($json_arr);
         }
 
-        $root_folder = $request->getParsedBodyParam('root_folder');
-        $target_folder = $request->getParsedBodyParam('target_folder');
+        $root_folder = $request->getParsedBodyParam(self::FIELD_ROOT_FOLDER);
+        $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
 
         $file_manager = new FileManager($root_folder);
 
@@ -193,10 +226,8 @@ class CRUDForm
         }
 
         $json_arr['files'][0]['url'] = '/files/' . $target_folder . '/' . $file_name;
-        $json_arr['files'][0]['deleteUrl'] = "";
-        $json_arr['files'][0]['deleteType'] = "DELETE";
 
-        $field_name = $request->getParsedBodyParam('field_name');
+        $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
         $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => $file_name]);
 
         $entity_service->save($obj);
