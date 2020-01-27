@@ -155,7 +155,7 @@ class CRUDForm
             'name' => $file_name,
         ];
 
-        $allowed_extensions = ["gif", "jpeg", "jpg", "png"];
+        $allowed_extensions = ['gif', 'jpeg', 'jpg', 'png'];
         $allowed_types = ["image/gif", "image/jpeg", "image/jpg", "image/pjpeg", "image/x-png", "image/png"];
 
         $pathinfo = pathinfo($load_file["name"]);
@@ -192,9 +192,14 @@ class CRUDForm
             $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
         }
 
-        $json_arr['files'][0]['url'] = '/files' . DIRECTORY_SEPARATOR . $target_folder . DIRECTORY_SEPARATOR . $file_name;
-        $json_arr['files'][0]['deleteUrl'] = "#";
+        $json_arr['files'][0]['url'] = '/files/' . $target_folder . '/' . $file_name;
+        $json_arr['files'][0]['deleteUrl'] = "";
         $json_arr['files'][0]['deleteType'] = "DELETE";
+
+        $field_name = $request->getParsedBodyParam('field_name');
+        $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => $file_name]);
+
+        $entity_service->save($obj);
 
         return $response->withJson($json_arr);
     }

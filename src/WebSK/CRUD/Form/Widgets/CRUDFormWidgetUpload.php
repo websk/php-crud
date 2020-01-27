@@ -15,6 +15,10 @@ use WebSK\Utils\Sanitize;
  */
 class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 {
+    const MAX_FILE_SIZE = 20971520;
+
+    const FILE_TYPE_IMAGE = 'image';
+
     /** @var string */
     protected $field_name;
 
@@ -27,13 +31,18 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     /** @var string */
     protected $form_action_url = '';
 
+    /** @var string */
+    protected $file_type;
+
     public function __construct(
         string $field_name,
+        string $file_type,
         string $target_folder,
         string $root_folder = '',
         string $form_action_url = ''
     ) {
         $this->setFieldName($field_name);
+        $this->setFileType($file_type);
         $this->setTargetFolder($target_folder);
         $this->setRootFolder($root_folder);
         $this->setFormActionUrl($form_action_url);
@@ -50,12 +59,22 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         $html = '';
 
         if (!isset($crud_form_widget_blueimp_file_upload_include_script)) {
-            $html .= '<link rel="stylesheet" href="/assets/libraries/blueimp-file-upload/css/jquery.fileupload.css">' .
-            '<script src="/assets/libraries/blueimp-file-upload/js/jquery.fileupload.js"></script>' .
-            '<script src="/assets/libraries/blueimp-file-upload/js/jquery.fileupload-process.js"></script>' .
-            '<script src="/assets/libraries/blueimp-file-upload/js/jquery.fileupload-validate.js"></script>';
+            $cdn_blueimp_file_upload_path = 'https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/10.7.0';
+
+            $html .= '<link rel="stylesheet" href="' . $cdn_blueimp_file_upload_path . '/css/jquery.fileupload.css">' .
+            '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload.js"></script>' .
+            '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload-process.js"></script>' .
+            '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload-validate.js"></script>';
 
             $crud_form_widget_blueimp_file_upload_include_script = false;
+        }
+
+        $file_type = $this->getFileType();
+
+        $accept_file_types = '@';
+        switch($file_type) {
+            case self::FILE_TYPE_IMAGE:
+                $accept_file_types = '/(\.|\/)(gif|jpe?g|png)$/i';
         }
 
         ob_start();
@@ -63,31 +82,43 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         <span class="btn btn-success fileinput-button">
             <i class="glyphicon glyphicon-plus"></i>
             <span>Выберите файл...</span>
-            <input id="load_file" type="file" name="load_file">
+            <input id="fileupload" type="file" name="load_file">
         </span>
 
-        <div id="image"></div>
+        <div id="view_file"></div>
 
         <script>
+            function viewFile(file_url) {
+                if (!file_url) {
+                    return;
+                }
+
+                $('#view_file').html('<img src="' + file_url +'" class="img-responsive img-thumbnail">');
+            }
+
             $(function () {
                 var url = '<?php echo $this->getFormActionUrl(); ?>';
 
-                $('#load_file').fileupload({
+                var file_url = '<?php echo $field_value ? '/files/'. $this->getTargetFolder() . '/' . $field_value : ''; ?>';
+                viewFile(file_url);
+
+                $('#fileupload').fileupload({
                     url: url,
                     dataType: 'json',
                     formData: [
                         {name: '<?php echo Operations::FIELD_NAME_OPERATION_CODE; ?>', value: '<?php echo CRUDForm::OPERATION_UPLOAD_FILE; ?>'},
                         {name: 'target_folder', value: '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>'},
-                        {name: 'root_folder', value: '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getRootFolder())); ?>'}
+                        {name: 'root_folder', value: '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getRootFolder())); ?>'},
+                        {name: 'field_name', value: '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>'}
                     ],
                     autoUpload: true,
-                    acceptFileTypes: /(\.|\/)(gif|jpe?g|png)$/i,
-                    maxFileSize: 20971520,
+                    acceptFileTypes: <?php echo $accept_file_types; ?>,
+                    maxFileSize: <?php echo self::MAX_FILE_SIZE; ?>,
                     previewThumbnail: false,
                     maxNumberOfFiles: 1,
                     messages: {
                         maxNumberOfFiles: 'Превышено максимальное количество файлов, загружаемое за один раз',
-                        acceptFileTypes: 'Этот файл не изображение',
+                        acceptFileTypes: 'Неверный тип файла',
                         maxFileSize: 'Размер файла слишком большой',
                         minFileSize: 'Размер файла слишком маленький'
                     }
@@ -112,7 +143,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                         if (file.url) {
                             $(data.context.children()[index])
                                 .append(' <div class="text-success">Файл  загружен</div>');
-                            $('#image').html('<img src="' + file.url +'" class="img-responsive img-thumbnail">');
+
+                            viewFile(file.url);
                         } else if (file.error) {
                             var error = $('<span class="text-danger"/>').text(file.error);
                             $(data.context.children()[index])
@@ -199,5 +231,21 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     public function setFormActionUrl(string $form_action_url): void
     {
         $this->form_action_url = $form_action_url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFileType(): string
+    {
+        return $this->file_type;
+    }
+
+    /**
+     * @param string $file_type
+     */
+    public function setFileType(string $file_type): void
+    {
+        $this->file_type = $file_type;
     }
 }

@@ -13,9 +13,6 @@ class FileManager
     /** @var string */
     protected $root_folder;
 
-    /** @var string */
-    protected $tmp_path;
-
     /**
      * FileManager constructor.
      * @param string $root_folder
@@ -28,8 +25,6 @@ class FileManager
             $files_data_path = ConfWrapper::value('files_data_path');
             $this->root_folder = $files_data_path . DIRECTORY_SEPARATOR . $root_folder;
         }
-
-        $this->tmp_path = ConfWrapper::value('tmp_path');
     }
 
     /**
@@ -123,14 +118,5 @@ class FileManager
     public function getFilePath(string $file_name)
     {
         return $this->getRootFolder() . DIRECTORY_SEPARATOR . $file_name;
-    }
-
-    /**
-     * @param string $file_name
-     * @return string
-     */
-    public function getFileUrl(string $file_name)
-    {
-        return DIRECTORY_SEPARATOR . $file_name;
     }
 }
