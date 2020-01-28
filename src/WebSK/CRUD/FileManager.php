@@ -10,20 +10,31 @@ use WebSK\Config\ConfWrapper;
  */
 class FileManager
 {
+    const DEFAULT_FILES_FOLDER = 'files';
+
     /** @var string */
-    protected $root_folder;
+    protected $files_root_path;
+
+    /** @var string */
+    protected $files_folder;
 
     /**
      * FileManager constructor.
-     * @param string $root_folder
+     * @param string $files_root_path
+     * @param string $files_folder
      */
-    public function __construct(string $root_folder = '')
+    public function __construct(string $files_root_path = '', string $files_folder = '')
     {
-        if ($root_folder) {
-            $this->root_folder = $root_folder;
+        if ($files_root_path) {
+            $this->files_root_path = $files_root_path;
         } else {
-            $files_data_path = ConfWrapper::value('files_data_path');
-            $this->root_folder = $files_data_path . DIRECTORY_SEPARATOR . $root_folder;
+            $this->files_root_path = ConfWrapper::value('files_root_path');
+        }
+
+        if ($files_folder) {
+            $this->files_folder = $files_folder;
+        } else {
+            $this->files_folder = ConfWrapper::value('files_folder', self::DEFAULT_FILES_FOLDER);
         }
     }
 
@@ -106,9 +117,25 @@ class FileManager
     /**
      * @return string
      */
-    public function getRootFolder()
+    public function getFilesRootPath()
     {
-        return $this->root_folder;
+        return $this->files_root_path;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFilesFolder(): string
+    {
+        return $this->files_folder;
+    }
+
+    /**
+     * @param string $files_folder
+     */
+    public function setFilesFolder(string $files_folder): void
+    {
+        $this->files_folder = $files_folder;
     }
 
     /**
@@ -117,6 +144,15 @@ class FileManager
      */
     public function getFilePath(string $file_name)
     {
-        return $this->getRootFolder() . DIRECTORY_SEPARATOR . $file_name;
+        return $this->getFilesRootPath() . DIRECTORY_SEPARATOR . $file_name;
+    }
+
+    /**
+     * @param string $file_name
+     * @return string
+     */
+    public function getFileUrl(string $file_name)
+    {
+        return $this->getFilesFolder() . DIRECTORY_SEPARATOR . $file_name;
     }
 }

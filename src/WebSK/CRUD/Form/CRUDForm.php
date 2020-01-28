@@ -195,9 +195,9 @@ class CRUDForm
 
         $old_file_name = '';
 
-        $load_file = $_FILES['load_file'];
+        $file = $_FILES['load_file'];
 
-        $file_name = $load_file['name'];
+        $file_name = $file['name'];
 
         $json_arr['files'][0] = [
             'name' => $file_name,
@@ -206,10 +206,10 @@ class CRUDForm
         $allowed_extensions = ['gif', 'jpeg', 'jpg', 'png'];
         $allowed_types = ["image/gif", "image/jpeg", "image/jpg", "image/pjpeg", "image/x-png", "image/png"];
 
-        $pathinfo = pathinfo($load_file["name"]);
+        $pathinfo = pathinfo($file_name);
 
-        if (!in_array($load_file["type"], $allowed_types)) {
-            $json_arr['files'][0]['error'] = 'Тип ' . $load_file["type"] . ' загружаемого файла ' . $file_name . ' не поддерживается ';
+        if (!in_array($file["type"], $allowed_types)) {
+            $json_arr['files'][0]['error'] = 'Тип ' . $file['type'] . ' загружаемого файла ' . $file_name . ' не поддерживается ';
             return $response->withJson($json_arr);
         }
 
@@ -219,7 +219,7 @@ class CRUDForm
             return $response->withJson($json_arr);
         }
 
-        if ($load_file["error"] > 0) {
+        if ($file["error"] > 0) {
             $json_arr['files'][0]['error'] = 'Не удалось загрузить файл';
             return $response->withJson($json_arr);
         }
@@ -229,7 +229,7 @@ class CRUDForm
 
         $file_manager = new FileManager($root_folder);
 
-        $file_name = $file_manager->storeUploadedFile($load_file["name"], $load_file["tmp_name"], $target_folder);
+        $file_name = $file_manager->storeUploadedFile($file_name, $file['tmp_name'], $target_folder);
 
         if (!$file_name) {
             $json_arr['files'][0]['error'] = 'Не удалось загрузить файл';
@@ -240,7 +240,7 @@ class CRUDForm
             $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
         }
 
-        $json_arr['files'][0]['url'] = '/files/' . $target_folder . '/' . $file_name;
+        $json_arr['files'][0]['url'] = $file_manager->getFileUrl($file_name);
 
         $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
         $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => $file_name]);
