@@ -134,6 +134,11 @@ class CRUDForm
         return $response->withRedirect($request->getUri());
     }
 
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @return Response
+     */
     protected function deleteFileFormOperation(Request $request, Response $response): Response
     {
         $entity_class_name = get_class($this->obj);
@@ -151,13 +156,23 @@ class CRUDForm
         $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
         $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
 
+        $file_name = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+
+        $json_arr['file'] = $file_name;
+
         $file_manager = new FileManager($root_folder);
 
-        $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR . $field_name);
+        $is_deleted = $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR . $field_name);
+
+        if (!$is_deleted) {
+            $json_arr['error'] = 'Не удалось удалить файл';
+            return $response->withJson($json_arr);
+        }
 
         $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => '']);
-
         $entity_service->save($obj);
+
+        return $response->withJson($json_arr);
     }
 
     /**
