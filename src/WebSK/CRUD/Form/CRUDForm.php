@@ -5,6 +5,7 @@ namespace WebSK\CRUD\Form;
 use Closure;
 use OLOG\CheckClassInterfaces;
 use OLOG\Url;
+use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\FileManager;
 use WebSK\Entity\InterfaceEntity;
@@ -37,7 +38,6 @@ class CRUDForm
     const FIELD_FORM_ID = '_FIELD_FORM_ID';
 
     const FIELD_TARGET_FOLDER = 'target_folder';
-    const FIELD_ROOT_FOLDER = 'root_folder';
     const FIELD_FIELD_NAME = 'field_name';
 
     /** @var CRUD */
@@ -152,7 +152,6 @@ class CRUDForm
         $entity_service = $this->crud->getEntityServiceByClassName($entity_class_name);
         $obj = $entity_service->getById($entity_id);
 
-        $root_folder = $request->getParsedBodyParam(self::FIELD_ROOT_FOLDER);
         $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
         $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
 
@@ -160,7 +159,10 @@ class CRUDForm
 
         $json_arr['file'] = $file_name;
 
-        $file_manager = new FileManager($root_folder);
+        $files_root_path = ConfWrapper::value('files_root_path');
+        $files_url_path = ConfWrapper::value('files_url_path');
+
+        $file_manager = new FileManager($files_root_path, $files_url_path);
 
         $is_deleted = $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR . $field_name);
 
@@ -195,7 +197,9 @@ class CRUDForm
 
         $old_file_name = '';
 
-        $file = $_FILES['load_file'];
+        $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
+
+        $file = $_FILES['file_' .  $field_name];
 
         $file_name = $file['name'];
 
@@ -206,14 +210,14 @@ class CRUDForm
         $allowed_extensions = ['gif', 'jpeg', 'jpg', 'png'];
         $allowed_types = ["image/gif", "image/jpeg", "image/jpg", "image/pjpeg", "image/x-png", "image/png"];
 
-        $pathinfo = pathinfo($file_name);
+        $file_info = new \SplFileInfo($file_name);
 
         if (!in_array($file["type"], $allowed_types)) {
             $json_arr['files'][0]['error'] = 'Тип ' . $file['type'] . ' загружаемого файла ' . $file_name . ' не поддерживается ';
             return $response->withJson($json_arr);
         }
 
-        $file_extension = mb_strtolower($pathinfo['extension']);
+        $file_extension = mb_strtolower($file_info->getExtension());
         if (!in_array($file_extension, $allowed_extensions)) {
             $json_arr['files'][0]['error'] = 'Формат ' . $file_extension . ' загружаемого файла ' . $file_name . ' не поддерживается ';
             return $response->withJson($json_arr);
@@ -224,10 +228,12 @@ class CRUDForm
             return $response->withJson($json_arr);
         }
 
-        $root_folder = $request->getParsedBodyParam(self::FIELD_ROOT_FOLDER);
-        $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
+        $files_root_path = ConfWrapper::value('files_root_path');
+        $files_url_path = ConfWrapper::value('files_url_path');
 
-        $file_manager = new FileManager($root_folder);
+        $file_manager = new FileManager($files_root_path, $files_url_path);
+
+        $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
 
         $file_name = $file_manager->storeUploadedFile($file_name, $file['tmp_name'], $target_folder);
 
@@ -242,7 +248,6 @@ class CRUDForm
 
         $json_arr['files'][0]['url'] = $file_manager->getFileUrl($file_name);
 
-        $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
         $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => $file_name]);
 
         $entity_service->save($obj);

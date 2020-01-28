@@ -2,40 +2,27 @@
 
 namespace WebSK\CRUD;
 
-use WebSK\Config\ConfWrapper;
-
 /**
  * Class FileManager
  * @package WebSK\CRUD
  */
 class FileManager
 {
-    const DEFAULT_FILES_FOLDER = 'files';
-
     /** @var string */
     protected $files_root_path;
 
     /** @var string */
-    protected $files_folder;
+    protected $files_url_path;
 
     /**
      * FileManager constructor.
      * @param string $files_root_path
-     * @param string $files_folder
+     * @param string $files_url_path
      */
-    public function __construct(string $files_root_path = '', string $files_folder = '')
+    public function __construct(string $files_root_path, string $files_url_path)
     {
-        if ($files_root_path) {
-            $this->files_root_path = $files_root_path;
-        } else {
-            $this->files_root_path = ConfWrapper::value('files_root_path');
-        }
-
-        if ($files_folder) {
-            $this->files_folder = $files_folder;
-        } else {
-            $this->files_folder = ConfWrapper::value('files_folder', self::DEFAULT_FILES_FOLDER);
-        }
+        $this->files_root_path = $files_root_path;
+        $this->files_url_path = $files_url_path;
     }
 
     /**
@@ -125,17 +112,9 @@ class FileManager
     /**
      * @return string
      */
-    public function getFilesFolder(): string
+    public function getFilesUrlPath(): string
     {
-        return $this->files_folder;
-    }
-
-    /**
-     * @param string $files_folder
-     */
-    public function setFilesFolder(string $files_folder): void
-    {
-        $this->files_folder = $files_folder;
+        return $this->files_url_path;
     }
 
     /**
@@ -153,6 +132,6 @@ class FileManager
      */
     public function getFileUrl(string $file_name)
     {
-        return $this->getFilesFolder() . DIRECTORY_SEPARATOR . $file_name;
+        return $this->getFilesUrlPath() . DIRECTORY_SEPARATOR . $file_name;
     }
 }

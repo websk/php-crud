@@ -28,7 +28,7 @@ return [
         'tmp_path' => '/var/www/tmp',
         'files_data_path' => '/var/www/php-crud/public/files',
         'files_root_path' => '/var/www/php-crud/public/files',
-        'files_folder' => 'files',
+        'files_url_path' => '/files',
         'site_domain' => 'http://localhost',
         'site_full_path' => '/var/www/php-crud',
         'site_name' => 'PHP CRUD Demo',

@@ -3,8 +3,10 @@
 namespace WebSK\CRUD\Form\Widgets;
 
 use OLOG\Operations;
+use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
+use WebSK\CRUD\FileManager;
 use WebSK\CRUD\Form\CRUDForm;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
 use WebSK\Utils\Sanitize;
@@ -20,16 +22,12 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     const FILE_TYPE_IMAGE = 'image';
 
     const FIELD_TARGET_FOLDER = 'target_folder';
-    const FIELD_ROOT_FOLDER = 'root_folder';
 
     /** @var string */
     protected $field_name;
 
     /** @var string */
     protected $target_folder;
-
-    /** @var string */
-    protected $root_folder;
 
     /** @var string */
     protected $form_action_url = '';
@@ -41,13 +39,11 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         string $field_name,
         string $file_type,
         string $target_folder,
-        string $root_folder = '',
         string $form_action_url = ''
     ) {
         $this->setFieldName($field_name);
         $this->setFileType($file_type);
         $this->setTargetFolder($target_folder);
-        $this->setRootFolder($root_folder);
         $this->setFormActionUrl($form_action_url);
     }
 
@@ -76,6 +72,13 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
         $file_type = $this->getFileType();
 
+        $files_root_path = ConfWrapper::value('files_root_path');
+        $files_url_path = ConfWrapper::value('files_url_path');
+
+        $file_manager = new FileManager($files_root_path, $files_url_path);
+
+        $file_url = $field_value ? $file_manager->getFileUrl($this->getTargetFolder() . '/' . $field_value) : '';
+
         $accept_file_types = '@';
         switch($file_type) {
             case self::FILE_TYPE_IMAGE:
@@ -87,41 +90,47 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         <span class="btn btn-success fileinput-button">
             <i class="glyphicon glyphicon-plus"></i>
             <span>Выберите файл...</span>
-            <input id="<?php echo $element_id; ?>" type="file" name="load_file">
+            <input id="<?php echo $element_id; ?>" type="file" name="file_<?php echo $field_name; ?>">
         </span>
 
         <div id="files_<?php echo $element_id; ?>"></div>
 
         <script>
-            function viewFile(file_url) {
-                if (!file_url) {
-                    return;
+            $(function () {
+                function viewFile(file_url, file_name) {
+                    if (!file_url) {
+                        return;
+                    }
+                    <?php
+                    if ($file_type == self::FILE_TYPE_IMAGE) {
+                        ?>
+                        var html = '<img src="' + file_url +'" class="img-responsive img-thumbnail">';
+                        <?php
+                    } else {
+                    ?>
+                        var html = '<a href="' + file_url +'" target="_blank">' + file_name + '</a>';
+                    <?php
+                    }
+                    ?>
+                    html += '<p><button class="btn btn-danger" title="Удалить">Удалить</button></p>';
+
+                    $('#files_<?php echo $element_id; ?>').html(html);
                 }
 
-                var html = '<img src="' + file_url +'" class="img-responsive img-thumbnail">';
+                let url = '<?php echo $this->getFormActionUrl(); ?>';
 
-                html += '<p><button class="btn btn-danger" title="Удалить">Удалить</button></p>';
-
-                $('#files_<?php echo $element_id; ?>').html(html);
-            }
-
-            $(function () {
-                var url = '<?php echo $this->getFormActionUrl(); ?>';
-
-                var file_url = '<?php echo $field_value ? '/files/'. $this->getTargetFolder() . '/' . $field_value : ''; ?>';
-                viewFile(file_url);
+                viewFile('<?php echo $file_url; ?>', '<?php echo $field_value; ?>');
 
                 $('#files_<?php echo $element_id; ?>').on('click', 'button', function (e) {
                     e.preventDefault();
 
-                    var link = $(this);
+                    let link = $(this);
 
-                    var req = $.ajax({
+                    $.ajax({
                         dataType: 'json',
                         data: {
                             '<?php echo Operations::FIELD_NAME_OPERATION_CODE; ?>': '<?php echo CRUDForm::OPERATION_DELETE_FILE; ?>',
-                            '<?php echo self::FIELD_TARGET_FOLDER; ?>e': '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>',
-                            '<?php echo self::FIELD_ROOT_FOLDER; ?>': '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getRootFolder())); ?>',
+                            '<?php echo self::FIELD_TARGET_FOLDER; ?>': '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>',
                             '<?php echo CRUDForm::FIELD_FIELD_NAME; ?>': '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>'
                         },
                         url: url,
@@ -149,7 +158,6 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     formData: [
                         {name: '<?php echo Operations::FIELD_NAME_OPERATION_CODE; ?>', value: '<?php echo CRUDForm::OPERATION_UPLOAD_FILE; ?>'},
                         {name: '<?php echo self::FIELD_TARGET_FOLDER; ?>', value: '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>'},
-                        {name: '<?php echo self::FIELD_ROOT_FOLDER; ?>', value: '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getRootFolder())); ?>'},
                         {name: '<?php echo CRUDForm::FIELD_FIELD_NAME; ?>', value: '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>'}
                     ],
                     autoUpload: true,
@@ -185,7 +193,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                             $(data.context.children()[index])
                                 .append(' <div class="text-success">Файл  загружен</div>');
 
-                            viewFile(file.url);
+                            viewFile(file.url, file.name);
                         } else if (file.error) {
                             var error = $('<span class="text-danger"/>').text(file.error);
                             $(data.context.children()[index])
@@ -224,22 +232,6 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     public function setFieldName(string $field_name): void
     {
         $this->field_name = $field_name;
-    }
-
-    /**
-     * @return string
-     */
-    public function getRootFolder(): string
-    {
-        return $this->root_folder;
-    }
-
-    /**
-     * @param string $root_folder
-     */
-    public function setRootFolder(string $root_folder): void
-    {
-        $this->root_folder = $root_folder;
     }
 
     /**
