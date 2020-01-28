@@ -5,7 +5,6 @@ namespace WebSK\CRUD\Form;
 use Closure;
 use OLOG\CheckClassInterfaces;
 use OLOG\Url;
-use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\FileManager;
 use WebSK\Entity\InterfaceEntity;
@@ -114,16 +113,15 @@ class CRUDForm
         }
 
         $form_id = $request->getParsedBodyParam(self::FIELD_FORM_ID);
-        if ($form_id != $this->form_unique_id) {
-            //return null;
-        }
 
         $operation_code = $request->getParsedBodyParam(Operations::FIELD_NAME_OPERATION_CODE);
 
         switch ($operation_code) {
             case self::OPERATION_DELETE_ENTITY:
+                Assert::assert($form_id != $this->form_unique_id);
                 return $this->deleteEntityOperation($request, $response);
             case self::OPERATION_SAVE_EDITOR_FORM:
+                Assert::assert($form_id != $this->form_unique_id);
                 return $this->saveEditorFormOperation($request, $response);
             case self::OPERATION_UPLOAD_FILE:
                 return $this->uploadFileFormOperation($request, $response);
@@ -159,16 +157,12 @@ class CRUDForm
 
         $json_arr['file'] = $file_name;
 
-        $files_root_path = ConfWrapper::value('files_root_path');
-        $files_url_path = ConfWrapper::value('files_url_path');
+        $file_manager = new FileManager();
 
-        $file_manager = new FileManager($files_root_path, $files_url_path);
-
-        $is_deleted = $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR . $field_name);
+        $is_deleted = $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR . $file_name);
 
         if (!$is_deleted) {
             $json_arr['error'] = 'Не удалось удалить файл';
-            return $response->withJson($json_arr);
         }
 
         $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => '']);
@@ -207,8 +201,8 @@ class CRUDForm
             'name' => $file_name,
         ];
 
-        $allowed_extensions = ['gif', 'jpeg', 'jpg', 'png'];
-        $allowed_types = ["image/gif", "image/jpeg", "image/jpg", "image/pjpeg", "image/x-png", "image/png"];
+        $allowed_extensions = ['gif', 'jpeg', 'jpg', 'png', 'pdf', 'csv'];
+        $allowed_types = ["image/gif", "image/jpeg", "image/jpg", "image/pjpeg", "image/x-png", "image/png", "application/pdf", "application/x-pdf", "text/csv"];
 
         $file_info = new \SplFileInfo($file_name);
 
@@ -228,10 +222,7 @@ class CRUDForm
             return $response->withJson($json_arr);
         }
 
-        $files_root_path = ConfWrapper::value('files_root_path');
-        $files_url_path = ConfWrapper::value('files_url_path');
-
-        $file_manager = new FileManager($files_root_path, $files_url_path);
+        $file_manager = new FileManager();
 
         $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
 
@@ -246,7 +237,7 @@ class CRUDForm
             $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
         }
 
-        $json_arr['files'][0]['url'] = $file_manager->getFileUrl($file_name);
+        $json_arr['files'][0]['url'] = $file_manager->getFileUrl($target_folder . '/' . $file_name);
 
         $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => $file_name]);
 

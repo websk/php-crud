@@ -2,12 +2,16 @@
 
 namespace WebSK\CRUD;
 
+use WebSK\Config\ConfWrapper;
+
 /**
  * Class FileManager
  * @package WebSK\CRUD
  */
 class FileManager
 {
+    const DEFAULT_FILES_FOLDER = 'files';
+
     /** @var string */
     protected $files_root_path;
 
@@ -19,10 +23,19 @@ class FileManager
      * @param string $files_root_path
      * @param string $files_url_path
      */
-    public function __construct(string $files_root_path, string $files_url_path)
+    public function __construct(string $files_root_path = '', string $files_url_path = '')
     {
-        $this->files_root_path = $files_root_path;
-        $this->files_url_path = $files_url_path;
+        if ($files_root_path) {
+            $this->files_root_path = $files_root_path;
+        } else {
+            $this->files_root_path = ConfWrapper::value('files_root_path');
+        }
+
+        if ($files_url_path) {
+            $this->files_url_path = $files_url_path;
+        } else {
+            $this->files_url_path = ConfWrapper::value('files_url_path', self::DEFAULT_FILES_FOLDER);
+        }
     }
 
     /**

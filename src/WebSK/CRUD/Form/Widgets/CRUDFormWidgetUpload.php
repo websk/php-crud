@@ -3,7 +3,6 @@
 namespace WebSK\CRUD\Form\Widgets;
 
 use OLOG\Operations;
-use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\FileManager;
@@ -37,8 +36,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
     public function __construct(
         string $field_name,
-        string $file_type,
         string $target_folder,
+        string $file_type = '',
         string $form_action_url = ''
     ) {
         $this->setFieldName($field_name);
@@ -72,14 +71,11 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
         $file_type = $this->getFileType();
 
-        $files_root_path = ConfWrapper::value('files_root_path');
-        $files_url_path = ConfWrapper::value('files_url_path');
-
-        $file_manager = new FileManager($files_root_path, $files_url_path);
+        $file_manager = new FileManager();
 
         $file_url = $field_value ? $file_manager->getFileUrl($this->getTargetFolder() . '/' . $field_value) : '';
 
-        $accept_file_types = '@';
+        $accept_file_types = 'undefined';
         switch($file_type) {
             case self::FILE_TYPE_IMAGE:
                 $accept_file_types = '/(\.|\/)(gif|jpe?g|png)$/i';
