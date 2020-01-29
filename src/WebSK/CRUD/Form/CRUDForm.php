@@ -118,10 +118,10 @@ class CRUDForm
 
         switch ($operation_code) {
             case self::OPERATION_DELETE_ENTITY:
-                Assert::assert($form_id != $this->form_unique_id);
+                Assert::assert($form_id == $this->form_unique_id);
                 return $this->deleteEntityOperation($request, $response);
             case self::OPERATION_SAVE_EDITOR_FORM:
-                Assert::assert($form_id != $this->form_unique_id);
+                Assert::assert($form_id == $this->form_unique_id);
                 return $this->saveEditorFormOperation($request, $response);
             case self::OPERATION_UPLOAD_FILE:
                 return $this->uploadFileFormOperation($request, $response);
