@@ -15,6 +15,7 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
 {
     const ACE_MODE_HTML = 'ace/mode/html';
     const ACE_MODE_JAVASCRIPT = 'ace/mode/javascript';
+    const ACE_MODE_JSON = 'ace/mode/json';
     const ACE_MODE_PHP = 'ace/mode/php';
     const ACE_MODE_SQL = 'ace/mode/sql';
     const ACE_MODE_XML = 'ace/mode/xml';
