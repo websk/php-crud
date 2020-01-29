@@ -6,8 +6,8 @@ use Closure;
 use OLOG\CheckClassInterfaces;
 use OLOG\Url;
 use WebSK\CRUD\CRUDCompiler;
-use WebSK\CRUD\FileManager;
 use WebSK\Entity\InterfaceEntity;
+use WebSK\FileManager\FileManager;
 use WebSK\Utils\Assert;
 use OLOG\HTML;
 use OLOG\Operations;
@@ -159,7 +159,7 @@ class CRUDForm
 
         $file_manager = new FileManager();
 
-        $is_deleted = $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR . $file_name);
+        $is_deleted = $file_manager->deleteFile($target_folder . DIRECTORY_SEPARATOR . $file_name);
 
         if (!$is_deleted) {
             $json_arr['error'] = 'Не удалось удалить файл';
@@ -201,40 +201,19 @@ class CRUDForm
             'name' => $file_name,
         ];
 
-        $allowed_extensions = ['gif', 'jpeg', 'jpg', 'png', 'pdf', 'csv'];
-        $allowed_types = ["image/gif", "image/jpeg", "image/jpg", "image/pjpeg", "image/x-png", "image/png", "application/pdf", "application/x-pdf", "text/csv"];
-
-        $file_info = new \SplFileInfo($file_name);
-
-        if (!in_array($file["type"], $allowed_types)) {
-            $json_arr['files'][0]['error'] = 'Тип ' . $file['type'] . ' загружаемого файла ' . $file_name . ' не поддерживается ';
-            return $response->withJson($json_arr);
-        }
-
-        $file_extension = mb_strtolower($file_info->getExtension());
-        if (!in_array($file_extension, $allowed_extensions)) {
-            $json_arr['files'][0]['error'] = 'Формат ' . $file_extension . ' загружаемого файла ' . $file_name . ' не поддерживается ';
-            return $response->withJson($json_arr);
-        }
-
-        if ($file["error"] > 0) {
-            $json_arr['files'][0]['error'] = 'Не удалось загрузить файл';
-            return $response->withJson($json_arr);
-        }
-
         $file_manager = new FileManager();
 
         $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
 
-        $file_name = $file_manager->storeUploadedFile($file_name, $file['tmp_name'], $target_folder);
+        $file_name = $file_manager->storeUploadedFile($file, $target_folder, $error);
 
-        if (!$file_name) {
-            $json_arr['files'][0]['error'] = 'Не удалось загрузить файл';
+        if ($error) {
+            $json_arr['files'][0]['error'] = $error;
             return $response->withJson($json_arr);
         }
 
         if ($old_file_name) {
-            $file_manager->removeFile($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
+            $file_manager->deleteFile($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
         }
 
         $json_arr['files'][0]['url'] = $file_manager->getFileUrl($target_folder . '/' . $file_name);

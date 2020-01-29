@@ -5,9 +5,9 @@ namespace WebSK\CRUD\Form\Widgets;
 use OLOG\Operations;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
-use WebSK\CRUD\FileManager;
 use WebSK\CRUD\Form\CRUDForm;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
+use WebSK\FileManager\FileManager;
 use WebSK\Utils\Sanitize;
 
 /**
@@ -97,17 +97,19 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     if (!file_url) {
                         return;
                     }
-                    <?php
+                    var html = '<a href="' + file_url +'" target="_blank">';
+                <?php
                     if ($file_type == self::FILE_TYPE_IMAGE) {
                         ?>
-                        var html = '<img src="' + file_url +'" class="img-responsive img-thumbnail">';
+                        html += '<img src="' + file_url +'" class="img-responsive img-thumbnail" style="max-width: 200px">';
                         <?php
                     } else {
                     ?>
-                        var html = '<a href="' + file_url +'" target="_blank">' + file_name + '</a>';
+                        html += file_name;
                     <?php
                     }
                     ?>
+                    html += '</a>';
                     html += '<p><button class="btn btn-danger" title="Удалить">Удалить</button></p>';
 
                     $('#files_<?php echo $element_id; ?>').html(html);

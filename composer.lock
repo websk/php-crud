@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7ba1ba2448711e3adbfff78e317d3e42",
+    "content-hash": "520201f7df365b8edc8e38db1a55ef75",
     "packages": [
         {
             "name": "nikic/fast-route",
@@ -538,6 +538,34 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "time": "2019-07-12T09:05:10+00:00"
+        },
+        {
+            "name": "websk/php-filemanager",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/websk/php-filemanager.git",
+                "reference": "db8f9c5149b118691efb0ea280a8ae7d313aa4e3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/websk/php-filemanager/zipball/db8f9c5149b118691efb0ea280a8ae7d313aa4e3",
+                "reference": "db8f9c5149b118691efb0ea280a8ae7d313aa4e3",
+                "shasum": ""
+            },
+            "require": {
+                "ext-mbstring": "*",
+                "websk/php-config": "1.0.*",
+                "websk/php-utils": "1.0.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "time": "2020-01-29T08:34:59+00:00"
         },
         {
             "name": "websk/php-slim",
