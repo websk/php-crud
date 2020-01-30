@@ -5,7 +5,7 @@
     "websk/php-cache": "1.1.*",
     "websk/php-config": "1.0.*",
     "websk/php-db": "1.2.*",
-    "websk/php-filemanager": "1.0.*",
+    "websk/php-filemanager": "dev-storage_filesystem",
     "websk/php-utils": "1.0.*",
     "websk/php-entity": "1.0.*",
     "websk/php-view": "1.0.*",

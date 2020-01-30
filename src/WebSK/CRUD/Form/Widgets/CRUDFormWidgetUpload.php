@@ -71,7 +71,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
         $file_type = $this->getFileType();
 
-        $file_manager = new FileManager();
+        $file_manager = new FileManager('files');
 
         $file_url = $field_value ? $file_manager->getFileUrl($this->getTargetFolder() . '/' . $field_value) : '';
 

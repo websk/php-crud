@@ -157,7 +157,7 @@ class CRUDForm
 
         $json_arr['file'] = $file_name;
 
-        $file_manager = new FileManager();
+        $file_manager = new FileManager('files');
 
         $is_deleted = $file_manager->deleteFile($target_folder . DIRECTORY_SEPARATOR . $file_name);
 
@@ -201,7 +201,7 @@ class CRUDForm
             'name' => $file_name,
         ];
 
-        $file_manager = new FileManager();
+        $file_manager = new FileManager('files');
 
         $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
 
