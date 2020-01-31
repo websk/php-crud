@@ -53,7 +53,7 @@ class DemoUserEditHandler extends BaseHandler
                 new CRUDFormRow('Дата рождения', new CRUDFormWidgetDate(DemoUser::_BIRTHDAY)),
                 new CRUDFormRow('Комментарий', new CRUDFormWidgetTextarea(DemoUser::_COMMENT)),
                 new CRUDFormRow('Создано', new CRUDFormWidgetTimestamp(DemoUser::_CREATED_AT_TS)),
-                new CRUDFormRow('Фото', new CRUDFormWidgetUpload(DemoUser::_PHOTO,  'images' . DIRECTORY_SEPARATOR . 'users', CRUDFormWidgetUpload::FILE_TYPE_IMAGE))
+                new CRUDFormRow('Фото', new CRUDFormWidgetUpload(DemoUser::_PHOTO,  'files', 'images' . DIRECTORY_SEPARATOR . 'users', CRUDFormWidgetUpload::FILE_TYPE_IMAGE))
             ]
         );
 

@@ -20,10 +20,11 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
     const FILE_TYPE_IMAGE = 'image';
 
-    const FIELD_TARGET_FOLDER = 'target_folder';
-
     /** @var string */
     protected $field_name;
+
+    /** @var string */
+    protected $storage;
 
     /** @var string */
     protected $target_folder;
@@ -34,13 +35,23 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     /** @var string */
     protected $file_type;
 
+    /**
+     * CRUDFormWidgetUpload constructor.
+     * @param string $field_name
+     * @param string $storage
+     * @param string $target_folder
+     * @param string $file_type
+     * @param string $form_action_url
+     */
     public function __construct(
         string $field_name,
+        string $storage,
         string $target_folder,
         string $file_type = '',
         string $form_action_url = ''
     ) {
         $this->setFieldName($field_name);
+        $this->setStorage($storage);
         $this->setFileType($file_type);
         $this->setTargetFolder($target_folder);
         $this->setFormActionUrl($form_action_url);
@@ -71,7 +82,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
         $file_type = $this->getFileType();
 
-        $file_manager = new FileManager('files');
+        $file_manager = new FileManager($this->getStorage());
 
         $file_url = $field_value ? $file_manager->getFileUrl($this->getTargetFolder() . '/' . $field_value) : '';
 
@@ -128,7 +139,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                         dataType: 'json',
                         data: {
                             '<?php echo Operations::FIELD_NAME_OPERATION_CODE; ?>': '<?php echo CRUDForm::OPERATION_DELETE_FILE; ?>',
-                            '<?php echo self::FIELD_TARGET_FOLDER; ?>': '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>',
+                            '<?php echo CRUDForm::FIELD_STORAGE; ?>': '<?php echo Sanitize::sanitizeAttrValue($this->getStorage()); ?>',
+                            '<?php echo CRUDForm::FIELD_TARGET_FOLDER; ?>': '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>',
                             '<?php echo CRUDForm::FIELD_FIELD_NAME; ?>': '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>'
                         },
                         url: url,
@@ -155,7 +167,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     dataType: 'json',
                     formData: [
                         {name: '<?php echo Operations::FIELD_NAME_OPERATION_CODE; ?>', value: '<?php echo CRUDForm::OPERATION_UPLOAD_FILE; ?>'},
-                        {name: '<?php echo self::FIELD_TARGET_FOLDER; ?>', value: '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>'},
+                        {name: '<?php echo CRUDForm::FIELD_STORAGE; ?>', value: '<?php echo Sanitize::sanitizeAttrValue($this->getStorage()); ?>'},
+                        {name: '<?php echo CRUDForm::FIELD_TARGET_FOLDER; ?>', value: '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>'},
                         {name: '<?php echo CRUDForm::FIELD_FIELD_NAME; ?>', value: '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>'}
                     ],
                     autoUpload: true,
@@ -230,6 +243,22 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     public function setFieldName(string $field_name): void
     {
         $this->field_name = $field_name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStorage(): string
+    {
+        return $this->storage;
+    }
+
+    /**
+     * @param string $storage
+     */
+    public function setStorage(string $storage): void
+    {
+        $this->storage = $storage;
     }
 
     /**

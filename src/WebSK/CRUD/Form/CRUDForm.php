@@ -36,6 +36,7 @@ class CRUDForm
     const FIELD_REDIRECT_URL_GET_PARAMS = '_FIELD_REDIRECT_URL_GET_PARAMS';
     const FIELD_FORM_ID = '_FIELD_FORM_ID';
 
+    const FIELD_STORAGE = 'storage';
     const FIELD_TARGET_FOLDER = 'target_folder';
     const FIELD_FIELD_NAME = 'field_name';
 
@@ -150,14 +151,17 @@ class CRUDForm
         $entity_service = $this->crud->getEntityServiceByClassName($entity_class_name);
         $obj = $entity_service->getById($entity_id);
 
-        $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
         $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
 
         $file_name = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
 
         $json_arr['file'] = $file_name;
 
-        $file_manager = new FileManager('files');
+        $storage = $request->getParsedBodyParam(self::FIELD_STORAGE);
+
+        $file_manager = new FileManager($storage);
+
+        $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
 
         $is_deleted = $file_manager->deleteFile($target_folder . DIRECTORY_SEPARATOR . $file_name);
 
@@ -201,7 +205,9 @@ class CRUDForm
             'name' => $file_name,
         ];
 
-        $file_manager = new FileManager('files');
+        $storage = $request->getParsedBodyParam(self::FIELD_STORAGE);
+
+        $file_manager = new FileManager($storage);
 
         $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
 
