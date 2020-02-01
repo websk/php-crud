@@ -16,7 +16,7 @@ use WebSK\Utils\Sanitize;
  */
 class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 {
-    const MAX_FILE_SIZE = 20971520;
+    const MAX_FILE_SIZE = 52428800;
 
     const FILE_TYPE_IMAGE = 'image';
 
@@ -30,10 +30,13 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     protected $target_folder;
 
     /** @var string */
-    protected $form_action_url = '';
+    protected $file_type = '';
 
     /** @var string */
-    protected $file_type;
+    protected $form_action_url = '';
+
+    /** @var array */
+    protected $allowed_extensions = [];
 
     /**
      * CRUDFormWidgetUpload constructor.
@@ -41,6 +44,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
      * @param string $storage
      * @param string $target_folder
      * @param string $file_type
+     * @param array $allowed_extensions
      * @param string $form_action_url
      */
     public function __construct(
@@ -48,12 +52,14 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         string $storage,
         string $target_folder,
         string $file_type = '',
+        array $allowed_extensions = [],
         string $form_action_url = ''
     ) {
         $this->setFieldName($field_name);
         $this->setStorage($storage);
-        $this->setFileType($file_type);
         $this->setTargetFolder($target_folder);
+        $this->setFileType($file_type);
+        $this->setAllowedExtensions($allowed_extensions);
         $this->setFormActionUrl($form_action_url);
     }
 
@@ -80,16 +86,14 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
             $crud_form_widget_blueimp_file_upload_include_script = false;
         }
 
-        $file_type = $this->getFileType();
-
         $file_manager = new FileManager($this->getStorage());
 
         $file_url = $field_value ? $file_manager->getFileUrl($this->getTargetFolder() . '/' . $field_value) : '';
 
         $accept_file_types = 'undefined';
-        switch($file_type) {
-            case self::FILE_TYPE_IMAGE:
-                $accept_file_types = '/(\.|\/)(gif|jpe?g|png)$/i';
+        $allowed_extensions = $this->getAllowedExtensions();
+        if ($allowed_extensions) {
+            $accept_file_types = '/(\.|\/)(' . implode('|', $allowed_extensions) . ')$/i';
         }
 
         ob_start();
@@ -110,6 +114,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     }
                     var html = '<a href="' + file_url +'" target="_blank">';
                 <?php
+                    $file_type = $this->getFileType();
+
                     if ($file_type == self::FILE_TYPE_IMAGE) {
                         ?>
                         html += '<img src="' + file_url +'" class="img-responsive img-thumbnail" style="max-width: 200px">';
@@ -280,6 +286,22 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     /**
      * @return string
      */
+    public function getFileType(): string
+    {
+        return $this->file_type;
+    }
+
+    /**
+     * @param string $file_type
+     */
+    public function setFileType(string $file_type): void
+    {
+        $this->file_type = $file_type;
+    }
+
+    /**
+     * @return string
+     */
     public function getFormActionUrl(): string
     {
         return $this->form_action_url;
@@ -294,18 +316,18 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getFileType(): string
+    public function getAllowedExtensions(): array
     {
-        return $this->file_type;
+        return $this->allowed_extensions;
     }
 
     /**
-     * @param string $file_type
+     * @param array $allowed_extensions
      */
-    public function setFileType(string $file_type): void
+    public function setAllowedExtensions(array $allowed_extensions): void
     {
-        $this->file_type = $file_type;
+        $this->allowed_extensions = $allowed_extensions;
     }
 }

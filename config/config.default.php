@@ -31,7 +31,7 @@ return [
                 'adapter' => 'local',
                 'root_path' => '/var/www/php-crud/public/files',
                 'url_path' => '/files',
-                'allowed_extension' => ['gif', 'jpeg', 'jpg', 'png', 'pdf', 'csv'],
+                'allowed_extensions' => ['gif', 'jpeg', 'jpg', 'png', 'pdf', 'csv'],
                 'allowed_types' => ['image/gif', 'image/jpeg', 'image/jpg', 'image/pjpeg', 'image/x-png', 'image/png', 'application/pdf', 'application/x-pdf', 'text/csv'],
             ]
         ],
