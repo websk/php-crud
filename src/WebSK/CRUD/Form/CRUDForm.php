@@ -163,7 +163,7 @@ class CRUDForm
 
         $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
 
-        $is_deleted = $file_manager->deleteFile($target_folder . DIRECTORY_SEPARATOR . $file_name);
+        $is_deleted = $file_manager->deleteFileIfExist($target_folder . DIRECTORY_SEPARATOR . $file_name);
 
         if (!$is_deleted) {
             $json_arr['error'] = 'Не удалось удалить файл';
@@ -211,7 +211,7 @@ class CRUDForm
 
         $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
 
-        $file_name = $file_manager->storeUploadedFile($file, $target_folder, $error);
+        $file_name = $file_manager->storeUploadedFile($file, $target_folder, '', $error);
 
         if ($error) {
             $json_arr['files'][0]['error'] = $error;
@@ -219,7 +219,7 @@ class CRUDForm
         }
 
         if ($old_file_name) {
-            $file_manager->deleteFile($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
+            $file_manager->deleteFileIfExist($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
         }
 
         $json_arr['files'][0]['url'] = $file_manager->getFileUrl($target_folder . '/' . $file_name);
