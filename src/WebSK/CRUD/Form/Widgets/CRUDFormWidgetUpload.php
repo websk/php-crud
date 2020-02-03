@@ -16,7 +16,7 @@ use WebSK\Utils\Sanitize;
  */
 class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 {
-    const MAX_FILE_SIZE = 52428800;
+    const DEFAULT_MAX_FILE_SIZE = 52428800;
 
     const FILE_TYPE_IMAGE = 'image';
 
@@ -35,6 +35,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     /** @var string */
     protected $form_action_url = '';
 
+    protected $max_file_size = self::DEFAULT_MAX_FILE_SIZE;
+
     /** @var array */
     protected $allowed_extensions = [];
 
@@ -45,6 +47,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
      * @param string $target_folder
      * @param string $file_type
      * @param array $allowed_extensions
+     * @param int $max_file_size
      * @param string $form_action_url
      */
     public function __construct(
@@ -53,6 +56,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         string $target_folder,
         string $file_type = '',
         array $allowed_extensions = [],
+        int $max_file_size = self::DEFAULT_MAX_FILE_SIZE,
         string $form_action_url = ''
     ) {
         $this->setFieldName($field_name);
@@ -60,6 +64,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         $this->setTargetFolder($target_folder);
         $this->setFileType($file_type);
         $this->setAllowedExtensions($allowed_extensions);
+        $this->setMaxFileSize($max_file_size);
         $this->setFormActionUrl($form_action_url);
     }
 
@@ -96,6 +101,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
             $accept_file_types = '/(\.|\/)(' . implode('|', $allowed_extensions) . ')$/i';
         }
 
+        $max_file_size = $this->getMaxFileSize();
+
         ob_start();
         ?>
         <span class="btn btn-success fileinput-button">
@@ -112,8 +119,11 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     if (!file_url) {
                         return;
                     }
+
+                    $('.fileinput-button').hide();
+
                     var html = '<a href="' + file_url +'" target="_blank">';
-                <?php
+                    <?php
                     $file_type = $this->getFileType();
 
                     if ($file_type == self::FILE_TYPE_IMAGE) {
@@ -158,6 +168,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                             return;
                         }
 
+                        $('.fileinput-button').show();
+
                         link.closest('p').remove();
                         $('#files_<?php echo $element_id; ?>').html('');
                     }).error(
@@ -179,7 +191,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     ],
                     autoUpload: true,
                     acceptFileTypes: <?php echo $accept_file_types; ?>,
-                    maxFileSize: <?php echo self::MAX_FILE_SIZE; ?>,
+                    maxFileSize: <?php echo $max_file_size; ?>,
                     previewThumbnail: true,
                     maxNumberOfFiles: 1,
                     messages: {
@@ -329,5 +341,21 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     public function setAllowedExtensions(array $allowed_extensions): void
     {
         $this->allowed_extensions = $allowed_extensions;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMaxFileSize(): int
+    {
+        return $this->max_file_size;
+    }
+
+    /**
+     * @param int $max_file_size
+     */
+    public function setMaxFileSize(int $max_file_size): void
+    {
+        $this->max_file_size = $max_file_size;
     }
 }

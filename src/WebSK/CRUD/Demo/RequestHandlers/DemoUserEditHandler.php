@@ -57,7 +57,7 @@ class DemoUserEditHandler extends BaseHandler
                     'Фото',
                     new CRUDFormWidgetUpload(
                         DemoUser::_PHOTO,
-                        'local',
+                        'files',
                         'images' . DIRECTORY_SEPARATOR . 'users',
                         CRUDFormWidgetUpload::FILE_TYPE_IMAGE
                     )
