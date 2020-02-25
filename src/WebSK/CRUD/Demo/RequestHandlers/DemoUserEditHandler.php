@@ -59,6 +59,9 @@ class DemoUserEditHandler extends BaseHandler
                         DemoUser::_PHOTO,
                         'files',
                         'images' . DIRECTORY_SEPARATOR . 'users',
+                        function(DemoUser $user_obj) {
+                            return $user_obj->getPhoto() ? '/files/images/users/' . $user_obj->getPhoto() : '';
+                        },
                         CRUDFormWidgetUpload::FILE_TYPE_IMAGE
                     )
                 )

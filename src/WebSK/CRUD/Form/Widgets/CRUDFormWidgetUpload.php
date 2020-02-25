@@ -2,12 +2,13 @@
 
 namespace WebSK\CRUD\Form\Widgets;
 
+use Closure;
 use OLOG\Operations;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\Form\CRUDForm;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
-use WebSK\FileManager\FileManager;
 use WebSK\Utils\Sanitize;
 
 /**
@@ -29,6 +30,9 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     /** @var string */
     protected $target_folder;
 
+    /** @var string|Closure */
+    protected $url;
+
     /** @var string */
     protected $file_type = '';
 
@@ -45,6 +49,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
      * @param string $field_name
      * @param string $storage
      * @param string $target_folder
+     * @param string|Closure $url
      * @param string $file_type
      * @param array $allowed_extensions
      * @param int $max_file_size
@@ -54,6 +59,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         string $field_name,
         string $storage,
         string $target_folder,
+        $url,
         string $file_type = '',
         array $allowed_extensions = [],
         int $max_file_size = self::DEFAULT_MAX_FILE_SIZE,
@@ -62,6 +68,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         $this->setFieldName($field_name);
         $this->setStorage($storage);
         $this->setTargetFolder($target_folder);
+        $this->setUrl($url);
         $this->setFileType($file_type);
         $this->setAllowedExtensions($allowed_extensions);
         $this->setMaxFileSize($max_file_size);
@@ -78,6 +85,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
         $element_id = 'fileupload_' . Sanitize::sanitizeAttrValue($field_name) . '_' . rand(1, 999999);
 
+        $file_url = CRUDCompiler::fieldValueOrCallableResult($this->getUrl(), $obj);
+
         $html = '';
 
         if (!isset($crud_form_widget_blueimp_file_upload_include_script)) {
@@ -91,10 +100,6 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
             $crud_form_widget_blueimp_file_upload_include_script = false;
         }
 
-        $file_manager = new FileManager($this->getStorage());
-
-        $file_url = $field_value ? $file_manager->getFileUrl($this->getTargetFolder() . '/' . $field_value) : '';
-
         $accept_file_types = 'undefined';
         $allowed_extensions = $this->getAllowedExtensions();
         if ($allowed_extensions) {
@@ -103,15 +108,18 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
         $max_file_size = $this->getMaxFileSize();
 
+        $fileinput_button_id = 'fileinput-button-' .  $element_id;
+        $files_area_id = 'files-' . $element_id;
+
         ob_start();
         ?>
-        <span class="btn btn-success fileinput-button">
+        <span class="btn btn-success fileinput-button" id="<?php echo $fileinput_button_id; ?>">
             <i class="glyphicon glyphicon-plus"></i>
             <span>Выберите файл...</span>
             <input id="<?php echo $element_id; ?>" type="file" name="file_<?php echo $field_name; ?>">
         </span>
 
-        <div id="files_<?php echo $element_id; ?>"></div>
+        <div id="<?php echo $files_area_id; ?>"></div>
 
         <script>
             $(function () {
@@ -120,7 +128,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                         return;
                     }
 
-                    $('.fileinput-button').hide();
+                    $('#<?php echo $fileinput_button_id; ?>').hide();
 
                     var html = '<a href="' + file_url +'" target="_blank">';
                     <?php
@@ -132,21 +140,21 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                         <?php
                     } else {
                     ?>
-                        html += file_name;
+                        html += '<p>' + file_name + '</p>';
                     <?php
                     }
                     ?>
                     html += '</a>';
                     html += '<p><button class="btn btn-danger" title="Удалить">Удалить</button></p>';
 
-                    $('#files_<?php echo $element_id; ?>').html(html);
+                    $('#<?php echo $files_area_id; ?>').html(html);
                 }
 
                 let url = '<?php echo $this->getFormActionUrl(); ?>';
 
                 viewFile('<?php echo $file_url; ?>', '<?php echo $field_value; ?>');
 
-                $('#files_<?php echo $element_id; ?>').on('click', 'button', function (e) {
+                $('#<?php echo $files_area_id; ?>').on('click', 'button', function (e) {
                     e.preventDefault();
 
                     let link = $(this);
@@ -164,18 +172,18 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     }).success(function (data) {
                         if (data.error) {
                             var error_msg = $('<span class="text-danger"/>').text(data.error);
-                            $('#files_<?php echo $element_id; ?>').append(error_msg);
+                            $('#<?php echo $files_area_id; ?>').append(error_msg);
                             return;
                         }
 
-                        $('.fileinput-button').show();
+                        $('#<?php echo $fileinput_button_id; ?>').show();
 
                         link.closest('p').remove();
-                        $('#files_<?php echo $element_id; ?>').html('');
+                        $('#<?php echo $files_area_id; ?>').html('');
                     }).error(
                         function (xhr, status, error) {
                             var error_msg = $('<span class="text-danger"/>').text(error);
-                            $('#files_<?php echo $element_id; ?>').append(error_msg);
+                            $('#<?php echo $files_area_id; ?>').append(error_msg);
                         }
                     );
                 });
@@ -201,7 +209,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                         minFileSize: 'Размер файла слишком маленький'
                     }
                 }).on('fileuploadadd', function (e, data) {
-                    data.context = $('<div/>').appendTo('#files_<?php echo $element_id; ?>');
+                    data.context = $('<div/>').appendTo('#<?php echo $files_area_id; ?>');
                     $.each(data.files, function (index, file) {
                         var node = $('<p/>')
                             .append($('<span/>').text(file.name));
@@ -218,11 +226,12 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     }
                 }).on('fileuploaddone', function (e, data) {
                     $.each(data.result.files, function (index, file) {
-                        if (file.url) {
+                        if (file.name) {
                             $(data.context.children()[index])
                                 .append(' <div class="text-success">Файл  загружен</div>');
 
-                            viewFile(file.url, file.name);
+                            $('#<?php echo $fileinput_button_id; ?>').hide();
+
                         } else if (file.error) {
                             var error = $('<span class="text-danger"/>').text(file.error);
                             $(data.context.children()[index])
@@ -293,6 +302,22 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     public function setTargetFolder(string $target_folder): void
     {
         $this->target_folder = $target_folder;
+    }
+
+    /**
+     * @return Closure|string
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * @param Closure|string $url
+     */
+    public function setUrl($url): void
+    {
+        $this->url = $url;
     }
 
     /**

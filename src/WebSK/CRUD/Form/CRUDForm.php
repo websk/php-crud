@@ -222,8 +222,6 @@ class CRUDForm
             $file_manager->deleteFileIfExist($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
         }
 
-        $json_arr['files'][0]['url'] = $file_manager->getFileUrl($target_folder . '/' . $file_name);
-
         $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => $file_name]);
 
         $entity_service->save($obj);
