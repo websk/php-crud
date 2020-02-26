@@ -12,28 +12,43 @@ use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
  */
 class CRUDTableFilterEqualInline implements InterfaceCRUDTableFilterVisible
 {
+    const DEFAULT_TIMEOUT = 500;
+
     /** @var string */
     protected $title;
+
     /** @var string */
     protected $field_name;
+
     /** @var string */
     protected $filter_uniq_id;
+
     /** @var string */
     protected $placeholder;
 
+    /** @var int */
+    protected $timeout;
+
     /**
-     * CRUDTableFilterEqualInlineVisible constructor.
+     * CRUDTableFilterEqualInline constructor.
      * @param string $filter_uniq_id
      * @param string $title
      * @param string $field_name
      * @param string $placeholder
+     * @param int $timeout
      */
-    public function __construct(string $filter_uniq_id, string $title, string $field_name, string $placeholder = '')
-    {
+    public function __construct(
+        string $filter_uniq_id,
+        string $title,
+        string $field_name,
+        string $placeholder = '',
+        int $timeout = self::DEFAULT_TIMEOUT
+    ) {
         $this->setFilterUniqId($filter_uniq_id);
         $this->setTitle($title);
         $this->setFieldName($field_name);
         $this->setPlaceholder($placeholder);
+        $this->setTimeout($timeout);
     }
 
     /** @inheritdoc */
@@ -88,10 +103,10 @@ class CRUDTableFilterEqualInline implements InterfaceCRUDTableFilterVisible
                     clearTimeout(timer);
                     timer = setTimeout(function () {
                         $this.closest('form').trigger('submit');
-                    }, 200);
+                    }, <?php echo $this->getTimeout(); ?>);
                 });
             };
-            new CRUDTableFilterEqualInline('<?= $this->getFilterUniqId() ?>');
+            new CRUDTableFilterEqualInline('<?php echo $this->getFilterUniqId(); ?>');
         </script>
         <?php
         $html .= ob_get_clean();
@@ -161,5 +176,21 @@ class CRUDTableFilterEqualInline implements InterfaceCRUDTableFilterVisible
     public function setPlaceholder(string $placeholder): void
     {
         $this->placeholder = $placeholder;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeout(): int
+    {
+        return $this->timeout;
+    }
+
+    /**
+     * @param int $timeout
+     */
+    public function setTimeout(int $timeout): void
+    {
+        $this->timeout = $timeout;
     }
 }

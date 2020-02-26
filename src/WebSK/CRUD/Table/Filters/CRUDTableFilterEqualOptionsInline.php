@@ -15,18 +15,25 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
 {
     /** @var string */
     protected $title;
+
     /** @var string */
     protected $field_name;
+
     /** @var string */
     protected $filter_uniq_id;
+
     /** @var bool */
     protected $initial_is_enabled;
+
     /** @var string */
     protected $initial_value;
+
     /** @var array */
     protected $options_arr;
+
     /** @var bool */
     protected $show_null_checkbox;
+
     /** @var string */
     protected $btn_all_text;
 
@@ -37,7 +44,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
      * @param string $field_name
      * @param array $options_arr
      * @param bool $initial_is_enabled
-     * @param bool $initial_value
+     * @param string $initial_value
      * @param bool $show_null_checkbox
      * @param string $btn_all_text
      */
@@ -47,7 +54,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
         string $field_name,
         array $options_arr,
         bool $initial_is_enabled,
-        bool $initial_value,
+        string $initial_value,
         bool $show_null_checkbox,
         string $btn_all_text = 'Все'
     ) {

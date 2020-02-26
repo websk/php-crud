@@ -14,16 +14,22 @@ class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
 {
     /** @var string */
     protected $title;
+
     /** @var string */
     protected $field_name;
+
     /** @var string */
     protected $filter_iniq_id;
+
     /** @var bool */
     protected $initial_is_enabled;
+
     /** @var string */
     protected $initial_value;
+
     /** @var array */
     protected $options_arr;
+
     /** @var bool */
     protected $show_null_checkbox;
 
