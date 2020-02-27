@@ -134,6 +134,10 @@ class CRUDForm
                 return $this->deleteFileFormOperation($request, $response);
         }
 
+        if ($form_id != $this->form_unique_id) {
+            return null;
+        }
+
         return $response->withRedirect($request->getUri());
     }
 
