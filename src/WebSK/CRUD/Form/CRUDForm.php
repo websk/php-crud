@@ -39,6 +39,7 @@ class CRUDForm
     const FIELD_STORAGE = 'storage';
     const FIELD_TARGET_FOLDER = 'target_folder';
     const FIELD_FIELD_NAME = 'field_name';
+    const FIELD_SAVE_AS = 'save_as';
 
     /** @var CRUD */
     protected $crud;
@@ -218,8 +219,9 @@ class CRUDForm
         $file_manager = new FileManager($storage);
 
         $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
+        $save_as = $request->getParsedBodyParam(self::FIELD_SAVE_AS, '');
 
-        $file_name = $file_manager->storeUploadedFile($file, $target_folder, '', $error);
+        $file_name = $file_manager->storeUploadedFile($file, $target_folder, $save_as, $error);
 
         if ($error) {
             $json_arr['files'][0]['error'] = $error;

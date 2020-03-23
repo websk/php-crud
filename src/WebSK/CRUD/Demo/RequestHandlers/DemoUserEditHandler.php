@@ -62,6 +62,7 @@ class DemoUserEditHandler extends BaseHandler
                         function(DemoUser $user_obj) {
                             return $user_obj->getPhoto() ? '/files/images/users/' . $user_obj->getPhoto() : '';
                         },
+                        $demo_user_obj->getId(),
                         CRUDFormWidgetUpload::FILE_TYPE_IMAGE
                     )
                 )

@@ -33,6 +33,9 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     /** @var string|Closure */
     protected $url;
 
+    /** @var $save_as */
+    protected $save_as;
+
     /** @var string */
     protected $file_type = '';
 
@@ -50,6 +53,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
      * @param string $storage
      * @param string $target_folder
      * @param string|Closure $url
+     * @param string $save_as
      * @param string $file_type
      * @param array $allowed_extensions
      * @param int $max_file_size
@@ -60,6 +64,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         string $storage,
         string $target_folder,
         $url,
+        string $save_as = '',
         string $file_type = '',
         array $allowed_extensions = [],
         int $max_file_size = self::DEFAULT_MAX_FILE_SIZE,
@@ -69,6 +74,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         $this->setStorage($storage);
         $this->setTargetFolder($target_folder);
         $this->setUrl($url);
+        $this->setSaveAs($save_as);
         $this->setFileType($file_type);
         $this->setAllowedExtensions($allowed_extensions);
         $this->setMaxFileSize($max_file_size);
@@ -93,9 +99,9 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
             $cdn_blueimp_file_upload_path = 'https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/10.7.0';
 
             $html .= '<link rel="stylesheet" href="' . $cdn_blueimp_file_upload_path . '/css/jquery.fileupload.css">' .
-            '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload.js"></script>' .
-            '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload-process.js"></script>' .
-            '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload-validate.js"></script>';
+                '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload.js"></script>' .
+                '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload-process.js"></script>' .
+                '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload-validate.js"></script>';
 
             $crud_form_widget_blueimp_file_upload_include_script = false;
         }
@@ -135,12 +141,12 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     $file_type = $this->getFileType();
 
                     if ($file_type == self::FILE_TYPE_IMAGE) {
-                        ?>
-                        html += '<img src="' + file_url +'" class="img-responsive img-thumbnail" style="max-width: 200px">';
-                        <?php
+                    ?>
+                    html += '<img src="' + file_url +'" class="img-responsive img-thumbnail" style="max-width: 200px">';
+                    <?php
                     } else {
                     ?>
-                        html += '<p>' + file_name + '</p>';
+                    html += '<p>' + file_name + '</p>';
                     <?php
                     }
                     ?>
@@ -165,7 +171,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                             '<?php echo Operations::FIELD_NAME_OPERATION_CODE; ?>': '<?php echo CRUDForm::OPERATION_DELETE_FILE; ?>',
                             '<?php echo CRUDForm::FIELD_STORAGE; ?>': '<?php echo Sanitize::sanitizeAttrValue($this->getStorage()); ?>',
                             '<?php echo CRUDForm::FIELD_TARGET_FOLDER; ?>': '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>',
-                            '<?php echo CRUDForm::FIELD_FIELD_NAME; ?>': '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>'
+                            '<?php echo CRUDForm::FIELD_FIELD_NAME; ?>': '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>',
+                            '<?php echo CRUDForm::FIELD_SAVE_AS; ?>': '<?php echo Sanitize::sanitizeAttrValue($this->getSaveAs()); ?>'
                         },
                         url: url,
                         type: 'POST'
@@ -195,7 +202,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                         {name: '<?php echo Operations::FIELD_NAME_OPERATION_CODE; ?>', value: '<?php echo CRUDForm::OPERATION_UPLOAD_FILE; ?>'},
                         {name: '<?php echo CRUDForm::FIELD_STORAGE; ?>', value: '<?php echo Sanitize::sanitizeAttrValue($this->getStorage()); ?>'},
                         {name: '<?php echo CRUDForm::FIELD_TARGET_FOLDER; ?>', value: '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>'},
-                        {name: '<?php echo CRUDForm::FIELD_FIELD_NAME; ?>', value: '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>'}
+                        {name: '<?php echo CRUDForm::FIELD_FIELD_NAME; ?>', value: '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>'},
+                        {name: '<?php echo CRUDForm::FIELD_SAVE_AS; ?>', value: '<?php echo Sanitize::sanitizeAttrValue($this->getSaveAs()); ?>'}
                     ],
                     autoUpload: true,
                     acceptFileTypes: <?php echo $accept_file_types; ?>,
@@ -216,6 +224,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                         node.appendTo(data.context);
                     });
                 }).on('fileuploadprocessalways', function (e, data) {
+                    $(".btn-primary").prop("disabled", false);
+
                     var index = data.index,
                         file = data.files[index],
                         node = $(data.context.children()[index]);
@@ -239,6 +249,9 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                                 .append(error);
                         }
                     });
+
+                    event.preventDefault();
+                    $(".btn-primary").prop("disabled", false);
                 }).on('fileuploadfail', function (e, data) {
                     $.each(data.files, function (index) {
                         var error = $('<span class="text-danger"/>').text('Файл не удалось загрузить.');
@@ -246,6 +259,11 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                             .append('<br>')
                             .append(error);
                     });
+
+                    event.preventDefault();
+                    $(".btn-primary").prop("disabled", false);
+                }).on('fileuploadstart', function (e) {
+                    $(".btn-primary").prop("disabled", true);
                 }).prop('disabled', !$.support.fileInput)
                     .parent().addClass($.support.fileInput ? undefined : 'disabled');
             });
@@ -382,5 +400,21 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     public function setMaxFileSize(int $max_file_size): void
     {
         $this->max_file_size = $max_file_size;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSaveAs()
+    {
+        return $this->save_as;
+    }
+
+    /**
+     * @param mixed $save_as
+     */
+    public function setSaveAs($save_as): void
+    {
+        $this->save_as = $save_as;
     }
 }
