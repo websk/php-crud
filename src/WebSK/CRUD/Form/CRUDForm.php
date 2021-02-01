@@ -178,7 +178,7 @@ class CRUDForm
             $json_arr['error'] = 'Не удалось удалить файл';
         }
 
-        $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => '']);
+        $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => null]);
         $entity_service->save($obj);
 
         return $response->withJson($json_arr);
