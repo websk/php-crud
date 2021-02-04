@@ -1,6 +1,7 @@
 {
   "name": "websk/php-crud",
   "require": {
+    "php": "^7.4",
     "slim/slim": "^3.0",
     "websk/php-cache": "1.1.*",
     "websk/php-config": "1.0.*",
