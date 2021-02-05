@@ -13,14 +13,15 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
 {
-    /** @var string */
-    protected $field_name;
-    /** @var array */
-    protected $options_arr;
-    /** @var bool */
-    protected $show_null_checkbox;
-    /** @var bool */
-    protected $is_required;
+    protected string $field_name;
+
+    protected array $options_arr;
+
+    protected bool $show_null_checkbox = false;
+
+    protected bool $is_required = false;
+
+    protected bool $disabled = false;
 
     /**
      * CRUDFormWidgetOptions constructor.
@@ -28,24 +29,28 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
      * @param array $options_arr
      * @param bool $show_null_checkbox
      * @param bool $is_required
+     * @param bool $disabled
      */
     public function __construct(
         string $field_name,
         array $options_arr,
         bool $show_null_checkbox = false,
-        bool $is_required = false
-    ) {
+        bool $is_required = false,
+        bool $disabled = false
+    )
+    {
         $this->setFieldName($field_name);
         $this->setOptionsArr($options_arr);
         $this->setShowNullCheckbox($show_null_checkbox);
         $this->setIsRequired($is_required);
+        $this->setDisabled($disabled);
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         return $this->htmlForValue($field_value);
     }
@@ -73,7 +78,7 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
                 $selected_html_attr = 'selected';
             }
 
-            $options .= '<option value="' . $value . '" ' . $selected_html_attr . '>' . $title . '</option>';
+            $options .= '<option value="' . Sanitize::sanitizeAttrValue($value) . '" ' . $selected_html_attr . '>' . Sanitize::sanitizeTagContent($title) . '</option>';
         }
 
         $is_null_checked = '';
@@ -81,14 +86,18 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
             $is_null_checked = ' checked ';
         }
 
-
         $is_required_str = '';
         if ($this->is_required) {
             $is_required_str = ' required ';
         }
 
+        $disabled = '';
+        if ($this->isDisabled()) {
+            $disabled = ' disabled';
+        }
+
         $html .= '<div class="input-group">';
-        $html .= '<select name="' . $input_name . '" class="form-control" ' . $is_required_str . '>' .
+        $html .= '<select name="' . $input_name . '" class="form-control" ' . $is_required_str . $disabled . '>' .
             $options . '</select>';
 
         if ($this->isShowNullCheckbox()) {
@@ -165,5 +174,21 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
     public function setIsRequired(bool $is_required): void
     {
         $this->is_required = $is_required;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisabled(): bool
+    {
+        return $this->disabled;
+    }
+
+    /**
+     * @param bool $disabled
+     */
+    public function setDisabled(bool $disabled): void
+    {
+        $this->disabled = $disabled;
     }
 }

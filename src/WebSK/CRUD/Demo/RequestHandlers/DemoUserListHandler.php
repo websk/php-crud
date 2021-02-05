@@ -12,7 +12,7 @@ use WebSK\CRUD\Form\CRUDFormRow;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\CRUDTableColumn;
-use WebSK\CRUD\Table\Filters\CRUDTableFilterLikeInline;
+use WebSK\CRUD\Table\Filters\CRUDTableFilterLike;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDatetime;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDelete;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetText;
@@ -81,12 +81,12 @@ class DemoUserListHandler extends BaseHandler
                 new CRUDTableColumn('', new CRUDTableWidgetDelete())
             ],
             [
-                new CRUDTableFilterLikeInline(self::FILTER_NAME, 'Имя на сайте', DemoUser::_NAME),
-                new CRUDTableFilterLikeInline(self::FILTER_EMAIL, 'Email', DemoUser::_EMAIL),
+                new CRUDTableFilterLike(self::FILTER_NAME, 'Имя на сайте', DemoUser::_NAME),
+                new CRUDTableFilterLike(self::FILTER_EMAIL, 'Email', DemoUser::_EMAIL),
             ],
             DemoUser::_CREATED_AT_TS . ' DESC',
             'users_list',
-            CRUDTable::FILTERS_POSITION_INLINE
+            CRUDTable::FILTERS_POSITION_TOP
         );
 
         $crud_form_response = $crud_table_obj->processRequest($request, $response);

@@ -132,7 +132,7 @@ class CRUDFormScript
     /**
      * @return string
      */
-    public static function includeBootstrapDateTimeScripts()
+    public static function includeBootstrapDateTimeScripts(): string
     {
         static $CRUD_form_bootstrap_date_time_include_script;
 

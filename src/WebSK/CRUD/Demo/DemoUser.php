@@ -10,57 +10,43 @@ use WebSK\Entity\Entity;
  */
 class DemoUser extends Entity
 {
-    const ENTITY_SERVICE_CONTAINER_ID = 'crud.demo_user_service';
-    const ENTITY_REPOSITORY_CONTAINER_ID = 'crud.demo_user_repository';
     const DB_TABLE_NAME = 'crud_demo_users';
 
     const _NAME = 'name';
-    /** @var string */
-    protected $name = '';
+    protected string $name = '';
 
     const _FIRST_NAME = 'first_name';
-    /** @var string */
-    protected $first_name = '';
+    protected string $first_name = '';
 
     const _LAST_NAME = 'last_name';
-    /** @var string */
-    protected $last_name = '';
+    protected string $last_name = '';
 
     const _EMAIL = 'email';
-    /** @var string */
-    protected $email = '';
+    protected string $email = '';
 
     const _BIRTHDAY = 'birthday';
-    /** @var string */
-    protected $birthday = '';
+    protected string $birthday = '';
 
     const _PHONE = 'phone';
-    /** @var string */
-    protected $phone = '';
+    protected string $phone = '';
 
     const _CITY = 'city';
-    /** @var string */
-    protected $city = '';
+    protected string $city = '';
 
     const _ADDRESS = 'address';
-    /** @var string */
-    protected $address = '';
+    protected string $address = '';
 
     const _COMPANY = 'company';
-    /** @var string */
-    protected $company = '';
+    protected string $company = '';
 
     const _COMMENT = 'comment';
-    /** @var string */
-    protected $comment = '';
+    protected string $comment = '';
 
     const _PHOTO = 'photo';
-    /** @var string */
-    protected $photo = '';
+    protected string $photo = '';
 
     const _PASSW = 'passw';
-    /** @var string */
-    protected $passw;
+    protected string $passw = '';
 
     /**
      * @return string
@@ -79,33 +65,33 @@ class DemoUser extends Entity
     }
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getFirstName(): ?string
+    public function getFirstName(): string
     {
         return $this->first_name;
     }
 
     /**
-     * @param null|string $first_name
+     * @param string $first_name
      */
-    public function setFirstName(?string $first_name): void
+    public function setFirstName(string $first_name): void
     {
         $this->first_name = $first_name;
     }
 
     /**
-     * @return null|string
+     * @return string
      */
-    public function getLastName(): ?string
+    public function getLastName(): string
     {
         return $this->last_name;
     }
 
     /**
-     * @param null|string $last_name
+     * @param string $last_name
      */
-    public function setLastName(?string $last_name): void
+    public function setLastName(string $last_name): void
     {
         $this->last_name = $last_name;
     }

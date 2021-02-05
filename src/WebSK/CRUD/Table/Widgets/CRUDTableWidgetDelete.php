@@ -2,6 +2,7 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Assert;
 use OLOG\Operations;
 use WebSK\Utils\Sanitize;
@@ -10,29 +11,30 @@ use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
+/**
+ * Class CRUDTableWidgetDelete
+ * @package WebSK\CRUD\Table\Widgets
+ */
 class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
 {
     const FIELD_CLASS_NAME = '_class_name';
     const FIELD_OBJECT_ID = '_id';
     const FIELD_REDIRECT_AFTER_DELETE_URL = 'redirect_after_delete_url';
 
-    /** @var string */
-    protected $redirect_after_delete_url;
+    protected string $redirect_after_delete_url;
 
-    /** @var string */
-    protected $button_text;
+    protected string $button_text = '';
 
-    /** @var string */
-    protected $button_class_str;
+    protected string $button_class_str = '';
     
-    /** @var string */
-    protected $form_action_url = '';
+    protected string $form_action_url = '';
     
     /**
      * CRUDTableWidgetDelete constructor.
      * @param string $button_text
      * @param string $button_class_str
      * @param string $redirect_after_delete_url
+     * @param string $form_action_url
      */
     public function __construct(
         string $button_text = '',
@@ -47,17 +49,17 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        Assert::assert($obj);
+        Assert::assert($entity_obj);
 
         $o = '';
         $o .= '<form style="display: inline;" method="post"' . ($this->getFormActionUrl() ? ' action=" ' . $this->getFormActionUrl() .  '"' : '') . '>';
         $o .= Operations::operationCodeHiddenField(CRUDTable::OPERATION_DELETE_ENTITY);
         $o .= '<input type="hidden" name="' . self::FIELD_CLASS_NAME . '" ' .
-            'value="' . Sanitize::sanitizeAttrValue(get_class($obj)) . '">';
+            'value="' . Sanitize::sanitizeAttrValue(get_class($entity_obj)) . '">';
         $o .= '<input type="hidden" name="' . self::FIELD_OBJECT_ID . '" ' .
-            'value="' . Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($obj)) . '">';
+            'value="' . Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($entity_obj)) . '">';
 
         if ($this->getRedirectAfterDeleteUrl() != '') {
             $o .= '<input type="hidden" name="' . self::FIELD_REDIRECT_AFTER_DELETE_URL . '" ' .

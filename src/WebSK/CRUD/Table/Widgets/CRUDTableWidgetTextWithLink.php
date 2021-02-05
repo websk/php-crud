@@ -5,6 +5,7 @@ namespace WebSK\CRUD\Table\Widgets;
 use Closure;
 use OLOG\HTML;
 use WebSK\CRUD\CRUDCompiler;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
@@ -21,43 +22,11 @@ class CRUDTableWidgetTextWithLink implements InterfaceCRUDTableWidget
     /** @var string|Closure */
     protected $link;
 
-    /** @var string */
-    protected $classes_str;
+    protected string $classes_str = '';
 
-    /** @var string */
-    protected $target = '';
+    protected string $target = '';
 
-    /** @var string */
-    protected $rel = '';
-
-    /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
-    {
-        $url = CRUDCompiler::fieldValueOrCallableResult($this->getLink(), $obj);
-
-        $text = CRUDCompiler::fieldValueOrCallableResult($this->getText(), $obj);
-        if (trim($text) == '') {
-            $text = '#EMPTY#';
-        }
-        $text = Sanitize::sanitizeTagContent($text);
-
-        $link_attrs_arr = [];
-        $link_attrs_arr['href'] = $url;
-
-        if ($this->getClassesStr() != '') {
-            $link_attrs_arr['class'] = $this->getClassesStr();
-        }
-
-        if ($this->getTarget() != '') {
-            $link_attrs_arr['target'] = $this->getTarget();
-        }
-
-        if ($this->getRel() != '') {
-            $link_attrs_arr['rel'] = $this->getRel();
-        }
-
-        return HTML::tag('a', $link_attrs_arr, $text);
-    }
+    protected string $rel = '';
 
     /**
      * CRUDTableWidgetTextWithLink constructor.
@@ -79,6 +48,35 @@ class CRUDTableWidgetTextWithLink implements InterfaceCRUDTableWidget
         $this->setClassesStr($classes_str);
         $this->setTarget($target);
         $this->setRel($rel);
+    }
+
+    /** @inheritdoc */
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
+    {
+        $url = CRUDCompiler::fieldValueOrCallableResult($this->getLink(), $entity_obj);
+
+        $text = CRUDCompiler::fieldValueOrCallableResult($this->getText(), $entity_obj);
+        if (trim($text) == '') {
+            $text = '#EMPTY#';
+        }
+        $text = Sanitize::sanitizeTagContent($text);
+
+        $link_attrs_arr = [];
+        $link_attrs_arr['href'] = $url;
+
+        if ($this->getClassesStr() != '') {
+            $link_attrs_arr['class'] = $this->getClassesStr();
+        }
+
+        if ($this->getTarget() != '') {
+            $link_attrs_arr['target'] = $this->getTarget();
+        }
+
+        if ($this->getRel() != '') {
+            $link_attrs_arr['rel'] = $this->getRel();
+        }
+
+        return HTML::tag('a', $link_attrs_arr, $text);
     }
 
     /**

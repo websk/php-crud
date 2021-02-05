@@ -12,9 +12,9 @@ use WebSK\CRUD\CRUD;
 interface InterfaceCRUDTableWidget
 {
     /**
-     * @param InterfaceEntity $obj
+     * @param InterfaceEntity $entity_obj
      * @param CRUD $crud
      * @return string
      */
-    public function html($obj, CRUD $crud): string;
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string;
 }

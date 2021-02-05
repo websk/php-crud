@@ -13,12 +13,11 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
 {
-    /** @var string */
-    protected $field_name;
-    /** @var string */
-    protected $referenced_class_name;
-    /** @var string */
-    protected $referenced_class_title_field;
+    protected string $field_name;
+
+    protected string $referenced_class_name;
+
+    protected string $referenced_class_title_field;
 
     /**
      * CRUDFormWidgetReference constructor.
@@ -34,13 +33,13 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
         $referenced_class_name = $this->getReferencedClassName();
         $referenced_class_title_field = $this->getReferencedClassTitleField();
 
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         $options_html_arr = ['<option value=""></option>'];
 
@@ -48,8 +47,8 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
 
         $options_arr = [];
         foreach ($referenced_obj_ids_arr as $id) {
-            $obj = $crud->createAndLoadObject($referenced_class_name, $id);
-            $options_arr[$id] = CRUDFieldsAccess::getObjectFieldValue($obj, $referenced_class_title_field);
+            $entity_obj = $crud->createAndLoadObject($referenced_class_name, $id);
+            $options_arr[$id] = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $referenced_class_title_field);
         }
 
         foreach ($options_arr as $value => $title) {
@@ -58,7 +57,7 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
                 $selected_html_attr = ' selected';
             }
 
-            $options_html_arr[] = '<option value="' . $value . '" ' . $selected_html_attr . '>' . $title . '</option>'; // TODO: sanitize
+            $options_html_arr[] = '<option value="' . $value . '" ' . $selected_html_attr . '>' . Sanitize::sanitizeTagContent($title) . '</option>';
         }
 
         $html = '';

@@ -21,35 +21,41 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
     const ACE_MODE_XML = 'ace/mode/xml';
     const ACE_MODE_TEXT = 'ace/mode/text';
 
-    /** @var string */
-    protected $field_name;
+    protected string $field_name;
 
-    /** @var string */
-    protected $ace_mode = self::ACE_MODE_HTML;
+    protected string  $ace_mode = self::ACE_MODE_HTML;
 
-    /** @var bool */
-    protected $ace_use_worker = false;
+    protected bool $ace_use_worker = false;
+
+    protected bool $wrap_text = false;
 
     /**
      * CRUDFormWidgetAceTextarea constructor.
      * @param string $field_name
      * @param string $ace_mode
      * @param bool $ace_user_worker
+     * @param bool $wrap_text
      */
-    public function __construct(string $field_name, $ace_mode = self::ACE_MODE_HTML, $ace_user_worker = false)
+    public function __construct(
+        string $field_name,
+        string $ace_mode = self::ACE_MODE_HTML,
+        $ace_user_worker = false,
+        $wrap_text = false
+    )
     {
         $this->setFieldName($field_name);
         $this->setAceMode($ace_mode);
         $this->setAceUseWorker($ace_user_worker);
+        $this->setWrapText($wrap_text);
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         static $CRUDFormWidgetAceTextarea_include_script;
 
         $field_name = $this->getFieldName();
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         $html = '';
 
@@ -81,9 +87,10 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
         $html .= '<script>
             var editor' . $editor_element_id . ' = ace.edit("' . $editor_element_id . '");
             editor' . $editor_element_id . '.setOption("maxLines", "Infinity");
+            editor' . $editor_element_id . '.setOption("wrap", ' . json_encode($this->isWrapText()) . ');
             
             editor' . $editor_element_id . '.getSession().setMode(' . json_encode($this->getAceMode()) . ');
-            editor' . $editor_element_id . '.getSession().setUseWorker(' . json_encode($this->getAceUseWorker()) . ');
+            editor' . $editor_element_id . '.getSession().setUseWorker(' . json_encode($this->isAceUseWorker()) . ');
 
             editor' . $editor_element_id . '.getSession().on("change", function() {
                 var target = document.getElementById("' . $editor_element_id . '_target");
@@ -129,7 +136,7 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
     /**
      * @return bool
      */
-    public function getAceUseWorker(): bool
+    public function isAceUseWorker(): bool
     {
         return $this->ace_use_worker;
     }
@@ -140,5 +147,21 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
     public function setAceUseWorker(bool $ace_use_worker): void
     {
         $this->ace_use_worker = $ace_use_worker;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isWrapText(): bool
+    {
+        return $this->wrap_text;
+    }
+
+    /**
+     * @param bool $wrap_text
+     */
+    public function setWrapText(bool $wrap_text): void
+    {
+        $this->wrap_text = $wrap_text;
     }
 }

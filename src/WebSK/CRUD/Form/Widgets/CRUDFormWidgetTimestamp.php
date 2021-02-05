@@ -14,36 +14,44 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
 {
-    /** @var string */
-    protected $field_name;
-    /** @var bool */
-    protected $show_null_checkbox;
-    /** @var bool */
-    protected $is_required;
+    protected string $field_name;
+
+    protected bool $show_null_checkbox = false;
+
+    protected bool $is_required = false;
+
+    protected bool $disabled = false;
 
     /**
      * CRUDFormWidgetTimestamp constructor.
      * @param string $field_name
      * @param bool $show_null_checkbox
      * @param bool $is_required
+     * @param bool $disabled
      */
-    public function __construct(string $field_name, bool $show_null_checkbox = false, bool $is_required = false)
+    public function __construct(
+        string $field_name,
+        bool $show_null_checkbox = false,
+        bool $is_required = false,
+        bool $disabled = false
+    )
     {
         $this->setFieldName($field_name);
         $this->setShowNullCheckbox($show_null_checkbox);
         $this->setIsRequired($is_required);
+        $this->setDisabled($disabled);
     }
 
     /**
-     * @param object $obj
+     * @param object $entity_obj
      * @param CRUD $crud
      * @return string
      * @throws \ReflectionException
      */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         $is_required_str = '';
         if ($this->is_required) {
@@ -58,6 +66,11 @@ class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
         $uniqid = uniqid('CRUDFormWidgetTimestamp_');
         $input_cols = $this->isShowNullCheckbox() ? '10' : '12';
 
+        $disabled = '';
+        if ($this->isDisabled()) {
+            $disabled = ' disabled';
+        }
+
         $html = '';
         $html .= '<div class="row">';
         $html .= '<div class="col-sm-' . $input_cols . '">';
@@ -67,7 +80,7 @@ class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
                value="<?= Sanitize::sanitizeTagContent($field_value) ?>"
                data-field="<?= $uniqid ?>_date" <?= $is_required_str ?>>
         <div class="input-group date" id="<?= $uniqid ?>">
-            <input id="<?= $uniqid ?>_date" type="text" class="form-control" value="<?= $field_value_attr ?>">
+            <input id="<?= $uniqid ?>_date" type="text" class="form-control" value="<?= $field_value_attr ?>"<?php echo $disabled; ?>>
             <span class="input-group-addon">
                 <span class="glyphicon glyphicon-calendar"></span>
             </span>
@@ -177,5 +190,21 @@ class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
     public function setIsRequired(bool $is_required): void
     {
         $this->is_required = $is_required;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isDisabled(): bool
+    {
+        return $this->disabled;
+    }
+
+    /**
+     * @param bool $disabled
+     */
+    public function setDisabled(bool $disabled): void
+    {
+        $this->disabled = $disabled;
     }
 }

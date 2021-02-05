@@ -12,26 +12,19 @@ use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
  */
 class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
 {
-    /** @var string */
-    protected $title;
+    protected string $title;
 
-    /** @var string */
-    protected $field_name;
+    protected string $field_name;
 
-    /** @var string */
-    protected $filter_iniq_id;
+    protected string $filter_iniq_id;
 
-    /** @var bool */
-    protected $initial_is_enabled;
+    protected bool $initial_is_enabled = false;
 
-    /** @var string */
-    protected $initial_value;
+    protected string $initial_value = '';
 
-    /** @var array */
-    protected $options_arr;
+    protected array $options_arr;
 
-    /** @var bool */
-    protected $show_null_checkbox;
+    protected bool $show_null_checkbox = false;
 
     /**
      * CRUDTableFilterEqualOptions constructor.
@@ -48,9 +41,9 @@ class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
         string $title,
         string $field_name,
         array $options_arr,
-        bool $initial_is_enabled,
-        string $initial_value,
-        bool $show_null_checkbox
+        bool $initial_is_enabled = false,
+        string $initial_value = '',
+        bool $show_null_checkbox = false
     ) {
         $this->setFilterIniqId($filter_uniq_id);
         $this->setTitle($title);

@@ -8,10 +8,9 @@ namespace WebSK\CRUD\Table;
  */
 class CRUDTableColumn implements InterfaceCRUDTableColumn
 {
-    /** @var string */
-    protected $title;
-    /** @var InterfaceCRUDTableWidget */
-    protected $widget_obj;
+    protected string $title;
+
+    protected InterfaceCRUDTableWidget $widget_obj;
 
     /**
      * CRUDTableColumn constructor.

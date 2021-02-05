@@ -41,34 +41,33 @@ class CRUDForm
     const FIELD_FIELD_NAME = 'field_name';
     const FIELD_SAVE_AS = 'save_as';
 
-    /** @var CRUD */
-    protected $crud;
-    /** @var object */
-    protected $obj;
+    protected CRUD $crud;
+
+    protected InterfaceEntity $obj;
+
     /** @var InterfaceCRUDFormRow[] */
-    protected $element_obj_arr;
-    /** @var string */
+    protected array $element_obj_arr;
+
+    /** @var string|Closure */
     protected $url_to_redirect_after_operation = '';
-    /** @var array */
-    protected $redirect_get_params_arr = [];
-    /** @var string */
-    protected $form_unique_id;
-    /** @var string */
-    protected $operation_code = self::OPERATION_SAVE_EDITOR_FORM;
-    /** @var bool */
-    protected $hide_submit_button = false;
 
-    /** @var string */
-    protected $submit_button_title = 'Сохранить';
+    protected array $redirect_get_params_arr = [];
 
-    /** @var string */
-    protected $submit_button_class = '';
+    protected string $form_unique_id;
+
+    protected string $operation_code = self::OPERATION_SAVE_EDITOR_FORM;
+
+    protected bool $hide_submit_button = false;
+
+    protected string $submit_button_title = 'Сохранить';
+
+    protected string $submit_button_class = '';
 
     /**
      * CRUDForm constructor.
      * @param CRUD $crud
      * @param string $form_unique_id
-     * @param $obj
+     * @param InterfaceEntity $obj
      * @param array $element_obj_arr
      * @param string|Closure $url_to_redirect_after_operation
      * @param array $redirect_get_params_arr
@@ -80,7 +79,7 @@ class CRUDForm
     public function __construct(
         CRUD $crud,
         string $form_unique_id,
-        $obj,
+        InterfaceEntity $obj,
         array $element_obj_arr,
         $url_to_redirect_after_operation = '',
         array $redirect_get_params_arr = [],
@@ -88,7 +87,8 @@ class CRUDForm
         bool $hide_submit_button = false,
         string $submit_button_title = 'Сохранить',
         string $submit_button_class = 'btn btn-primary'
-    ) {
+    )
+    {
         $this->crud = $crud;
         $this->form_unique_id = $form_unique_id;
         $this->obj = $obj;
@@ -158,11 +158,11 @@ class CRUDForm
         Assert::assert($entity_id);
 
         $entity_service = $this->crud->getEntityServiceByClassName($entity_class_name);
-        $obj = $entity_service->getById($entity_id);
+        $entity_obj = $entity_service->getById($entity_id);
 
         $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
 
-        $file_name = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $file_name = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         $json_arr['file'] = $file_name;
 
@@ -172,14 +172,21 @@ class CRUDForm
 
         $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
 
-        $is_deleted = $file_manager->deleteFileIfExist($target_folder . DIRECTORY_SEPARATOR . $file_name);
+        $file_path = $target_folder . DIRECTORY_SEPARATOR . $file_name;
 
-        if (!$is_deleted) {
-            $json_arr['error'] = 'Не удалось удалить файл';
+        if ($file_manager->getStorage()->has($file_path)) {
+            $is_deleted = $file_manager->deleteFileIfExist($file_path);
+
+            if (!$is_deleted) {
+                $json_arr['error'] = 'Не удалось удалить файл';
+            }
         }
 
-        $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => null]);
-        $entity_service->save($obj);
+        $blank_entity_obj = new $entity_class_name();
+        $blank_field_value = CRUDFieldsAccess::getObjectFieldValue($blank_entity_obj, $field_name);
+
+        $entity_obj = CRUDFieldsAccess::setObjectFieldsFromArray($entity_obj, [$field_name => $blank_field_value]);
+        $entity_service->save($entity_obj);
 
         return $response->withJson($json_arr);
     }
@@ -200,7 +207,7 @@ class CRUDForm
         Assert::assert($entity_id);
 
         $entity_service = $this->crud->getEntityServiceByClassName($entity_class_name);
-        $obj = $entity_service->getById($entity_id);
+        $entity_obj = $entity_service->getById($entity_id);
 
         $old_file_name = '';
 
@@ -232,9 +239,9 @@ class CRUDForm
             $file_manager->deleteFileIfExist($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
         }
 
-        $obj = CRUDFieldsAccess::setObjectFieldsFromArray($obj, [$field_name => $file_name]);
+        $entity_obj = CRUDFieldsAccess::setObjectFieldsFromArray($entity_obj, [$field_name => $file_name]);
 
-        $entity_service->save($obj);
+        $entity_service->save($entity_obj);
 
         return $response->withJson($json_arr);
     }

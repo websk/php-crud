@@ -13,12 +13,11 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetTextarea implements InterfaceCRUDFormWidget
 {
-    /** @var string */
-    protected $field_name;
-    /** @var bool */
-    protected $is_required;
-    /** @var bool */
-    protected $disabled;
+    protected string $field_name;
+
+    protected bool $is_required = false;
+
+    protected bool $disabled = false;
 
     /**
      * CRUDFormWidgetTextarea constructor.
@@ -34,10 +33,10 @@ class CRUDFormWidgetTextarea implements InterfaceCRUDFormWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
         $is_required_str = '';
         if ($this->isRequired()) {
             $is_required_str = ' required ';

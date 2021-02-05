@@ -11,8 +11,7 @@ use WebSK\CRUD\CRUD;
  */
 class CRUDFormInvisibleRow implements InterfaceCRUDFormRow
 {
-    /** @var InterfaceCRUDFormWidget */
-    protected $widget_obj;
+    protected InterfaceCRUDFormWidget $widget_obj;
 
     /**
      * CRUDFormInvisibleRow constructor.

@@ -21,31 +21,24 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
     const FILE_TYPE_IMAGE = 'image';
 
-    /** @var string */
-    protected $field_name;
+    protected string $field_name;
 
-    /** @var string */
-    protected $storage;
+    protected string $storage;
 
-    /** @var string */
-    protected $target_folder;
+    protected string $target_folder;
 
     /** @var string|Closure */
     protected $url;
 
-    /** @var $save_as */
-    protected $save_as;
+    protected string $save_as = '';
 
-    /** @var string */
-    protected $file_type = '';
+    protected string $file_type = '';
 
-    /** @var string */
-    protected $form_action_url = '';
+    protected string $form_action_url = '';
 
-    protected $max_file_size = self::DEFAULT_MAX_FILE_SIZE;
+    protected int $max_file_size = self::DEFAULT_MAX_FILE_SIZE;
 
-    /** @var array */
-    protected $allowed_extensions = [];
+    protected array $allowed_extensions = [];
 
     /**
      * CRUDFormWidgetUpload constructor.
@@ -69,7 +62,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         array $allowed_extensions = [],
         int $max_file_size = self::DEFAULT_MAX_FILE_SIZE,
         string $form_action_url = ''
-    ) {
+    )
+    {
         $this->setFieldName($field_name);
         $this->setStorage($storage);
         $this->setTargetFolder($target_folder);
@@ -82,16 +76,16 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         static $crud_form_widget_blueimp_file_upload_include_script;
 
         $field_name = $this->getFieldName();
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         $element_id = 'fileupload_' . Sanitize::sanitizeAttrValue($field_name) . '_' . rand(1, 999999);
 
-        $file_url = CRUDCompiler::fieldValueOrCallableResult($this->getUrl(), $obj);
+        $file_url = CRUDCompiler::fieldValueOrCallableResult($this->getUrl(), $entity_obj);
 
         $html = '';
 

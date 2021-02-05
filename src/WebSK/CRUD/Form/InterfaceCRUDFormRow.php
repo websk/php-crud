@@ -3,6 +3,7 @@
 namespace WebSK\CRUD\Form;
 
 use WebSK\CRUD\CRUD;
+use WebSK\Entity\InterfaceEntity;
 
 /**
  * Interface InterfaceCRUDFormRow
@@ -11,9 +12,9 @@ use WebSK\CRUD\CRUD;
 interface InterfaceCRUDFormRow
 {
     /**
-     * @param object $obj
+     * @param InterfaceEntity $obj
      * @param CRUD $crud
      * @return string
      */
-    public function html($obj, CRUD $crud): string;
+    public function html(InterfaceEntity $obj, CRUD $crud): string;
 }

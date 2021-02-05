@@ -6,6 +6,7 @@ use Closure;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
+use WebSK\Entity\InterfaceEntity;
 
 /**
  * Class CRUDTableWidgetHtml
@@ -26,9 +27,9 @@ class CRUDTableWidgetHtml implements InterfaceCRUDTableWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        return CRUDCompiler::fieldValueOrCallableResult($this->getHtml(), $obj);
+        return CRUDCompiler::fieldValueOrCallableResult($this->getHtml(), $entity_obj);
     }
 
     /**

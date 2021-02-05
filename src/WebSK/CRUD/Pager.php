@@ -29,7 +29,7 @@ class Pager
     }
 
     /**
-     * @param Request $request3
+     * @param Request $request
      * @param string $table_index_on_page
      * @return int
      */
@@ -54,7 +54,11 @@ class Pager
      * @param int $default_page_size
      * @return int
      */
-    public static function getPageSize(Request $request, string $table_index_on_page, int $default_page_size = 30): int
+    public static function getPageSize(
+        Request $request,
+        string $table_index_on_page,
+        int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
+    ): int
     {
         $page_size_param = $request->getParam(self::pageSizeFormFieldName($table_index_on_page), null);
         if (is_null($page_size_param)) {
@@ -78,7 +82,11 @@ class Pager
      * @param int $default_page_size
      * @return int
      */
-    protected static function getNextPageStart(Request $request, string $table_index_on_page, int $default_page_size = 30): int
+    protected static function getNextPageStart(
+        Request $request,
+        string $table_index_on_page,
+        int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
+    ): int
     {
         $start = self::getPageOffset($request, $table_index_on_page);
         $page_size = self::getPageSize($request, $table_index_on_page, $default_page_size);
@@ -91,7 +99,11 @@ class Pager
      * @param int $default_page_size
      * @return int
      */
-    protected static function getPrevPageStart(Request $request, string $table_index_on_page, int $default_page_size = 30): int
+    protected static function getPrevPageStart(
+        Request $request,
+        string $table_index_on_page,
+        int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
+    ): int
     {
         $start = self::getPageOffset($request, $table_index_on_page);
         $page_size = self::getPageSize($request, $table_index_on_page, $default_page_size);
@@ -123,7 +135,12 @@ class Pager
      * @param int $default_page_size
      * @return bool
      */
-    protected static function hasNextPage(Request $request, string $table_index_on_page, int $elements_count, int $default_page_size = 30): bool
+    protected static function hasNextPage(
+        Request $request,
+        string $table_index_on_page,
+        int $elements_count,
+        int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
+    ): bool
     {
         if (is_null($elements_count)) {
             return true;
@@ -155,7 +172,7 @@ class Pager
         int $elements_count = null,
         bool $display_total_rows_count = false,
         int $total_rows_count = 0,
-        int $default_page_size = 30
+        int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
     ): string {
         $pager_needed = false;
         if (self::hasPrevPage($request, $table_index_on_page)) {

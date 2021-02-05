@@ -5,6 +5,7 @@ namespace WebSK\CRUD\Table\Widgets;
 use Closure;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDCompiler;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
@@ -27,9 +28,9 @@ class CRUDTableWidgetText implements InterfaceCRUDTableWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        $html = CRUDCompiler::fieldValueOrCallableResult($this->getText(), $obj);
+        $html = CRUDCompiler::fieldValueOrCallableResult($this->getText(), $entity_obj);
 
         return Sanitize::sanitizeTagContent($html);
     }

@@ -3,13 +3,13 @@
 namespace WebSK\CRUD;
 
 use Closure;
+use Slim\Http\Request;
 use WebSK\Entity\EntityRepository;
 use WebSK\Entity\EntityService;
 use WebSK\Entity\WeightService;
 use WebSK\Utils\Assert;
 use OLOG\CheckClassInterfaces;
 use Psr\Container\ContainerInterface;
-use Slim\Http\Request;
 use WebSK\Entity\InterfaceEntity;
 use WebSK\Entity\InterfaceWeight;
 use WebSK\CRUD\Form\CRUDForm;
@@ -17,8 +17,7 @@ use WebSK\CRUD\Form\InterfaceCRUDFormRow;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\InterfaceCRUDTableColumn;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilter;
-use WebSK\CRUD\Table\InterfaceCRUDTableFilterInvisible;
-use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
+use WebSK\Utils\Sanitize;
 
 /**
  * Class CRUD
@@ -26,8 +25,9 @@ use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
  */
 class CRUD
 {
-    /** @var ContainerInterface */
-    protected $container;
+    const DEFAULT_PAGE_SIZE = 100;
+
+    protected ContainerInterface $container;
 
     /**
      * CRUD constructor.
@@ -60,8 +60,9 @@ class CRUD
         string $table_id = '',
         string $filters_position = CRUDTable::FILTERS_POSITION_NONE,
         bool $display_total_rows_count = false,
-        int $page_size = 30
-    ): CRUDTable {
+        int $page_size = self::DEFAULT_PAGE_SIZE
+    ): CRUDTable
+    {
         return new CRUDTable(
             $this,
             $entity_class_name,
@@ -99,7 +100,8 @@ class CRUD
         bool $hide_submit_button = false,
         string $submit_button_title = 'Сохранить',
         string $submit_button_class = 'btn btn-primary'
-    ): CRUDForm {
+    ): CRUDForm
+    {
         return new CRUDForm(
             $this,
             $form_unique_id,
@@ -126,7 +128,7 @@ class CRUD
      * @param int $start
      * @param bool $execute_total_rows_count_query
      * @param int $total_rows_count
-     * @return array Массив идентикаторов объектов.
+     * @return array Массив идентификаторов объектов.
      * @throws \Exception
      */
     public function getObjIdsArrForClassName(
@@ -134,21 +136,63 @@ class CRUD
         string $entity_class_name,
         array $filters_arr,
         string $order_by = '',
-        int $page_size = 30,
+        int $page_size = self::DEFAULT_PAGE_SIZE,
         int $start = 0,
         bool $execute_total_rows_count_query = false,
         int &$total_rows_count = 0
-    ): array {
+    ): array
+    {
         CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
 
-        Assert::assert(!empty($entity_class_name::ENTITY_REPOSITORY_CONTAINER_ID));
+        $repository_container_id = EntityRepository::getContainerIdByClassName($entity_class_name);
+        Assert::assert($this->container->has($repository_container_id), 'Unknown repository ' . $repository_container_id);
 
         /** @var EntityRepository $entity_repository */
-        $entity_repository = $this->container->get($entity_class_name::ENTITY_REPOSITORY_CONTAINER_ID);
+        $entity_repository = $this->container->get($repository_container_id);
 
-        $query_param_values_arr = array();
+        $db_id_field_name = CRUDFieldsAccess::getIdFieldName($entity_class_name);
 
-        $where = ' 1 = 1 ';
+        list($where, $query_param_values_arr) = $this->makeSQLConditionsAndPlaceholderValues($request, $filters_arr);
+
+        $db_table_name = $entity_repository->getTableName();
+
+        $query = 'SELECT ' . Sanitize::sanitizeSqlColumnName($db_id_field_name)
+            . ' FROM ' . Sanitize::sanitizeSqlColumnName($db_table_name);
+
+        if ($where) {
+            $query .= ' WHERE ' . $where;
+        }
+
+        if ($order_by == '') { //@TODO sanitize $order_by
+            $order_by = Sanitize::sanitizeSqlColumnName($db_id_field_name);
+        }
+
+        $query .= ' ORDER BY ' . $order_by
+            . ' LIMIT ' . intval($page_size)
+            . ' OFFSET ' . intval($start);
+
+        $obj_ids_arr = $entity_repository->getDbService()->readColumn(
+            $query,
+            $query_param_values_arr
+        );
+
+        if ($execute_total_rows_count_query) {
+            $total_rows_count = $this->getTotalRowsCount($request, $entity_class_name, $filters_arr);
+        }
+
+        return $obj_ids_arr;
+    }
+
+    /**
+     * @param Request $request
+     * @param InterfaceCRUDTableFilter[] $filters_arr
+     * @return array
+     * @throws \Exception
+     */
+    protected function makeSQLConditionsAndPlaceholderValues(Request $request, array $filters_arr): array
+    {
+        $where = '';
+        $query_param_values_arr = [];
 
         foreach ($filters_arr as $filter_obj) {
             CheckClassInterfaces::exceptionIfClassNotImplementsInterface(
@@ -156,47 +200,59 @@ class CRUD
                 InterfaceCRUDTableFilter::class
             );
 
-            if ($filter_obj instanceof InterfaceCRUDTableFilterVisible) {
-                list($filter_sql_condition, $filter_placeholder_values_arr) =
-                    $filter_obj->sqlConditionAndPlaceholderValue($request);
-                if ($filter_sql_condition != '') {
-                    $where .= ' and ' . $filter_sql_condition;
-                }
+            list($filter_sql_condition, $filter_placeholder_values_arr) =
+                $filter_obj->sqlConditionAndPlaceholderValue($request);
 
-                $query_param_values_arr = array_merge($query_param_values_arr, $filter_placeholder_values_arr);
-            } elseif ($filter_obj instanceof InterfaceCRUDTableFilterInvisible) {
-                list($filter_sql_condition, $filter_placeholder_values_arr) =
-                    $filter_obj->sqlConditionAndPlaceholderValue($request);
-                if ($filter_sql_condition != '') {
-                    $where .= ' and ' . $filter_sql_condition;
+            if ($filter_sql_condition != '') {
+                if ($where) {
+                    $where .= ' AND ';
                 }
-
-                $query_param_values_arr = array_merge($query_param_values_arr, $filter_placeholder_values_arr);
+                $where .= $filter_sql_condition;
             }
+
+            $query_param_values_arr = array_merge($query_param_values_arr, $filter_placeholder_values_arr);
         }
 
-        $db_id_field_name = $entity_repository->getIdFieldName();
+        return [$where, $query_param_values_arr];
+    }
 
-        if ($order_by == '') { //@TODO sanitize $order_by
-            $order_by = $db_id_field_name;
-        }
+    /**
+     * @param Request $request
+     * @param string $entity_class_name
+     * @param InterfaceCRUDTableFilter[] $filters_arr
+     * @return int
+     * @throws \Exception
+     */
+    protected function getTotalRowsCount(Request $request, string $entity_class_name, array $filters_arr): int
+    {
+        $repository_container_id = EntityRepository::getContainerIdByClassName($entity_class_name);
+        Assert::assert($this->container->has($repository_container_id), 'Unknown repository ' . $repository_container_id);
+
+        /** @var EntityRepository $entity_repository */
+        $entity_repository = $this->container->get($repository_container_id);
+
+        $db_id_field_name = CRUDFieldsAccess::getIdFieldName($entity_class_name);
 
         $db_table_name = $entity_repository->getTableName();
 
-        $obj_ids_arr = $entity_repository->getDbService()->readColumn(
-            'select ' . $db_id_field_name . ' from ' . $db_table_name . ' where ' . $where .
-            ' order by ' . $order_by . ' limit ' . intval($page_size) . ' offset ' . intval($start),
+        list($where, $query_param_values_arr) = $this->makeSQLConditionsAndPlaceholderValues($request, $filters_arr);
+
+        $rows_count_query = 'SELECT count(' . Sanitize::sanitizeSqlColumnName($db_id_field_name) . ')'
+            .' FROM ' . Sanitize::sanitizeSqlColumnName($db_table_name);
+        if ($where) {
+            $rows_count_query .= ' WHERE ' . $where;
+        }
+
+        $total_rows_count = $entity_repository->getDbService()->readField(
+            $rows_count_query,
             $query_param_values_arr
         );
 
-        if ($execute_total_rows_count_query) {
-            $total_rows_count = $entity_repository->getDbService()->readField(
-                'select count(' . $db_id_field_name . ') from ' . $db_table_name . ' where ' . $where,
-                $query_param_values_arr
-            );
+        if ($total_rows_count === false) {
+            return 0;
         }
 
-        return $obj_ids_arr;
+        return $total_rows_count;
     }
 
     /**
@@ -205,7 +261,7 @@ class CRUD
      * @return null|InterfaceEntity
      * @throws \ReflectionException
      */
-    public function saveOrUpdateObjectFromFormRequest($obj, Request $request)
+    public function saveOrUpdateObjectFromFormRequest($obj, Request $request): ?InterfaceEntity
     {
         $entity_class_name = get_class($obj);
         Assert::assert($entity_class_name);
@@ -224,6 +280,15 @@ class CRUD
                 $prop_name = $prop_obj->getName();
 
                 $post_fields_arr = $request->getParsedBody();
+
+                // чтение возможных NULL
+                if (array_key_exists($prop_name . "___is_null", $post_fields_arr)) {
+                    if ($_POST[$prop_name . "___is_null"]) {
+                        $null_fields_arr[$prop_name] = 1;
+                        continue;
+                    }
+                }
+
                 // сейчас если поля нет в форме - оно не будет изменено в объекте.
                 // это позволяет показывать в форме только часть полей, на остальные форма не повлияет
                 if (array_key_exists($prop_name, $post_fields_arr)) {
@@ -262,7 +327,7 @@ class CRUD
      * @return InterfaceEntity
      * @throws \Exception
      */
-    public function createAndLoadObject(string $entity_class_name, int $entity_id)
+    public function createAndLoadObject(string $entity_class_name, int $entity_id): InterfaceEntity
     {
         /** @var EntityService $entity_service */
         $entity_service = $this->getEntityServiceByClassName($entity_class_name);
@@ -272,10 +337,10 @@ class CRUD
 
     /**
      * @param string $entity_class_name
-     * @param $entity_id
+     * @param int $entity_id
      * @throws \Exception
      */
-    public function deleteObject(string $entity_class_name, $entity_id)
+    public function deleteObject(string $entity_class_name, int $entity_id)
     {
         $entity_service = $this->getEntityServiceByClassName($entity_class_name);
 
@@ -286,7 +351,7 @@ class CRUD
      * @param InterfaceEntity $entity_obj
      * @throws \Exception
      */
-    public function saveObject($entity_obj)
+    public function saveObject(InterfaceEntity $entity_obj)
     {
         $entity_class_name = get_class($entity_obj);
 
@@ -326,12 +391,13 @@ class CRUD
      * @return EntityService
      * @throws \Exception
      */
-    public function getEntityServiceByClassName(string $entity_class_name)
+    public function getEntityServiceByClassName(string $entity_class_name): EntityService
     {
-        Assert::assert(!empty($entity_class_name::ENTITY_SERVICE_CONTAINER_ID));
+        $service_container_id = EntityService::getContainerIdByClassName($entity_class_name);
+        Assert::assert($service_container_id);
 
         /** @var EntityService $entity_service */
-        $entity_service = $this->container->get($entity_class_name::ENTITY_SERVICE_CONTAINER_ID);
+        $entity_service = $this->container->get($service_container_id);
 
         return $entity_service;
     }

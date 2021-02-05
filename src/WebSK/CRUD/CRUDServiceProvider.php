@@ -14,20 +14,20 @@ class CRUDServiceProvider
 
     /**
      * @param ContainerInterface $container
-     * @return CRUD
      */
-    public static function getCrud(ContainerInterface $container)
+    public static function register(ContainerInterface $container)
     {
-        return $container[self::CRUD_CONTAINER_ID];
+        $container[self::CRUD_CONTAINER_ID] = function (ContainerInterface $container): CRUD {
+            return new CRUD($container);
+        };
     }
 
     /**
      * @param ContainerInterface $container
+     * @return CRUD
      */
-    public static function register(ContainerInterface $container)
+    public static function getCrud(ContainerInterface $container): CRUD
     {
-        $container[self::CRUD_CONTAINER_ID] = function (ContainerInterface $container) {
-            return new CRUD($container);
-        };
+        return $container[self::CRUD_CONTAINER_ID];
     }
 }

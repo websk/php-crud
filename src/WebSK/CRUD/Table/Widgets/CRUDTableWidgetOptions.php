@@ -5,6 +5,7 @@ namespace WebSK\CRUD\Table\Widgets;
 use Closure;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDCompiler;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
@@ -17,21 +18,7 @@ class CRUDTableWidgetOptions implements InterfaceCRUDTableWidget
     /** @var string|Closure */
     protected $value;
 
-    /** @var array */
-    protected $options_arr;
-
-    /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
-    {
-        $value = CRUDCompiler::fieldValueOrCallableResult($this->getValue(), $obj);
-
-        $html = "UNDEFINED";
-        $options_arr = $this->getOptionsArr();
-        if (array_key_exists($value, $options_arr)) {
-            $html = $options_arr[$value];
-        }
-        return Sanitize::sanitizeTagContent($html);
-    }
+    protected array $options_arr;
 
     /**
      * CRUDTableWidgetOptions constructor.
@@ -42,6 +29,19 @@ class CRUDTableWidgetOptions implements InterfaceCRUDTableWidget
     {
         $this->setOptionsArr($options_arr);
         $this->setValue($value);
+    }
+
+    /** @inheritdoc */
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
+    {
+        $value = CRUDCompiler::fieldValueOrCallableResult($this->getValue(), $entity_obj);
+
+        $html = "UNDEFINED";
+        $options_arr = $this->getOptionsArr();
+        if (array_key_exists($value, $options_arr)) {
+            $html = $options_arr[$value];
+        }
+        return Sanitize::sanitizeTagContent($html);
     }
 
     /**

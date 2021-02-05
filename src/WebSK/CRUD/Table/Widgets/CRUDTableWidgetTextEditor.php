@@ -8,6 +8,7 @@ use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
+use WebSK\Entity\InterfaceEntity;
 
 /**
  * Class CRUDTableWidgetTextEditor
@@ -15,14 +16,11 @@ use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
  */
 class CRUDTableWidgetTextEditor implements InterfaceCRUDTableWidget
 {
-    /** @var string */
-    protected $field_name;
+    protected string $field_name;
 
-    /** @var string */
-    protected $text;
+    protected string $text;
 
-    /** @var string */
-    protected $crudtable_id;
+    protected string $crudtable_id;
 
     /**
      * CRUDTableWidgetTextEditor constructor.
@@ -38,9 +36,9 @@ class CRUDTableWidgetTextEditor implements InterfaceCRUDTableWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        return HTML::tag('form', ['class' => 'js-text-editor'], function () use ($obj) {
+        return HTML::tag('form', ['class' => 'js-text-editor'], function () use ($entity_obj) {
             echo '<input type="hidden" name="' . Operations::FIELD_NAME_OPERATION_CODE .
                 '" value="' . CRUDTable::OPERATION_UPDATE_ENTITY_FIELD . '">';
             echo '<input type="hidden" name="' . CRUDTable::FIELD_FIELD_NAME .
@@ -48,9 +46,9 @@ class CRUDTableWidgetTextEditor implements InterfaceCRUDTableWidget
             echo '<input type="hidden" name="' . CRUDTable::FIELD_CRUDTABLE_ID .
                 '" value="' . $this->getCrudtableId() . '">';
             echo '<input type="hidden" name="' . CRUDTable::FIELD_ENTITY_ID .
-                '" value="' . $obj->getId() . '">';
+                '" value="' . $entity_obj->getId() . '">';
             echo '<input type="text" name="' . CRUDTable::FIELD_FIELD_VALUE .
-                '" value="' .  CRUDFieldsAccess::getObjectFieldValue($obj, $this->getFieldName()) . '">';
+                '" value="' .  CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName()) . '">';
             echo '<button class="btn btn-xs btn-default glyphicon glyphicon-ok" type="submit"></button>';
         });
     }

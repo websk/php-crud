@@ -3,6 +3,7 @@
 namespace WebSK\CRUD;
 
 use Closure;
+use WebSK\Entity\InterfaceEntity;
 
 /**
  * Class CRUDCompiler
@@ -12,10 +13,10 @@ class CRUDCompiler
 {
     /**
      * @param string|Closure $fieldname_or_closure
-     * @param object $obj
-     * @return mixed
+     * @param InterfaceEntity $obj
+     * @return string|Closure
      */
-    public static function fieldValueOrCallableResult($fieldname_or_closure, $obj)
+    public static function fieldValueOrCallableResult($fieldname_or_closure, InterfaceEntity $obj)
     {
         if (self::isClosure($fieldname_or_closure)) {
             return $fieldname_or_closure($obj);
@@ -32,7 +33,7 @@ class CRUDCompiler
      * @param string|Closure $closure
      * @return bool
      */
-    public static function isClosure($closure)
+    public static function isClosure($closure): bool
     {
         return is_object($closure) && ($closure instanceof \Closure);
     }

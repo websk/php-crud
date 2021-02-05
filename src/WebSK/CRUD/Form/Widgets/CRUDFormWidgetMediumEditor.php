@@ -13,12 +13,11 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetMediumEditor implements InterfaceCRUDFormWidget
 {
-    /** @var string */
-    protected $field_name;
-    /** @var string */
-    protected $uniqid;
-    /** @var string */
-    protected $editor_options_str;
+    protected string $field_name;
+
+    protected string $uniqid = '';
+
+    protected string $editor_options_str = 'placeholder: false';
 
     /**
      * CRUDFormWidgetMediumEditor constructor.
@@ -30,7 +29,8 @@ class CRUDFormWidgetMediumEditor implements InterfaceCRUDFormWidget
         string $field_name,
         string $uniqid = '',
         string $editor_options_str = 'placeholder: false'
-    ) {
+    )
+    {
         $this->setFieldName($field_name);
         $this->setEditorOptionsStr($editor_options_str);
 
@@ -42,12 +42,12 @@ class CRUDFormWidgetMediumEditor implements InterfaceCRUDFormWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         static $CRUDFormWidgetMediumEditor_include_script;
 
         $field_name = $this->getFieldName();
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         /* @TODO Нужно изменить на нах CDN */
         $script = '';

@@ -8,23 +8,35 @@ use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
 
+/**
+ * Class CRUDFormWidgetReferenceAjax
+ * @package WebSK\CRUD\Form\Widgets
+ */
 class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
 {
     const REFERENCED_ID_PLACEHOLDER = 'REFERENCED_ID';
 
-    /** @var string */
-    protected $field_name;
-    /** @var string */
-    protected $ajax_action_url;
-    /** @var string */
-    protected $referenced_class_name;
-    /** @var string */
-    protected $referenced_class_title_field;
-    /** @var string */
-    protected $editor_url;
-    /** @var bool */
-    protected $is_required;
+    protected string $field_name;
 
+    protected string $ajax_action_url;
+
+    protected string $referenced_class_name;
+
+    protected string $referenced_class_title_field;
+
+    protected string $editor_url;
+
+    protected bool $is_required = false;
+
+    /**
+     * CRUDFormWidgetReferenceAjax constructor.
+     * @param string $field_name
+     * @param string $referenced_class_name
+     * @param string $referenced_class_title_field
+     * @param string $ajax_action_url
+     * @param string $editor_url
+     * @param bool $is_required
+     */
     public function __construct(
         string $field_name,
         string $referenced_class_name,
@@ -32,7 +44,8 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         string $ajax_action_url,
         string $editor_url,
         bool $is_required = false
-    ) {
+    )
+    {
         $this->setFieldName($field_name);
         $this->setAjaxActionUrl($ajax_action_url);
         $this->setReferencedClassName($referenced_class_name);
@@ -42,15 +55,12 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         $field_name = $this->getFieldName();
-//        if (is_null($input_name)) {
-//            $input_name = $field_name;
-//        }
         $input_name = $field_name;
 
         $referenced_class_name = $this->getReferencedClassName();
@@ -102,7 +112,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         }
 
         $html .= '<div class="form-control" style="overflow: auto;" '.
-            'id="' . Sanitize::sanitizeAttrValue($select_element_id) . '_text">' . $referenced_obj_title . '</div>';
+            'id="' . Sanitize::sanitizeAttrValue($select_element_id) . '_text">' . Sanitize::sanitizeTagContent($referenced_obj_title) . '</div>';
 
         if ($this->getEditorUrl()) {
             $html .= '<span class="input-group-btn">';
@@ -177,7 +187,8 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
      * @param string $contents_html
      * @return string
      */
-    protected static function modal($modal_element_id, $title, $contents_html = ''){
+    protected static function modal($modal_element_id, $title, $contents_html = ''): string
+    {
         $html = '<div class="modal fade" id="' . $modal_element_id . '" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
 		<div class="modal-dialog" role="document">
 		<div class="modal-content">

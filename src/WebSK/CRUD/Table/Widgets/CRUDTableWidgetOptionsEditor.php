@@ -8,15 +8,19 @@ use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
+use WebSK\Entity\InterfaceEntity;
 
+/**
+ * Class CRUDTableWidgetOptionsEditor
+ * @package WebSK\CRUD\Table\Widgets
+ */
 class CRUDTableWidgetOptionsEditor implements InterfaceCRUDTableWidget
 {
-    /** @var string */
-    protected $field_name;
-    /** @var array */
-    protected $options_arr;
-    /** @var string */
-    protected $crudtable_id;
+    protected string $field_name;
+
+    protected array $options_arr;
+
+    protected string $crudtable_id;
 
     /**
      * CRUDTableWidgetOptionsEditor constructor.
@@ -32,21 +36,21 @@ class CRUDTableWidgetOptionsEditor implements InterfaceCRUDTableWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        return HTML::tag('form', ['class' => 'js-options-editor'], function () use ($obj) {
+        return HTML::tag('form', ['class' => 'js-options-editor'], function () use ($entity_obj) {
             echo '<input type="hidden" name="' . Operations::FIELD_NAME_OPERATION_CODE . '" '.
                 'value="' . CRUDTable::OPERATION_UPDATE_ENTITY_FIELD . '">';
             echo '<input type="hidden" name="' . CRUDTable::FIELD_FIELD_NAME . '" '.
                 'value="' . $this->getFieldName() . '">';
             echo '<input type="hidden" name="' . CRUDTable::FIELD_CRUDTABLE_ID . '" '.
                 'value="' . $this->getCrudtableId() . '">';
-            echo '<input type="hidden" name="' . CRUDTable::FIELD_ENTITY_ID . '" value="' . $obj->getId() . '">';
+            echo '<input type="hidden" name="' . CRUDTable::FIELD_ENTITY_ID . '" value="' . $entity_obj->getId() . '">';
             echo '<input type="hidden" name="' . CRUDTable::FIELD_FIELD_VALUE . '" '.
-                'value="' .  CRUDFieldsAccess::getObjectFieldValue($obj, $this->getFieldName()) . '">';
+                'value="' .  CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName()) . '">';
 
             $options_arr = $this->getOptionsArr();
-            $obj_value = CRUDFieldsAccess::getObjectFieldValue($obj, $this->getFieldName());
+            $obj_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName());
             foreach ($options_arr as $value => $option_name) {
                 $disabled = '';
                 if ($value == $obj_value) {

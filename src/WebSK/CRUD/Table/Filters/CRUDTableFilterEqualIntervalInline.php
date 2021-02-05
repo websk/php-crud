@@ -12,20 +12,15 @@ use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
  */
 class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisible
 {
-    /** @var string */
-    protected $title;
+    protected string $title;
 
-    /** @var string */
-    protected $field_name;
+    protected string $field_name;
 
-    /** @var string */
-    protected $filter_start_uniq_id;
+    protected string $filter_start_uniq_id;
 
-    /** @var string */
-    protected $filter_end_uniq_id;
+    protected string $filter_end_uniq_id;
 
-    /** @var string */
-    protected $placeholder;
+    protected string $placeholder;
 
     /**
      * CRUDTableFilterEqualIntervalInline constructor.
@@ -89,7 +84,7 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
             'value' => $request->getParam($this->getFilterStartUniqId(), '')
         ], '');
 
-        $html .= 'по ';
+        $html .= ' по ';
         $html .= HTML::tag('input', [
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterEndUniqId(),

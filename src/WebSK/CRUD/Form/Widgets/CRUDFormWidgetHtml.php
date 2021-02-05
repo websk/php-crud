@@ -11,8 +11,7 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetHtml implements InterfaceCRUDFormWidget
 {
-    /** @var string */
-    protected $html = '';
+    protected string $html = '';
 
     /**
      * CRUDFormWidgetHtml constructor.
@@ -40,7 +39,7 @@ class CRUDFormWidgetHtml implements InterfaceCRUDFormWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         return $this->getHtml();
     }

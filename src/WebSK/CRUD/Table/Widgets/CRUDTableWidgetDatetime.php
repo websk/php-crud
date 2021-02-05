@@ -5,6 +5,7 @@ namespace WebSK\CRUD\Table\Widgets;
 use Closure;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDCompiler;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
@@ -17,8 +18,7 @@ class CRUDTableWidgetDatetime implements InterfaceCRUDTableWidget
     /** @var string|Closure */
     protected $datetime;
 
-    /** @var string */
-    protected $format;
+    protected string $format = "d.m.Y H:i:s";
 
     /**
      * CRUDTableWidgetDatetime constructor.
@@ -32,9 +32,9 @@ class CRUDTableWidgetDatetime implements InterfaceCRUDTableWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        $datetime = CRUDCompiler::fieldValueOrCallableResult($this->getDatetime(), $obj);
+        $datetime = CRUDCompiler::fieldValueOrCallableResult($this->getDatetime(), $entity_obj);
         $date_obj = new \DateTime($datetime);
         $date = $date_obj->format($this->getFormat());
 

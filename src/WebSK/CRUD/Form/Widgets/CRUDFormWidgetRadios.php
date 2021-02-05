@@ -13,16 +13,15 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
 {
-    /** @var string */
-    protected $field_name;
-    /** @var array */
-    protected $options_arr;
-    /** @var bool */
-    protected $show_null_checkbox;
-    /** @var bool */
-    protected $is_required;
-    /** @var bool */
-    protected $disabled;
+    protected string $field_name;
+
+    protected array $options_arr;
+
+    protected bool $show_null_checkbox = false;
+
+    protected bool $is_required = false;
+
+    protected bool $disabled;
 
     /**
      * CRUDFormWidgetRadios constructor.
@@ -38,7 +37,8 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
         bool $show_null_checkbox = false,
         bool $is_required = false,
         bool $disabled = false
-    ) {
+    )
+    {
         $this->setFieldName($field_name);
         $this->setOptionsArr($options_arr);
         $this->setShowNullCheckbox($show_null_checkbox);
@@ -47,10 +47,10 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         return $this->htmlForValue($field_value);
     }
@@ -69,11 +69,8 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
         }
 
         $uniqid = uniqid('CRUDFormWidgetRadios_');
-        $input_cols = $this->isShowNullCheckbox() ? '10' : '12';
 
         $html = '';
-        //$html .= '<div class="row">';
-        //$html .= '<div class="col-sm-' . $input_cols . '" id="' . $uniqid . '_radio_box">';
         $html .= '<div id="' . $uniqid . '_radio_box">';
 
         $options_arr = $this->getOptionsArr();
@@ -96,9 +93,8 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
 
             $html .= '<label class="radio-inline"><input type="radio" name="' .
                 Sanitize::sanitizeAttrValue($input_name) . '" value="' . Sanitize::sanitizeAttrValue($value) . '" ' .
-                $selected_html_attr . ' ' . $is_required_str . ' ' . $disabled . '> ' . $title . '</label>';
+                $selected_html_attr . ' ' . $is_required_str . ' ' . $disabled . '> ' . Sanitize::sanitizeTagContent($title) . '</label>';
         }
-        //$html .= '</div>';
 
         if ($this->isShowNullCheckbox()) {
             $is_null_checked = '';

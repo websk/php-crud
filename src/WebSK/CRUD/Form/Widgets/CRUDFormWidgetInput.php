@@ -13,20 +13,15 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetInput implements InterfaceCRUDFormWidget
 {
-    /** @var string */
-    protected $field_name;
+    protected string $field_name;
 
-    /** @var bool */
-    protected $show_null_checkbox;
+    protected bool $show_null_checkbox = false;
 
-    /** @var bool */
-    protected $is_required;
+    protected bool $is_required = false;
 
-    /** @var bool */
-    protected $disabled;
+    protected bool $disabled = false;
 
-    /** @var bool */
-    protected $disable_autocomplete = false;
+    protected bool $disable_autocomplete = false;
 
     /**
      * CRUDFormWidgetInput constructor.
@@ -42,7 +37,8 @@ class CRUDFormWidgetInput implements InterfaceCRUDFormWidget
         bool $is_required = false,
         bool $disabled = false,
         bool $disable_autocomplete = false
-    ) {
+    )
+    {
         $this->setFieldName($field_name);
         $this->setShowNullCheckbox($show_null_checkbox);
         $this->setIsRequired($is_required);
@@ -51,10 +47,10 @@ class CRUDFormWidgetInput implements InterfaceCRUDFormWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         $is_required_str = '';
         if ($this->is_required) {

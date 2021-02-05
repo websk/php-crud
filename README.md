@@ -1,13 +1,12 @@
 # php-crud
 
-## Config example
-* config/config.default.php
+## Config
+* CRUD no special configs
 
 ## Demo
-* copy config/config.default.php as config/config.php
+* copy config/config.example.php as config/config.php
 * replace settings and paths
-* create MySQL DB db_demo_crud (or other) 
-* load in MySQL DB dump.sql
+* load in MySQL DB src/WebSK/CRUD/Demo/dump/dump.sql
 * composer install
 * cd public
 * php -S localhost:8000

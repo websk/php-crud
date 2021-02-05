@@ -2,7 +2,10 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
+use OLOG\CheckClassInterfaces;
 use WebSK\CRUD\CRUDCompiler;
+use WebSK\Entity\InterfaceEntity;
+use WebSK\Entity\InterfaceWeight;
 use WebSK\Utils\Assert;
 use WebSK\CRUD\CRUD;
 use OLOG\Operations;
@@ -20,14 +23,11 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
 {
     const FORMFIELD_CONTEXT_FIELDS_NAME = 'context_field_names';
 
-    /** @var array */
-    protected $context_fields_arr = [];
+    protected array $context_fields_arr = [];
 
-    /** @var string */
-    protected $button_text;
+    protected string $button_text = '';
 
-    /** @var string */
-    protected $button_class_str;
+    protected string $button_class_str = '';
 
     /**
      * CRUDTableWidgetWeight constructor.
@@ -46,10 +46,12 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        Assert::assert($obj);
-        //@TODO check $obj implements InterfaceWeight
+        Assert::assert($entity_obj);
+
+        $entity_class_name = get_class($entity_obj);
+        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceWeight::class);
 
         $o = '';
         $o .= '<form style="display: inline;" method="post">';
@@ -58,13 +60,13 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
             Sanitize::sanitizeAttrValue(implode(',', array_keys($this->getContextFieldsArr()))) . '">';
 
         foreach ($this->getContextFieldsArr() as $context_field_name => $context_field_value) {
-            $context_field_value = CRUDCompiler::fieldValueOrCallableResult($context_field_value, $obj);
+            $context_field_value = CRUDCompiler::fieldValueOrCallableResult($context_field_value, $entity_obj);
             $o .= NullablePostFields::hiddenFieldHtml($context_field_name, $context_field_value);
         }
 
-        $o .= '<input type="hidden" name="_class_name" value="' . Sanitize::sanitizeAttrValue(get_class($obj)) . '">';
+        $o .= '<input type="hidden" name="_class_name" value="' . Sanitize::sanitizeAttrValue(get_class($entity_obj)) . '">';
         $o .= '<input type="hidden" name="_id" value="' .
-            Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($obj)) . '">';
+            Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($entity_obj)) . '">';
 
         $o .= '<button class="' . $this->getButtonClassStr() . '" type="submit">' . $this->getButtonText() . '</button>';
 

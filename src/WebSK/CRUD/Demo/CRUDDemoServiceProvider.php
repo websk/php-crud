@@ -26,7 +26,7 @@ class CRUDDemoServiceProvider
          * @param ContainerInterface $container
          * @return DBService
          */
-        $container[self::DEMO_DB_SERVICE_CONTAINER_ID] = function (ContainerInterface $container) {
+        $container[self::DEMO_DB_SERVICE_CONTAINER_ID] = function (ContainerInterface $container): DBService {
             $db_config = $container['settings']['db'][self::DEMO_DB_ID];
 
             $db_connector = new DBConnectorMySQL(
@@ -47,10 +47,10 @@ class CRUDDemoServiceProvider
          * @param ContainerInterface $container
          * @return DemoUserService
          */
-        $container[DemoUser::ENTITY_SERVICE_CONTAINER_ID] = function (ContainerInterface $container) {
+        $container[DemoUserService::class] = function (ContainerInterface $container): DemoUserService {
             return new DemoUserService(
                 DemoUser::class,
-                $container->get(DemoUser::ENTITY_REPOSITORY_CONTAINER_ID),
+                $container->get(DemoUserRepository::class),
                 CacheServiceProvider::getCacheService($container)
             );
         };
@@ -59,7 +59,7 @@ class CRUDDemoServiceProvider
          * @param ContainerInterface $container
          * @return DemoUserRepository
          */
-        $container[DemoUser::ENTITY_REPOSITORY_CONTAINER_ID] = function (ContainerInterface $container) {
+        $container[DemoUserRepository::class] = function (ContainerInterface $container): DemoUserRepository {
             return new DemoUserRepository(
                 DemoUser::class,
                 $container->get(self::DEMO_DB_SERVICE_CONTAINER_ID)
@@ -71,7 +71,7 @@ class CRUDDemoServiceProvider
      * @param ContainerInterface $container
      * @return DBService
      */
-    public static function getDemoDBService(ContainerInterface $container)
+    public static function getDemoDBService(ContainerInterface $container): DBService
     {
         return $container->get(self::DEMO_DB_SERVICE_CONTAINER_ID);
     }
@@ -80,8 +80,8 @@ class CRUDDemoServiceProvider
      * @param ContainerInterface $container
      * @return DemoUserService
      */
-    public static function getDemoUserService(ContainerInterface $container)
+    public static function getDemoUserService(ContainerInterface $container): DemoUserService
     {
-        return $container->get(DemoUser::ENTITY_SERVICE_CONTAINER_ID);
+        return $container->get(DemoUserService::class);
     }
 }

@@ -15,10 +15,9 @@ use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
  */
 class CRUDTableWidgetReferenceSelect implements InterfaceCRUDTableWidget
 {
-    /** @var string */
-    protected $title_field_name;
-    /** @var string */
-    protected $id_field_name;
+    protected string $title_field_name;
+
+    protected string $id_field_name;
 
     /**
      * CRUDTableWidgetReferenceSelect constructor.
@@ -32,24 +31,24 @@ class CRUDTableWidgetReferenceSelect implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @param InterfaceEntity $obj
+     * @param InterfaceEntity $entity_obj
      * @param CRUD $crud
      * @return string
      * @throws \ReflectionException
      */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        Assert::assert($obj);
+        Assert::assert($entity_obj);
 
         $title_field_name = $this->getTitleFieldName();
 
-        $obj_title = CRUDFieldsAccess::getObjectFieldValue($obj, $title_field_name);
+        $obj_title = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $title_field_name);
 
         $id_field_name = $this->getIdFieldName();
         if ($id_field_name == '') {
-            $id = CRUDFieldsAccess::getObjId($obj);
+            $id = CRUDFieldsAccess::getObjId($entity_obj);
         } else {
-            $id = CRUDFieldsAccess::getObjectFieldValue($obj, $id_field_name);
+            $id = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $id_field_name);
         }
 
         return '<button class="btn btn-xs btn-default js-ajax-form-select" type="submit" ' .

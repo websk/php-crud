@@ -11,7 +11,12 @@ use OLOG\Preloader;
  */
 class CRUDTableScript
 {
-    public static function render($table_class, $query_url)
+
+    /**
+     * @param string $table_class
+     * @param string $query_url
+     */
+    public static function render(string $table_class, string $query_url)
     {
         static $include_script;
 
@@ -147,6 +152,15 @@ class CRUDTableScript
                             if (($tr.find("a").length > 1)) {
                                 return false;
                             }
+
+                            if (($tr.find("a").attr('target') == '_blank')) {
+                                return false;
+                            }
+
+                            if (($tr.find("a").hasClass('no-tr-link'))) {
+                                return false;
+                            }
+
                             var $link = $tr.find("a:first");
                             var url = $link.attr("href");
                             var link_style = "z-index: 1;position: absolute;top: 0;" +
@@ -231,10 +245,16 @@ class CRUDTableScript
         <?php
     }
 
-    public static function getHtml($table_class, $query_url)
+    /**
+     * @param string $table_class
+     * @param string $query_url
+     * @return string
+     */
+    public static function getHtml(string $table_class, string $query_url): string
     {
         ob_start();
         self::render($table_class, $query_url);
+
         return ob_get_clean();
     }
 }

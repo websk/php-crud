@@ -11,17 +11,16 @@ use WebSK\CRUD\Table\InterfaceCRUDTableFilterInvisible;
  */
 class CRUDTableFilterNotEqualInvisible implements InterfaceCRUDTableFilterInvisible
 {
-    /** @var string */
-    protected $field_name;
-    /** @var string */
-    protected $filter_value;
+    protected string $field_name;
+
+    protected string $filter_value;
 
     /**
      * CRUDTableFilterEqualInvisible constructor.
-     * @param $field_name
-     * @param $filter_value
+     * @param string $field_name
+     * @param string $filter_value
      */
-    public function __construct($field_name, $filter_value)
+    public function __construct(string $field_name, string $filter_value)
     {
         $this->setFieldName($field_name);
         $this->setFilterValue($filter_value);

@@ -12,8 +12,7 @@ use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
  */
 class CRUDTableWidgetCheckbox implements InterfaceCRUDTableWidget
 {
-    /** @var string */
-    protected $field_name;
+    protected string $field_name;
 
     /**
      * CRUDTableWidgetCheckbox constructor.
@@ -25,9 +24,9 @@ class CRUDTableWidgetCheckbox implements InterfaceCRUDTableWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html($entity_obj, CRUD $crud): string
     {
-        if (CRUDFieldsAccess::getObjectFieldValue($obj, $this->getFieldName())) {
+        if (CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName())) {
             $html = '<span style ="text-decoration: none;" class="glyphicon glyphicon-check"></span>';
         } else {
             $html = '<span style ="text-decoration: none;" class="glyphicon glyphicon-unchecked"></span>';

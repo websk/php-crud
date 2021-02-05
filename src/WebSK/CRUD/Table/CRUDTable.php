@@ -47,35 +47,27 @@ class CRUDTable
 
     const CSV_COLUMN_DELIMITER = ';';
 
-    /** @var CRUD */
-    protected $crud;
+    protected CRUD $crud;
 
-    /** @var string */
-    protected $entity_class_name;
+    protected string $entity_class_name;
 
-    /** @var CRUDForm */
-    protected $create_form_obj;
+    protected ?CRUDForm $create_form_obj = null;
 
     /** @var InterfaceCRUDTableColumn[] */
-    protected $column_obj_arr;
+    protected array $column_obj_arr;
 
     /** @var InterfaceCRUDTableFilter[] */
-    protected $filters_arr;
+    protected array $filters_arr;
 
-    /** @var string */
-    protected $order_by = '';
+    protected string $order_by = '';
 
-    /** @var string */
-    protected $table_id = '';
+    protected string $table_id = '';
 
-    /** @var string */
-    protected $filters_position = self::FILTERS_POSITION_NONE;
+    protected string $filters_position = self::FILTERS_POSITION_NONE;
 
-    /** @var bool */
-    protected $display_total_rows_count = false;
+    protected bool $display_total_rows_count = false;
 
-    /** @var int */
-    protected $page_size;
+    protected int $page_size = CRUD::DEFAULT_PAGE_SIZE;
 
     /**
      * CRUDTable constructor.
@@ -100,8 +92,9 @@ class CRUDTable
         string $table_id = '',
         string $filters_position = self::FILTERS_POSITION_NONE,
         bool $display_total_rows_count = false,
-        int $page_size = 30
-    ) {
+        int $page_size = CRUD::DEFAULT_PAGE_SIZE
+    )
+    {
         $this->crud = $crud;
         $this->entity_class_name = $entity_class_name;
         $this->create_form_obj = $create_form_obj;
@@ -120,9 +113,7 @@ class CRUDTable
      */
     public function html(Request $request): string
     {
-        //
         // вывод таблицы
-        //
 
         $table_container_element_id = uniqid('tableContainer_');
         if ($this->table_id) {
@@ -170,6 +161,8 @@ class CRUDTable
                     $this->create_form_obj ? $this->create_form_obj->html() : ''
                 );
             }
+
+            echo '<div class="table-responsive">';
 
             echo '<table class="table table-hover">';
 
@@ -235,6 +228,8 @@ class CRUDTable
 
             echo '</table>';
 
+            echo '</div>';
+
             echo Pager::renderPager(
                 $request,
                 $this->table_id,
@@ -266,7 +261,7 @@ class CRUDTable
      * @param string $column_delimiter
      * @return string
      */
-    public function csv(Request $request, string $column_delimiter = self::CSV_COLUMN_DELIMITER)
+    public function csv(Request $request, string $column_delimiter = self::CSV_COLUMN_DELIMITER): string
     {
         $tsv = '';
         $total_rows_count = 0;
@@ -324,7 +319,7 @@ class CRUDTable
      */
     protected function csvCellRender(string $str, string $column_delimiter): string
     {
-        $str = mb_ereg_replace('[\R\t]', ' ', $str);
+        $str = mb_ereg_replace('@[\R\t]@', ' ', $str);
         return $str . $column_delimiter;
     }
 
@@ -334,7 +329,7 @@ class CRUDTable
      */
     protected function csvRowRender(string $str): string
     {
-        $str = mb_ereg_replace('\R', ' ', $str);
+        $str = mb_ereg_replace('@\R@', ' ', $str);
         return $str . "\r\n";
     }
 
@@ -379,8 +374,6 @@ class CRUDTable
      */
     public function deleteEntityOperation(Request $request, Response $response): Response
     {
-        // @TODO: do not pass DB table name in form - pass crud table id instead, get entity class name from crud table
-        // @TODO: also check entity owner
         $entity_class_name = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_CLASS_NAME);
         Assert::assert($entity_class_name);
 
@@ -407,8 +400,6 @@ class CRUDTable
      */
     public function swapEntityWeightOperation(Request $request, Response $response): Response
     {
-        // @TODO: do not pass DB table name in form - pass crud table id instead, get entity class name from crud table
-        // @TODO: also check entity owner
         $entity_class_name = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_CLASS_NAME);
         Assert::assert($entity_class_name);
 
@@ -531,7 +522,8 @@ class CRUDTable
         string $table_index_on_page,
         array $filters_arr,
         string $create_form_html = ''
-    ): string {
+    ): string
+    {
         if (empty($filters_arr) && ($create_form_html == '')) {
             return '';
         }
@@ -590,7 +582,8 @@ class CRUDTable
         string $table_index_on_page,
         string $create_form_html,
         array $filters_arr
-    ): string {
+    ): string
+    {
         if ($create_form_html == '') {
             return '';
         }

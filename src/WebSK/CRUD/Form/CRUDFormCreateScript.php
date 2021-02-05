@@ -4,6 +4,10 @@ namespace WebSK\CRUD\Form;
 
 use OLOG\Preloader;
 
+/**
+ * Class CRUDFormCreateScript
+ * @package WebSK\CRUD\Form
+ */
 class CRUDFormCreateScript
 {
     /**

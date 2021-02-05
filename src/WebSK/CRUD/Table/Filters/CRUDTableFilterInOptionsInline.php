@@ -3,15 +3,15 @@
 namespace WebSK\CRUD\Table\Filters;
 
 use OLOG\HTML;
-use WebSK\Utils\Sanitize;
 use Slim\Http\Request;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
+use WebSK\Utils\Sanitize;
 
 /**
- * Class CRUDTableFilterEqualOptionsInline
+ * Class CRUDTableFilterInOptionsInline
  * @package WebSK\CRUD\Table\Filters
  */
-class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisible
+class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
 {
     protected string $title;
 
@@ -21,7 +21,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
 
     protected bool $initial_is_enabled = false;
 
-    protected string $initial_value = '';
+    protected array $initial_value = [];
 
     protected array $options_arr;
 
@@ -30,13 +30,13 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
     protected string $btn_all_text = 'Все';
 
     /**
-     * CRUDTableFilterEqualOptionsInlineVisible constructor.
+     * CRUDTableFilterInOptionsInline constructor.
      * @param string $filter_uniq_id
      * @param string $title
      * @param string $field_name
      * @param array $options_arr
      * @param bool $initial_is_enabled
-     * @param string $initial_value
+     * @param array $initial_value
      * @param bool $show_null_checkbox
      * @param string $btn_all_text
      */
@@ -46,10 +46,11 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
         string $field_name,
         array $options_arr,
         bool $initial_is_enabled = false,
-        string $initial_value = '',
+        array $initial_value = [],
         bool $show_null_checkbox = false,
         string $btn_all_text = 'Все'
-    ) {
+    )
+    {
         $this->setFilterUniqId($filter_uniq_id);
         $this->setTitle($title);
         $this->setFieldName($field_name);
@@ -87,15 +88,15 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
 
     /**
      * @param Request $request
-     * @return null|string
+     * @return null|array
      */
-    public function getValue(Request $request): ?string
+    public function getValue(Request $request): ?array
     {
         if (!$this->useValuesFromForm($request)) {
             return $this->getInitialValue();
         }
 
-        $value = $request->getParam($this->getFilterUniqId(), '');
+        $value = (array)$request->getParam($this->getFilterUniqId(), []);
         $is_null = $request->getParam($this->nullCheckboxInputName(), '');
 
         if ($is_null != '') {
@@ -137,11 +138,14 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
             echo '<span onclick="f' . $input_name . '_changeFiltres(this);" class="btn btn-xs btn-default ' .
                 ($this->isEnabled($request) ? '' : 'active') . '">' . $this->getBtnAllText() . '</span>';
 
-            echo '<input type="hidden" name="' . $input_name . '" ' .
-                'value="' . ($this->isEnabled($request) ? $this->getValue($request) : '') . '">';
+            $value_arr = $this->isEnabled($request) ? $this->getValue($request) : [];
+            foreach ($value_arr as $value) {
+                echo '<input type="hidden" name="' . $input_name . '[]" ' . 'value="' . Sanitize::sanitizeAttrValue($value) . '">';
+            }
+
             $options_arr = $this->getOptionsArr();
-            foreach ($options_arr as $value => $title) {
-                echo '<span data-value="' . $value . '" data-enabled="1" ' .
+            foreach ($options_arr as $title => $value) {
+                echo '<span data-value="' . json_encode($value) . '" data-enabled="1" ' .
                     'onclick="f' . $input_name . '_changeFiltres(this);" class="btn btn-xs btn-default ' .
                     (($this->isEnabled($request) && ($this->getValue($request) == $value)) ? 'active' : '') .
                     '">' . $title . '</span>';
@@ -153,7 +157,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
                     ((is_null($this->getValue($request)) && ($this->isEnabled($request))) ? '1' : '') . '">';
                 echo '<span data-isnull="1" data-enabled="1" onclick="f' . $input_name . '_changeFiltres(this);" ' .
                     'class="btn btn-xs btn-default ' .
-                    ((is_null($this->getValue($request)) && ($this->isEnabled($request))) ? 'active' : '') . '">'.
+                    ((is_null($this->getValue($request)) && ($this->isEnabled($request))) ? 'active' : '') . '">' .
                     'Не указано</span>';
             }
         });
@@ -170,11 +174,14 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
                 $this.addClass('active');
 
                 var enabled = $this.data('enabled') || '';
-                var value = $this.data('value') || '';
+                var value = $this.data('value') || [];
                 var isnull = $this.data('isnull') || '';
 
                 $filter.find('[name="<?= $this->enabledCheckboxInputName() ?>"]').val(enabled);
-                $filter.find('[name="<?= $input_name ?>"]').val(value);
+                $filter.find('[name="<?= $input_name ?>[]"]').remove();
+                value.forEach((val) => {
+                    $('<input/>').attr({type: 'hidden', name:'<?= $input_name ?>[]'}).val(val).appendTo($filter);
+                });
                 $filter.find('[name="<?= $this->nullCheckboxInputName() ?>"]').val(isnull);
 
                 $form.submit();
@@ -212,14 +219,19 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
             return ['', []];
         }
 
-        $value = $this->getValue($request);
+        $value_arr = $this->getValue($request);
         $sanitized_column_name = Sanitize::sanitizeSqlColumnName($this->getFieldName());
 
-        if (is_null($value)) {
+        if (is_null($value_arr)) {
             return [' ' . $sanitized_column_name . ' is null ', []];
         }
+        if (!count($value_arr)) {
+            return ['', []];
+        }
 
-        return [' ' . $sanitized_column_name . ' = ? ', [$value]];
+        $in_placeholders_arr = array_fill(0, count($value_arr), '?');
+        $sql = ' ' . $sanitized_column_name . ' IN (' . implode(',', $in_placeholders_arr) . ')';
+        return [$sql, $value_arr];
     }
 
     /**
@@ -287,17 +299,17 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
     }
 
     /**
-     * @return string
+     * @return array
      */
-    public function getInitialValue(): string
+    public function getInitialValue(): array
     {
         return $this->initial_value;
     }
 
     /**
-     * @param string $initial_value
+     * @param array $initial_value
      */
-    public function setInitialValue(string $initial_value): void
+    public function setInitialValue(array $initial_value): void
     {
         $this->initial_value = $initial_value;
     }

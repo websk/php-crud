@@ -3,6 +3,7 @@
 namespace WebSK\CRUD\Form\Widgets;
 
 use WebSK\CRUD\Form\CRUDFormScript;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
@@ -14,12 +15,11 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetDate implements InterfaceCRUDFormWidget
 {
-    /** @var string */
-    protected $field_name;
-    /** @var bool */
-    protected $show_null_checkbox;
-    /** @var bool */
-    protected $is_required;
+    protected string $field_name;
+
+    protected bool $show_null_checkbox = false;
+
+    protected bool $is_required = false;
 
     /**
      * CRUDFormWidgetDate constructor.
@@ -35,10 +35,10 @@ class CRUDFormWidgetDate implements InterfaceCRUDFormWidget
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
-        $field_value = CRUDFieldsAccess::getObjectFieldValue($obj, $field_name);
+        $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         $is_required_str = '';
         if ($this->is_required) {

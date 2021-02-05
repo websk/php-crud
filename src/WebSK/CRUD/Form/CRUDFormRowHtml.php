@@ -3,6 +3,7 @@
 namespace WebSK\CRUD\Form;
 
 use WebSK\CRUD\CRUD;
+use WebSK\Entity\InterfaceEntity;
 
 /**
  * Class CRUDFormRowHtml
@@ -10,8 +11,7 @@ use WebSK\CRUD\CRUD;
  */
 class CRUDFormRowHtml implements InterfaceCRUDFormRow
 {
-    /** @var string */
-    protected $html;
+    protected string $html;
 
     /**
      * CRUDFormRowHtml constructor.
@@ -23,7 +23,7 @@ class CRUDFormRowHtml implements InterfaceCRUDFormRow
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $obj, CRUD $crud): string
     {
         return $this->getHtml();
     }

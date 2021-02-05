@@ -3,6 +3,7 @@
 namespace WebSK\CRUD\Form;
 
 use WebSK\CRUD\CRUD;
+use WebSK\Entity\InterfaceEntity;
 
 /**
  * Class CRUDFormVerticalRow
@@ -10,12 +11,11 @@ use WebSK\CRUD\CRUD;
  */
 class CRUDFormVerticalRow implements InterfaceCRUDFormRow
 {
-    /** @var string */
-    protected $title;
-    /** @var InterfaceCRUDFormWidget */
-    protected $widget_obj;
-    /** @var string */
-    protected $comment_str;
+    protected string $title;
+
+    protected InterfaceCRUDFormWidget $widget_obj;
+
+    protected string $comment_str;
 
     /**
      * CRUDFormVerticalRow constructor.
@@ -31,7 +31,7 @@ class CRUDFormVerticalRow implements InterfaceCRUDFormRow
     }
 
     /** @inheritdoc */
-    public function html($obj, CRUD $crud): string
+    public function html(InterfaceEntity $obj, CRUD $crud): string
     {
         $html = '';
 
