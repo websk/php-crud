@@ -19,7 +19,7 @@ use WebSK\Slim\Router;
 class CRUDDemoApp extends App
 {
     /**
-     * SkifApp constructor.
+     * CRUDDemoApp constructor.
      * @param array $config
      */
     public function __construct($config = [])

@@ -14,7 +14,7 @@ CREATE TABLE `crud_demo_users` (
     `address` varchar(250) DEFAULT '',
     `company` varchar(200) DEFAULT '',
     `comment` mediumtext,
-    `passw` varchar(50) DEFAULT '',
+    `passw` varchar(50) DEFAULT NULL,
     PRIMARY KEY (`id`),
     UNIQUE KEY `email` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

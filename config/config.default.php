@@ -5,7 +5,7 @@ return [
         'displayErrorDetails' => false,
         'cache' => [
             'engine' => \WebSK\Cache\Engines\Memcache::class,
-            'cache_key_prefix' => 'phpcrud',
+            'cache_key_prefix' => 'websk_crud',
             'servers' => [
                 [
                     'host' => 'localhost',

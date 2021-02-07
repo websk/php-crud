@@ -46,7 +46,7 @@ class DemoUser extends Entity
     protected string $photo = '';
 
     const _PASSW = 'passw';
-    protected string $passw = '';
+    protected ?string $passw = null;
 
     /**
      * @return string
@@ -225,17 +225,17 @@ class DemoUser extends Entity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getPassw(): string
+    public function getPassw(): ?string
     {
         return $this->passw;
     }
 
     /**
-     * @param string $passw
+     * @param string|null $passw
      */
-    public function setPassw(string $passw): void
+    public function setPassw(?string $passw): void
     {
         $this->passw = $passw;
     }
