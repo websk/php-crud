@@ -49,6 +49,7 @@ class CRUD
      * @param string $filters_position
      * @param bool $display_total_rows_count
      * @param int $page_size
+     * @param string $create_button_position
      * @return CRUDTable
      */
     public function createTable(
@@ -60,7 +61,8 @@ class CRUD
         string $table_id = '',
         string $filters_position = CRUDTable::FILTERS_POSITION_NONE,
         bool $display_total_rows_count = false,
-        int $page_size = self::DEFAULT_PAGE_SIZE
+        int $page_size = self::DEFAULT_PAGE_SIZE,
+        string $create_button_position = CRUDTable::CREATE_BUTTON_POSITION_NONE
     ): CRUDTable
     {
         return new CRUDTable(
@@ -73,7 +75,8 @@ class CRUD
             $table_id,
             $filters_position,
             $display_total_rows_count,
-            $page_size
+            $page_size,
+            $create_button_position
         );
     }
 

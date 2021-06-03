@@ -13,6 +13,8 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
 {
+    const NO_VALUE_TEXT = 'Нет значения';
+
     protected string $field_name;
 
     protected array $options_arr;
@@ -56,7 +58,7 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @param string $field_value
+     * @param string|null $field_value
      * @param string|null $input_name
      * @return string
      */
@@ -101,11 +103,30 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
             $options . '</select>';
 
         if ($this->isShowNullCheckbox()) {
-            $html .= '<div class="input-group-addon">';
+            $html .= '<div class="input-group-addon checkbox">';
+            $html .= '<label>';
             $html .= '<input type = "checkbox" value="1" name="' . Sanitize::sanitizeAttrValue($input_name) .
-                '___is_null" ' . $is_null_checked . ' /> null';
+                '___is_null" ' . $is_null_checked . ' /> ' . self::NO_VALUE_TEXT;
+            $html .= '</label>';
             $html .= '</div>';
         }
+
+        $html .=
+            '<script>
+                $(document).ready(function () {
+                    $("input[name=\'' . Sanitize::sanitizeAttrValue($input_name) . '___is_null\']").on("change", function() {
+                        if ($(this).prop("checked")) {
+                            $("select[name=\'' . $input_name . '\'").find("option[value=\'\']").prop("selected", true);
+                        }
+                    });
+                    
+                    $("select[name=\'' . $input_name . '\'").on("change", function () {
+                        $("input[name=\'' . Sanitize::sanitizeAttrValue($input_name) . '___is_null\']").prop("checked", $(this).val() ? false : true);
+                    });
+                    
+                    $("select[name=\'' . $input_name . '\'").trigger("change");
+                });
+            </script>';
 
         $html .= '</div>';
 

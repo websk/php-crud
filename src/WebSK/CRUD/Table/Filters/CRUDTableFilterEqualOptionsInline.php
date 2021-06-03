@@ -13,6 +13,10 @@ use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
  */
 class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisible
 {
+    const IS_NULL_POSTFIX = '___null';
+    const ENABLED_POSTFIX = '___enabled';
+    const PASSED_POSTFIX = '___passed';
+
     protected string $title;
 
     protected string $field_name;
@@ -82,7 +86,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
      */
     public function nullCheckboxInputName(): string
     {
-        return Sanitize::sanitizeAttrValue($this->getFilterUniqId() . '___is_null');
+        return Sanitize::sanitizeAttrValue($this->getFilterUniqId() . self::IS_NULL_POSTFIX);
     }
 
     /**
@@ -110,7 +114,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
      */
     public function enabledCheckboxInputName(): string
     {
-        return Sanitize::sanitizeAttrValue($this->getFilterUniqId() . '___enabled');
+        return Sanitize::sanitizeAttrValue($this->getFilterUniqId() . self::ENABLED_POSTFIX);
     }
 
     /**
@@ -118,7 +122,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
      */
     public function filterIsPassedInputName(): string
     {
-        return $this->getFilterUniqId() . '___passed';
+        return $this->getFilterUniqId() . self::PASSED_POSTFIX;
     }
 
     /** @inheritdoc */

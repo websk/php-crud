@@ -86,7 +86,7 @@ class DemoUserListHandler extends BaseHandler
             ],
             DemoUser::_CREATED_AT_TS . ' DESC',
             'users_list',
-            CRUDTable::FILTERS_POSITION_TOP
+            CRUDTable::FILTERS_POSITION_INLINE
         );
 
         $crud_form_response = $crud_table_obj->processRequest($request, $response);

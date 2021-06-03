@@ -3,6 +3,7 @@
 namespace WebSK\CRUD\Form\Widgets;
 
 use OLOG\Preloader;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
@@ -22,7 +23,8 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
 
     protected string $referenced_class_name;
 
-    protected string $referenced_class_title_field;
+    /** @var string|Closure */
+    protected $referenced_class_title_field;
 
     protected string $editor_url;
 
@@ -32,7 +34,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
      * CRUDFormWidgetReferenceAjax constructor.
      * @param string $field_name
      * @param string $referenced_class_name
-     * @param string $referenced_class_title_field
+     * @param string|Closure $referenced_class_title_field
      * @param string $ajax_action_url
      * @param string $editor_url
      * @param bool $is_required
@@ -40,7 +42,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     public function __construct(
         string $field_name,
         string $referenced_class_name,
-        string $referenced_class_title_field,
+        $referenced_class_title_field,
         string $ajax_action_url,
         string $editor_url,
         bool $is_required = false
@@ -75,12 +77,15 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         }
 
         if (!is_null($field_value)) {
-            $referenced_obj = $crud->createAndLoadObject($referenced_class_name, $field_value);
-            $referenced_obj_title = CRUDFieldsAccess::getObjectFieldValue(
-                $referenced_obj,
-                $referenced_class_title_field
-            );
-            $disabled_btn_link = '';
+            if (CRUDCompiler::isClosure($referenced_class_title_field)) {
+                $referenced_obj_title = $referenced_class_title_field($entity_obj);
+            } else {
+                $referenced_obj = $crud->createAndLoadObject($referenced_class_name, $field_value);
+                $referenced_obj_title = CRUDFieldsAccess::getObjectFieldValue(
+                    $referenced_obj,
+                    $referenced_class_title_field
+                );
+            }
         }
 
         $is_required_str = '';
@@ -255,7 +260,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return string
+     * @return string|Closure
      */
     public function getReferencedClassTitleField(): string
     {
@@ -263,9 +268,9 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @param string $referenced_class_title_field
+     * @param string|Closure $referenced_class_title_field
      */
-    public function setReferencedClassTitleField(string $referenced_class_title_field): void
+    public function setReferencedClassTitleField($referenced_class_title_field): void
     {
         $this->referenced_class_title_field = $referenced_class_title_field;
     }

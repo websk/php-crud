@@ -37,6 +37,13 @@ class CRUDTable
     const FILTERS_POSITION_NONE = 'FILTERS_POSITION_NONE';
     const FILTERS_POSITION_INLINE = 'FILTERS_POSITION_INLINE';
 
+    const CREATE_BUTTON_POSITION_LEFT_POPUP = 'CREATE_BUTTON_POSITION_LEFT_POPUP';
+    const CREATE_BUTTON_POSITION_RIGHT_POPUP = 'CREATE_BUTTON_POSITION_RIGHT_POPUP';
+    const CREATE_BUTTON_POSITION_LEFT_TOOLBAR = 'CREATE_BUTTON_POSITION_LEFT_TOOLBAR';
+    const CREATE_BUTTON_POSITION_RIGHT_TOOLBAR = 'CREATE_BUTTON_POSITION_RIGHT_TOOLBAR';
+    const CREATE_BUTTON_POSITION_NONE = 'CREATE_BUTTON_POSITION_NONE';
+    const CREATE_BUTTON_TEXT = 'Создать';
+
     const FIELD_CRUDTABLE_ID = 'crudtable_id';
     const FIELD_FIELD_NAME = 'field_name';
     const FIELD_FIELD_VALUE = 'field_value';
@@ -69,6 +76,8 @@ class CRUDTable
 
     protected int $page_size = CRUD::DEFAULT_PAGE_SIZE;
 
+    protected string $create_button_position = self::CREATE_BUTTON_POSITION_NONE;
+
     /**
      * CRUDTable constructor.
      * @param CRUD $crud
@@ -81,6 +90,7 @@ class CRUDTable
      * @param string $filters_position
      * @param bool $display_total_rows_count
      * @param int $page_size
+     * @param string $create_button_position
      */
     public function __construct(
         CRUD $crud,
@@ -92,7 +102,8 @@ class CRUDTable
         string $table_id = '',
         string $filters_position = self::FILTERS_POSITION_NONE,
         bool $display_total_rows_count = false,
-        int $page_size = CRUD::DEFAULT_PAGE_SIZE
+        int $page_size = CRUD::DEFAULT_PAGE_SIZE,
+        string $create_button_position = self::CREATE_BUTTON_POSITION_NONE
     )
     {
         $this->crud = $crud;
@@ -105,6 +116,7 @@ class CRUDTable
         $this->filters_position = $filters_position;
         $this->display_total_rows_count = $display_total_rows_count;
         $this->page_size = $page_size;
+        $this->setCreateButtonPosition($create_button_position);
     }
 
     /**
@@ -141,12 +153,9 @@ class CRUDTable
             }
             echo '<div class="col-sm-' . $col_sm_class . '">';
 
-            if ($this->filters_position != self::FILTERS_POSITION_INLINE) {
-                echo self::toolbarHtml(
-                    $this->table_id,
-                    $this->create_form_obj ? $this->create_form_obj->html() : '',
-                    $this->filters_arr
-                );
+            if ($this->create_form_obj) {
+                $create_form_html = $this->create_form_obj->html();
+                echo $this->createFormHtml($create_form_html);
             }
 
             if ($this->filters_position == self::FILTERS_POSITION_TOP) {
@@ -154,11 +163,10 @@ class CRUDTable
             }
 
             if ($this->filters_position == self::FILTERS_POSITION_INLINE) {
-                echo self::filtersAndCreateButtonHtmlInline(
+                echo self::filtersHtmlInline(
                     $request,
                     $this->table_id,
-                    $this->filters_arr,
-                    $this->create_form_obj ? $this->create_form_obj->html() : ''
+                    $this->filters_arr
                 );
             }
 
@@ -309,7 +317,7 @@ class CRUDTable
             $tsv .= $this->csvRowRender($row_html);
         }
 
-        return $tsv;
+        return strip_tags($tsv);
     }
 
     /**
@@ -514,25 +522,22 @@ class CRUDTable
      * @param Request $request
      * @param string $table_index_on_page
      * @param InterfaceCRUDTableFilter[] $filters_arr
-     * @param string $create_form_html
      * @return string
      */
-    public static function filtersAndCreateButtonHtmlInline(
+    public static function filtersHtmlInline(
         Request $request,
         string $table_index_on_page,
-        array $filters_arr,
-        string $create_form_html = ''
+        array $filters_arr
     ): string
     {
-        if (empty($filters_arr) && ($create_form_html == '')) {
+        if (empty($filters_arr)) {
             return '';
         }
 
         $html = HTML::div('filters-inline', '', function () use (
             $request,
             $table_index_on_page,
-            $filters_arr,
-            $create_form_html
+            $filters_arr
         ) {
             echo '<style>.filters-inline {margin-bottom: 10px;}</style>';
 
@@ -561,45 +566,88 @@ class CRUDTable
 
                 echo '</form>';
             }
-
-            if ($create_form_html != '') {
-                $create_form_element_id = 'collapse_' . rand(1, 999999);
-                echo MagnificPopup::button($create_form_element_id, 'btn btn-sm btn-primary pull-right', '<span class="glyphicon glyphicon-plus"></span> Создать');
-                echo MagnificPopup::popupHtml($create_form_element_id, $create_form_html);
-            }
         });
 
         return $html;
     }
 
     /**
-     * @param string $table_index_on_page
      * @param string $create_form_html
-     * @param InterfaceCRUDTableFilter[] $filters_arr
+     * @param string $create_button_position
+     * @param bool $table_has_filters
      * @return string
      */
-    protected static function toolbarHtml(
-        string $table_index_on_page,
+    protected static function createButtonPopupHtml(
         string $create_form_html,
-        array $filters_arr
-    ): string
-    {
-        if ($create_form_html == '') {
-            return '';
+        string $create_button_position,
+        bool $table_has_filters = true
+    ) : string {
+        $button_create_position_class_name = '';
+        switch ($create_button_position) {
+            case self::CREATE_BUTTON_POSITION_LEFT_POPUP:
+                $button_create_position_class_name = ' pull-left';
+                break;
+            case self::CREATE_BUTTON_POSITION_RIGHT_POPUP:
+                $button_create_position_class_name = ' pull-right';
+                break;
         }
 
         $html = '';
 
         $create_form_element_id = 'collapse_' . rand(1, 999999);
+        $html .= MagnificPopup::button(
+            $create_form_element_id,
+            'btn btn-sm btn-default' . $button_create_position_class_name,
+            self::CREATE_BUTTON_TEXT
+        );
+        $html .= MagnificPopup::popupHtml($create_form_element_id, $create_form_html);
 
-        $html .= '<div class="btn-group" role="group">';
+        if (!$table_has_filters) {
+            $html .= '<div style="display: inline-block; width: 100%"></div>';
+        }
+
+        return $html;
+    }
+
+    /**
+     * @param string $create_form_html
+     * @param string $create_position_button
+     * @return string
+     */
+    protected static function createButtonToolbarHtml(
+        string $create_form_html,
+        string $create_position_button
+    ): string {
+        $html = '';
+
+        $button_create_position_class_name = '';
+        switch ($create_position_button) {
+            case self::CREATE_BUTTON_POSITION_LEFT_TOOLBAR:
+                $button_create_position_class_name = ' pull-left';
+                break;
+            case self::CREATE_BUTTON_POSITION_RIGHT_TOOLBAR:
+                $button_create_position_class_name = ' pull-right';
+                break;
+        }
+
+        $create_form_element_id = 'collapse_' . rand(1, 999999);
+        $create_from_btn_group_id = '#btn-group-' . $create_form_element_id;
+
+        $html .= '<style>' . $create_from_btn_group_id . ' { margin-bottom: 10px; }</style>';
+        $html .= '<div class="btn-group' . $button_create_position_class_name . '" role="group">';
         if ($create_form_html) {
-            $html .= '<button type="button" class="btn btn-default" data-toggle="collapse" data-target="#' .
-                $create_form_element_id . '">Создать</button>';
+            $html .=
+                '<button 
+                    type="button" 
+                    class="btn btn-default" 
+                    data-toggle="collapse" 
+                    data-target="#' . $create_form_element_id . '"
+                >' . self::CREATE_BUTTON_TEXT . '</button>';
         }
         $html .= '</div>';
 
         if ($create_form_html) {
+            $html .= '<br /><br />';
             $html .= '<div class="collapse" id="' . $create_form_element_id . '"><div class="well">' .
                 $create_form_html . '</div></div>';
             $html .= '<script>' .
@@ -609,5 +657,79 @@ class CRUDTable
         }
 
         return $html;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCreateButtonPosition(): string
+    {
+        return $this->create_button_position;
+    }
+
+    /**
+     * @param string $create_button_position
+     */
+    public function setCreateButtonPosition(string $create_button_position): void
+    {
+        $this->create_button_position = $create_button_position;
+    }
+
+    /**
+     * @param string $create_form_html
+     * @return string
+     */
+    protected function createFormHtml(string $create_form_html) : string
+    {
+        $table_has_visible_filters = $this->tableHasVisibleFilters();
+
+        if ($this->getCreateButtonPosition() == self::CREATE_BUTTON_POSITION_NONE) {
+            if (!$table_has_visible_filters
+                ||$this->filters_position == self::FILTERS_POSITION_INLINE) {
+                $this->setCreateButtonPosition(self::CREATE_BUTTON_POSITION_RIGHT_POPUP);
+            } else {
+                $this->setCreateButtonPosition(self::CREATE_BUTTON_POSITION_LEFT_TOOLBAR);
+            }
+        }
+
+        if ($this->getCreateButtonPosition() == self::CREATE_BUTTON_POSITION_LEFT_POPUP
+            || $this->getCreateButtonPosition() == self::CREATE_BUTTON_POSITION_RIGHT_POPUP
+        ) {
+            return self::createButtonPopupHtml(
+                $create_form_html,
+                $this->getCreateButtonPosition(),
+                $table_has_visible_filters
+            );
+        }
+
+        if ($this->getCreateButtonPosition() == self::CREATE_BUTTON_POSITION_LEFT_TOOLBAR
+            || $this->getCreateButtonPosition() == self::CREATE_BUTTON_POSITION_RIGHT_TOOLBAR) {
+            return self::createButtonToolbarHtml(
+                $create_form_html,
+                $this->getCreateButtonPosition()
+            );
+        }
+
+        return '';
+    }
+
+    /**
+     * @return bool
+     */
+    protected function tableHasVisibleFilters() : bool
+    {
+        if (!$this->filters_arr) {
+            return false;
+        }
+
+        foreach ($this->filters_arr as $filter_obj) {
+            if ($filter_obj instanceof InterfaceCRUDTableFilterInvisible) {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
     }
 }

@@ -42,9 +42,7 @@ class CRUDFormVerticalRow implements InterfaceCRUDFormRow
         $html .= $this->getWidgetObj()->html($obj, $crud);
 
         if ($this->getCommentStr()) {
-            $html .= '<div class="col-sm-12">';
             $html .= '<span class="help-block">' . $this->getCommentStr() . '</span>';
-            $html .= '</div>';
         }
 
         $html .= '</div>';

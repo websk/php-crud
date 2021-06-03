@@ -3,6 +3,7 @@
 namespace WebSK\CRUD\Table\Widgets;
 
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
@@ -23,16 +24,24 @@ class CRUDTableWidgetCheckbox implements InterfaceCRUDTableWidget
         $this->setFieldName($field_name);
     }
 
-    /** @inheritdoc */
-    public function html($entity_obj, CRUD $crud): string
+    /** @inheritdoc
+     * @throws \ReflectionException
+     */
+    public function html($obj, CRUD $crud): string
     {
-        if (CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName())) {
-            $html = '<span style ="text-decoration: none;" class="glyphicon glyphicon-check"></span>';
-        } else {
-            $html = '<span style ="text-decoration: none;" class="glyphicon glyphicon-unchecked"></span>';
+        if (CRUDFieldsAccess::objectHasProperty($obj, $this->getFieldName())) {
+            if (CRUDFieldsAccess::getObjectFieldValue($obj, $this->getFieldName())) {
+                return '<span style ="text-decoration: none;" class="glyphicon glyphicon-check"></span>';
+            } else {
+                return '<span style ="text-decoration: none;" class="glyphicon glyphicon-unchecked"></span>';
+            }
         }
 
-        return $html;
+        if (CRUDCompiler::fieldValueOrCallableResult($this->getFieldName(), $obj)) {
+            return '<span style ="text-decoration: none;" class="glyphicon glyphicon-check"></span>';
+        } else {
+            return '<span style ="text-decoration: none;" class="glyphicon glyphicon-unchecked"></span>';
+        }
     }
 
     /**
