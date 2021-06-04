@@ -36,8 +36,8 @@ class DemoUser extends Entity
     const _ADDRESS = 'address';
     protected string $address = '';
 
-    const _COMPANY = 'company';
-    protected string $company = '';
+    const _COMPANY_ID = 'company_id';
+    protected ?int $company_id = null;
 
     const _COMMENT = 'comment';
     protected string $comment = '';
@@ -209,20 +209,21 @@ class DemoUser extends Entity
     }
 
     /**
-     * @return string
+     * @return int|null
      */
-    public function getCompany(): string
+    public function getCompanyId(): ?int
     {
-        return $this->company;
+        return $this->company_id;
     }
 
     /**
-     * @param string $company
+     * @param int|null $company_id
      */
-    public function setCompany(string $company): void
+    public function setCompanyId(?int $company_id): void
     {
-        $this->company = $company;
+        $this->company_id = $company_id;
     }
+
 
     /**
      * @return string|null

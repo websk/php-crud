@@ -4,13 +4,10 @@ namespace WebSK\CRUD\Demo;
 
 use Slim\App;
 use Slim\Handlers\Strategies\RequestResponseArgs;
-use Slim\Http\Request;
-use Slim\Http\Response;
 use WebSK\Cache\CacheServiceProvider;
 use WebSK\CRUD\CRUDServiceProvider;
 use WebSK\DB\DBWrapper;
 use WebSK\Slim\Facade;
-use WebSK\Slim\Router;
 
 /**
  * Class CRUDApp
@@ -43,10 +40,6 @@ class CRUDDemoApp extends App
         };
 
         CRUDDemoRoutes::register($this);
-
-        $this->get('/', function (Request $request, Response $response) {
-            return $response->withRedirect(Router::pathFor(CRUDDemoRoutes::ROUTE_NAME_USER_LIST));
-        });
 
         /** Use facade */
         Facade::setFacadeApplication($this);

@@ -65,6 +65,29 @@ class CRUDDemoServiceProvider
                 $container->get(self::DEMO_DB_SERVICE_CONTAINER_ID)
             );
         };
+
+        /**
+         * @param ContainerInterface $container
+         * @return DemoCompanyService
+         */
+        $container[DemoCompanyService::class] = function (ContainerInterface $container): DemoCompanyService {
+            return new DemoCompanyService(
+                DemoCompany::class,
+                $container->get(DemoCompanyRepository::class),
+                CacheServiceProvider::getCacheService($container)
+            );
+        };
+
+        /**
+         * @param ContainerInterface $container
+         * @return DemoCompanyRepository
+         */
+        $container[DemoCompanyRepository::class] = function (ContainerInterface $container): DemoCompanyRepository {
+            return new DemoCompanyRepository(
+                DemoCompany::class,
+                $container->get(self::DEMO_DB_SERVICE_CONTAINER_ID)
+            );
+        };
     }
 
     /**
@@ -83,5 +106,14 @@ class CRUDDemoServiceProvider
     public static function getDemoUserService(ContainerInterface $container): DemoUserService
     {
         return $container->get(DemoUserService::class);
+    }
+
+    /**
+     * @param ContainerInterface $container
+     * @return DemoCompanyService
+     */
+    public static function getDemoCompanyService(ContainerInterface $container): DemoCompanyService
+    {
+        return $container->get(DemoCompanyService::class);
     }
 }

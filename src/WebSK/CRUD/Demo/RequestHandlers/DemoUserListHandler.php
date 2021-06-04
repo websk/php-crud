@@ -6,13 +6,15 @@ use Slim\Http\Request;
 use Slim\Http\Response;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUDServiceProvider;
-use WebSK\CRUD\Demo\CRUDDemoRoutes;
+use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Demo\DemoUser;
 use WebSK\CRUD\Form\CRUDFormRow;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
+use WebSK\CRUD\Form\Widgets\CRUDFormWidgetReferenceAjax;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\CRUDTableColumn;
 use WebSK\CRUD\Table\Filters\CRUDTableFilterLike;
+use WebSK\CRUD\Table\Filters\CRUDTableFilterMultipleAutocomplete;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDatetime;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDelete;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetText;
@@ -43,16 +45,29 @@ class DemoUserListHandler extends BaseHandler
         $crud_table_obj = CRUDServiceProvider::getCrud($this->container)->createTable(
             DemoUser::class,
             CRUDServiceProvider::getCrud($this->container)->createForm(
-                'user_create',
+                'demo_user_create',
                 new DemoUser(),
                 [
                     new CRUDFormRow('Имя на сайте', new CRUDFormWidgetInput(DemoUser::_NAME)),
                     new CRUDFormRow('Имя', new CRUDFormWidgetInput(DemoUser::_FIRST_NAME)),
                     new CRUDFormRow('Фамилия', new CRUDFormWidgetInput(DemoUser::_LAST_NAME)),
-                    new CRUDFormRow('Email', new CRUDFormWidgetInput(DemoUser::_EMAIL))
+                    new CRUDFormRow('Email', new CRUDFormWidgetInput(DemoUser::_EMAIL)),
+                    new CRUDFormRow(
+                        'Компания',
+                        new CRUDFormWidgetReferenceAjax(
+                            DemoUser::_COMPANY_ID,
+                            DemoCompany::class,
+                            DemoCompany::_NAME,
+                            $this->pathFor(DemoCompanyListAjaxHandler::class),
+                            $this->pathFor(
+                                DemoCompanyEditHandler::class,
+                                ['demo_company_id' => CRUDFormWidgetReferenceAjax::REFERENCED_ID_PLACEHOLDER]
+                            )
+                        )
+                    ),
                 ],
                 function(DemoUser $user_obj) {
-                    return Router::pathFor(CRUDDemoRoutes::ROUTE_NAME_USER_EDIT, ['user_id' => $user_obj->getId()]);
+                    return Router::pathFor(DemoUserEditHandler::class, ['demo_user_id' => $user_obj->getId()]);
                 }
             ),
             [
@@ -62,7 +77,7 @@ class DemoUserListHandler extends BaseHandler
                     new CRUDTableWidgetTextWithLink(
                         DemoUser::_NAME,
                         function(DemoUser $user_obj) {
-                            return Router::pathFor(CRUDDemoRoutes::ROUTE_NAME_USER_EDIT, ['user_id' => $user_obj->getId()]);
+                            return Router::pathFor(DemoUserEditHandler::class, ['demo_user_id' => $user_obj->getId()]);
                         }
                     )
                 ),
@@ -83,10 +98,21 @@ class DemoUserListHandler extends BaseHandler
             [
                 new CRUDTableFilterLike(self::FILTER_NAME, 'Имя на сайте', DemoUser::_NAME),
                 new CRUDTableFilterLike(self::FILTER_EMAIL, 'Email', DemoUser::_EMAIL),
+                new CRUDTableFilterMultipleAutocomplete(
+                    DemoUser::_COMPANY_ID,
+                    'Компания',
+                    DemoUser::_COMPANY_ID,
+                    DemoCompany::_ID,
+                    DemoCompany::_NAME,
+                    $this->pathFor(DemoCompanyJsonHandler::class)
+                ),
             ],
             DemoUser::_CREATED_AT_TS . ' DESC',
-            'users_list',
-            CRUDTable::FILTERS_POSITION_INLINE
+            'demo_users_list',
+            CRUDTable::FILTERS_POSITION_TOP,
+            false,
+            100,
+            CRUDTable::CREATE_BUTTON_POSITION_LEFT_POPUP
         );
 
         $crud_form_response = $crud_table_obj->processRequest($request, $response);

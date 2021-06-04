@@ -3,8 +3,13 @@
 namespace WebSK\CRUD\Demo;
 
 use Slim\App;
+use WebSK\CRUD\Demo\RequestHandlers\DemoCompanyEditHandler;
+use WebSK\CRUD\Demo\RequestHandlers\DemoCompanyJsonHandler;
+use WebSK\CRUD\Demo\RequestHandlers\DemoCompanyListAjaxHandler;
+use WebSK\CRUD\Demo\RequestHandlers\DemoCompanyListHandler;
 use WebSK\CRUD\Demo\RequestHandlers\DemoUserEditHandler;
 use WebSK\CRUD\Demo\RequestHandlers\DemoUserListHandler;
+use WebSK\CRUD\Demo\RequestHandlers\DemoUserMainHandler;
 use WebSK\Utils\HTTP;
 
 /**
@@ -13,20 +18,35 @@ use WebSK\Utils\HTTP;
  */
 class CRUDDemoRoutes
 {
-    const ROUTE_NAME_USER_LIST = 'crud:users:list';
-    const ROUTE_NAME_USER_EDIT = 'crud:users:edit';
 
     /**
      * @param App $app
      */
     public static function register(App $app)
     {
-        $app->group('/users', function (App $app) {
-            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '', DemoUserListHandler::class)
-                ->setName(self::ROUTE_NAME_USER_LIST);
+        $app->get('/', DemoUserMainHandler::class)
+            ->setName(DemoUserMainHandler::class);
 
-            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST],'/{user_id:\d+}', DemoUserEditHandler::class)
-                ->setName(self::ROUTE_NAME_USER_EDIT);
+        $app->group('/demo_users', function (App $app) {
+            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '', DemoUserListHandler::class)
+                ->setName(DemoUserListHandler::class);
+
+            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST],'/{demo_user_id:\d+}', DemoUserEditHandler::class)
+                ->setName(DemoUserEditHandler::class);
+        });
+
+        $app->group('/demo_companies', function (App $app) {
+            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '', DemoCompanyListHandler::class)
+                ->setName(DemoCompanyListHandler::class);
+
+            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '/ajax', DemoCompanyListAjaxHandler::class)
+                ->setName(DemoCompanyListAjaxHandler::class);
+
+            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '/json', DemoCompanyJsonHandler::class)
+                ->setName(DemoCompanyJsonHandler::class);
+
+            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST],'/{demo_company_id:\d+}', DemoCompanyEditHandler::class)
+                ->setName(DemoCompanyEditHandler::class);
         });
     }
 }

@@ -20,15 +20,6 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
     const REMOTE_SOURCE_DROPDOWN_MAX_ITEMS = 30;
 
     const DEFAULT_CONFIG = [
-        'input_id' => null,
-        'ajax_url' => null,
-        'field_value' => null,
-        'filter_field_value' => null,
-        'field_text' => null,
-        'constants' => [
-            'json_field_value' => CRUDTableJSON::JSON_FIELD_VALUE,
-            'json_field_text' => CRUDTableJSON::JSON_FIELD_TEXT
-        ],
         'tokenize' => [
             'debounce' => 200,
             'searchMinLength' => self::REMOTE_SOURCE_MIN_SEARCH_LENGTH,
@@ -121,14 +112,16 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
         $config = self::DEFAULT_CONFIG;
         $config['input_id'] = $input_id;
         $config['ajax_url'] = $this->getRemoteDataSourceUrl();
-        $config['field_value'] = $this->getReferenceFilterValue();
+        $config['field_value_name'] = $this->getReferenceFilterValue();
         if ($request->getParam($this->getFieldName())) {
-            $config['filter_field_value'] = implode(
+            $config['field_value_val'] = implode(
                 CRUDTableFilterInVisible::DEFAULT_SEPARATOR,
                 $request->getParam($this->getFieldName())
             );
         }
-        $config['field_text'] = $this->getReferenceFilterText();
+        $config['field_text_name'] = $this->getReferenceFilterText();
+        $config['submit_form'] = true;
+
         $html .= '<script>createMultipleAutocompleteFilter(' . json_encode($config) . ');</script>';
 
         return $html;
@@ -242,15 +235,13 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
         <script type="text/javascript">
             function createMultipleAutocompleteFilter(config) {
                 config = Object.assign({
-                    input_id: null,
-                    constants: {
-                        json_field_value: null,
-                        json_field_text: null
-                    },
-                    field_value: null,
-                    filter_field_value: null,
-                    field_text: null,
-                    ajax_url: null,
+                    input_id: '',
+                    options: [],
+                    submit_form: false,
+                    field_value_name: '',
+                    field_value_val: '',
+                    field_text_name: '',
+                    ajax_url: '',
                     tokenize: {}
                 }, config);
 
@@ -258,48 +249,76 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
                     return;
                 }
 
-                if (!config.ajax_url) {
-                    return;
-                }
-
-                if (config.filter_field_value) {
-                    $.ajax(config.ajax_url + '?' + config.field_value + '=' + config.filter_field_value, {
+                if (config.field_value_val && config.field_value_name && config.ajax_url) {
+                    let ajax_url = new URL(config.ajax_url, document.location.origin);
+                    ajax_url.searchParams.append(config.field_value_name, config.field_value_val);
+                    $.ajax(ajax_url.href, {
                         dataType: 'json',
                         success: function (data) {
                             $.each(data, function (index, item) {
                                 let item_data = [
-                                    item[config.constants.json_field_value],
-                                    item[config.constants.json_field_text],
+                                    item[config.field_value_name],
+                                    item[config.field_text_name],
                                     true
                                 ];
                                 $('#' + config.input_id).tokenize2().trigger('tokenize:tokens:add', item_data);
-                                $('#' + config.input_id).on('tokenize:tokens:add tokenize:tokens:remove', function (container) {
-                                    $(this).closest('form').trigger('submit');
-                                });
+                                if (config.submit_form) {
+                                    $('#' + config.input_id).on('tokenize:tokens:add tokenize:tokens:remove', function (container) {
+                                        $(this).closest('form').trigger('submit');
+                                    });
+                                }
                             });
                         }
                     });
                 }
 
-                config.tokenize.dataSource = function(term, object) {
-                    let field_text_search = $("#" + config.input_id).parent().find(".token-search").find("input").val();
-                    $.ajax(config.ajax_url + '?' + config.field_text + '=' + field_text_search, {
-                        dataType: 'json',
-                        success: function(data) {
-                            var $items = [];
-                            $.each(data, function(index, item) {
-                                $items.push(item);
-                            });
-                            object.trigger('tokenize:dropdown:fill', [$items]);
+                if (config.ajax_url) {
+                    config.tokenize.dataSource = function (term, object) {
+                        let ajax_url = new URL(config.ajax_url, document.location.origin);
+                        ajax_url.searchParams.append('term', term);
+                        if (config.field_text_name) {
+                            ajax_url.searchParams.append(config.field_text_name, term);
                         }
-                    });
+                        $.ajax(ajax_url.href, {
+                            dataType: 'json',
+                            success: function (data) {
+                                var $items = [];
+                                $.each(data, function (index, item) {
+                                    if (item.hasOwnProperty('value') && item.hasOwnProperty('text')) {
+                                        $items.push(item);
+                                    } else {
+                                        let item_data = {
+                                            'value': item[config.field_value_name],
+                                            'text': item[config.field_text_name],
+                                        };
+                                        $items.push(item_data);
+                                    }
+                                });
+                                object.trigger('tokenize:dropdown:fill', [$items]);
+                            }
+                        });
 
-                    $('#' + config.input_id).on('tokenize:tokens:add tokenize:tokens:remove', function(container) {
-                        $(this).closest('form').trigger('submit');
-                    });
-                };
+                        if (config.submit_form) {
+                            $('#' + config.input_id).on('tokenize:tokens:add tokenize:tokens:remove', function (container) {
+                                $(this).closest('form').trigger('submit');
+                            });
+                        }
+                    };
+                }
 
                 $('#' + config.input_id).tokenize2(config.tokenize);
+
+                for (let option in config.options) {
+                    $('#' + config.input_id).tokenize2().trigger('tokenize:tokens:add', config.options[option]);
+                }
+
+                if (!config.ajax_url) {
+                    $(document).ready(function () {
+                        $('#' + config.input_id).on('tokenize:select', function (container) {
+                            $(this).tokenize2().trigger('tokenize:search', [$(this).tokenize2().input.val()]);
+                        });
+                    });
+                }
             }
         </script>
         <?php

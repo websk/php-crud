@@ -4,6 +4,7 @@ namespace WebSK\CRUD;
 
 use Closure;
 use Slim\Http\Request;
+use WebSK\CRUD\Table\CRUDTableJSON;
 use WebSK\Entity\EntityRepository;
 use WebSK\Entity\EntityService;
 use WebSK\Entity\WeightService;
@@ -77,6 +78,28 @@ class CRUD
             $display_total_rows_count,
             $page_size,
             $create_button_position
+        );
+    }
+
+    /**
+     * @param string $entity_class_name
+     * @param InterfaceCRUDTableColumn[] $column_obj_arr
+     * @param InterfaceCRUDTableFilter[] $filters_arr
+     * @param string $order_by
+     * @return CRUDTableJSON
+     */
+    public function createTableJSON(
+        string $entity_class_name,
+        array $column_obj_arr,
+        array $filters_arr = [],
+        string $order_by = ''
+    ): CRUDTableJSON {
+        return new CRUDTableJSON(
+            $this,
+            $entity_class_name,
+            $column_obj_arr,
+            $filters_arr,
+            $order_by
         );
     }
 
