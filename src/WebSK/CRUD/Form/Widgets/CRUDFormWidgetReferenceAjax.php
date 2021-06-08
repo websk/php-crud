@@ -86,6 +86,8 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
                     $referenced_class_title_field
                 );
             }
+
+            $disabled_btn_link = '';
         }
 
         $is_required_str = '';

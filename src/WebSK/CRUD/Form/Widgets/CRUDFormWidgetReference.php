@@ -88,7 +88,7 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
                 }
             );
 
-            select_element.dispatchEvent(new Event('change')); // fire to initialize is_null input on display
+            select_element.dispatchEvent(new Event('change'));
         </script>
 
         <?php

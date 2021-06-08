@@ -28,7 +28,7 @@ class DemoUser extends Entity
     protected string $birthday = '';
 
     const _PHONE = 'phone';
-    protected string $phone = '';
+    protected ?string $phone = null;
 
     const _CITY = 'city';
     protected string $city = '';
@@ -113,17 +113,17 @@ class DemoUser extends Entity
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }
 
     /**
-     * @param string $phone
+     * @param null|string $phone
      */
-    public function setPhone(string $phone): void
+    public function setPhone(?string $phone): void
     {
         $this->phone = $phone;
     }

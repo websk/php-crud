@@ -52,6 +52,7 @@ class DemoUserEditHandler extends BaseHandler
                 new CRUDFormRow('Имя', new CRUDFormWidgetInput(DemoUser::_FIRST_NAME)),
                 new CRUDFormRow('Фамилия', new CRUDFormWidgetInput(DemoUser::_LAST_NAME)),
                 new CRUDFormRow('Email', new CRUDFormWidgetInput(DemoUser::_EMAIL)),
+                new CRUDFormRow('Телефон', new CRUDFormWidgetInput(DemoUser::_PHONE, true)),
                 new CRUDFormRow('Дата рождения', new CRUDFormWidgetDate(DemoUser::_BIRTHDAY)),
                 new CRUDFormRow(
                     'Компания',
