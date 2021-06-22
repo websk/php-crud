@@ -60,7 +60,11 @@ class DemoUserEditHandler extends BaseHandler
                         DemoUser::_COMPANY_ID,
                         DemoCompany::class,
                         DemoCompany::_NAME,
-                        $this->pathFor(DemoCompanyListAjaxHandler::class)
+                        $this->pathFor(DemoCompanyListAjaxHandler::class),
+                        $this->pathFor(
+                            DemoCompanyEditHandler::class,
+                            ['demo_company_id' => CRUDFormWidgetReferenceAjax::REFERENCED_ID_PLACEHOLDER]
+                        )
                     )
                 ),
                 new CRUDFormRow('Комментарий', new CRUDFormWidgetTextarea(DemoUser::_COMMENT)),
