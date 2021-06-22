@@ -26,7 +26,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     /** @var string|Closure */
     protected $referenced_class_title_field;
 
-    protected string $editor_url;
+    protected ?string $editor_url;
 
     protected bool $is_required = false;
 
@@ -36,7 +36,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
      * @param string $referenced_class_name
      * @param string|Closure $referenced_class_title_field
      * @param string $ajax_action_url
-     * @param string $editor_url
+     * @param null|string $editor_url
      * @param bool $is_required
      */
     public function __construct(
@@ -44,7 +44,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         string $referenced_class_name,
         $referenced_class_title_field,
         string $ajax_action_url,
-        string $editor_url,
+        ?string $editor_url = null,
         bool $is_required = false
     )
     {
@@ -136,47 +136,47 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         ob_start(); ?>
 
         <script>
-            $('#<?= $choose_form_element_id ?>').on('hidden.bs.modal', function () {
-                $('#<?= $choose_form_element_id ?> .modal-body').html('');
+            $('#<?php echo $choose_form_element_id ?>').on('hidden.bs.modal', function () {
+                $('#<?php echo $choose_form_element_id ?> .modal-body').html('');
             });
 
-            $('#<?= $choose_form_element_id ?>').on('shown.bs.modal', function (e) {
+            $('#<?php echo $choose_form_element_id ?>').on('shown.bs.modal', function (e) {
                 OLOG.preloader.show();
                 $.ajax({
-                    url: "<?= $this->getAjaxActionUrl() ?>"
+                    url: "<?php echo $this->getAjaxActionUrl() ?>"
                 }).success(function (received_html) {
-                    $('#<?= $choose_form_element_id ?> .modal-body').html(received_html);
+                    $('#<?php echo $choose_form_element_id ?> .modal-body').html(received_html);
                     OLOG.preloader.hide();
                 }).error(function (err) {
-                    $('#<?= $choose_form_element_id ?> .modal-body')
+                    $('#<?php echo $choose_form_element_id ?> .modal-body')
                         .html('<div class="alert alert-danger">' + err.status + ': ' + err.statusText + '</div>');
                     OLOG.preloader.hide();
                 });
             });
 
-            $('#<?= $choose_form_element_id ?>').on('click', '.js-ajax-form-select', function (e) {
+            $('#<?php echo $choose_form_element_id ?>').on('click', '.js-ajax-form-select', function (e) {
                 e.preventDefault();
                 var select_id = $(this).data('id');
                 var select_title = $(this).data('title');
-                $('#<?= $choose_form_element_id ?>').modal('hide');
-                $('#<?= $select_element_id ?>_text').text(select_title);
-                $('#<?= $select_element_id ?>_btn_link').attr('disabled', false);
-                $('#<?= $select_element_id ?>').val(select_id).trigger('change');
-                $('#<?= $select_element_id ?>_is_null').val('');
+                $('#<?php echo $choose_form_element_id ?>').modal('hide');
+                $('#<?php echo $select_element_id ?>_text').text(select_title);
+                $('#<?php echo $select_element_id ?>_btn_link').attr('disabled', false);
+                $('#<?php echo $select_element_id ?>').val(select_id).trigger('change');
+                $('#<?php echo $select_element_id ?>_is_null').val('');
             });
 
-            $('#<?= $select_element_id ?>_btn_is_null').on('click', function (e) {
+            $('#<?php echo $select_element_id ?>_btn_is_null').on('click', function (e) {
                 e.preventDefault();
-                $('#<?= $select_element_id ?>_text').text('');
-                $('#<?= $select_element_id ?>_btn_link').attr('disabled', true);
-                $('#<?= $select_element_id ?>').val('').trigger('change');
-                $('#<?= $select_element_id ?>_is_null').val(1);
+                $('#<?php echo $select_element_id ?>_text').text('');
+                $('#<?php echo $select_element_id ?>_btn_link').attr('disabled', true);
+                $('#<?php echo $select_element_id ?>').val('').trigger('change');
+                $('#<?php echo $select_element_id ?>_is_null').val(1);
             });
 
-            $('#<?= $select_element_id ?>_btn_link').on('click', function (e) {
-                var url = '<?= $this->getEditorUrl() ?>';
-                var id = $('#<?= $select_element_id ?>').val();
-                url = url.replace('<?= self::REFERENCED_ID_PLACEHOLDER ?>', id);
+            $('#<?php echo $select_element_id ?>_btn_link').on('click', function (e) {
+                var url = '<?php echo $this->getEditorUrl() ?>';
+                var id = $('#<?php echo $select_element_id ?>').val();
+                url = url.replace('<?php echo self::REFERENCED_ID_PLACEHOLDER ?>', id);
 
                 window.location = url;
             });
@@ -278,17 +278,17 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return string
+     * @return null|string
      */
-    public function getEditorUrl(): string
+    public function getEditorUrl(): ?string
     {
         return $this->editor_url;
     }
 
     /**
-     * @param string $editor_url
+     * @param null|string $editor_url
      */
-    public function setEditorUrl(string $editor_url): void
+    public function setEditorUrl(?string $editor_url): void
     {
         $this->editor_url = $editor_url;
     }
