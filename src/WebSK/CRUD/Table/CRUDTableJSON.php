@@ -3,7 +3,7 @@
 namespace WebSK\CRUD\Table;
 
 use OLOG\Assert;
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
 
@@ -51,9 +51,9 @@ class CRUDTableJSON
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      */
-    public function json(Request $request)
+    public function json(ServerRequestInterface $request)
     {
         $data_arr = [];
 

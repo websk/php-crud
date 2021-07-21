@@ -2,13 +2,13 @@
 
 namespace WebSK\CRUD\Table;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Utils\Assert;
 use OLOG\CheckClassInterfaces;
 use OLOG\HTML;
 use OLOG\MagnificPopup;
 use OLOG\Operations;
-use Slim\Http\Request;
-use Slim\Http\Response;
 use WebSK\Entity\InterfaceWeight;
 use WebSK\Utils\HTTP;
 use WebSK\CRUD\CRUD;
@@ -120,10 +120,10 @@ class CRUDTable
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return string
      */
-    public function html(Request $request): string
+    public function html(ServerRequestInterface $request): string
     {
         // вывод таблицы
 
@@ -265,11 +265,11 @@ class CRUDTable
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $column_delimiter
      * @return string
      */
-    public function csv(Request $request, string $column_delimiter = self::CSV_COLUMN_DELIMITER): string
+    public function csv(ServerRequestInterface $request, string $column_delimiter = self::CSV_COLUMN_DELIMITER): string
     {
         $tsv = '';
         $total_rows_count = 0;
@@ -342,17 +342,17 @@ class CRUDTable
     }
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return null|Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return null|ResponseInterface
      * @throws \Exception
      * @throws \ReflectionException
      */
-    public function processRequest(Request $request, Response $response): ?Response
+    public function processRequest(ServerRequestInterface $request, ResponseInterface $response): ?ResponseInterface
     {
         if ($this->create_form_obj instanceof CRUDForm) {
             $crud_form_response = $this->create_form_obj->processRequest($request, $response);
-            if ($crud_form_response instanceof Response) {
+            if ($crud_form_response instanceof ResponseInterface) {
                 return $crud_form_response;
             }
         }
@@ -375,12 +375,12 @@ class CRUDTable
     }
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      * @throws \Exception
      */
-    public function deleteEntityOperation(Request $request, Response $response): Response
+    public function deleteEntityOperation(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $entity_class_name = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_CLASS_NAME);
         Assert::assert($entity_class_name);
@@ -401,12 +401,12 @@ class CRUDTable
     }
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      * @throws \Exception
      */
-    public function swapEntityWeightOperation(Request $request, Response $response): Response
+    public function swapEntityWeightOperation(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $entity_class_name = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_CLASS_NAME);
         Assert::assert($entity_class_name);
@@ -436,13 +436,13 @@ class CRUDTable
     }
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      * @throws \Exception
      * @throws \ReflectionException
      */
-    public function updateEntityFieldOperation(Request $request, Response $response): ?Response
+    public function updateEntityFieldOperation(ServerRequestInterface $request, ResponseInterface $response): ?ResponseInterface
     {
         $table_id_from_request = $request->getParsedBodyParam(CRUDTable::FIELD_CRUDTABLE_ID, '');
         // проверяем, что операция выполняется для таблицы из запроса, потому что класс модели мы берем из таблицы
@@ -475,12 +475,12 @@ class CRUDTable
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param InterfaceCRUDTableFilter[] $filters_arr
      * @return string
      * @throws \Exception
      */
-    protected static function filtersHtml(Request $request, array $filters_arr): string
+    protected static function filtersHtml(ServerRequestInterface $request, array $filters_arr): string
     {
         $html = '';
 
@@ -519,13 +519,13 @@ class CRUDTable
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $table_index_on_page
      * @param InterfaceCRUDTableFilter[] $filters_arr
      * @return string
      */
     public static function filtersHtmlInline(
-        Request $request,
+        ServerRequestInterface $request,
         string $table_index_on_page,
         array $filters_arr
     ): string

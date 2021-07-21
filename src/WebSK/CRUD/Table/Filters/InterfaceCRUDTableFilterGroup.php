@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilter;
 
 /**
@@ -17,10 +17,10 @@ interface InterfaceCRUDTableFilterGroup
     public function getTitle(): string;
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return string
      */
-    public function getHtml(Request $request): string;
+    public function getHtml(ServerRequestInterface $request): string;
 
     /**
      * @return InterfaceCRUDTableFilter[]

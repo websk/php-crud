@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class CRUDTableFilterMultipleAutocompleteInline
@@ -13,7 +13,7 @@ class CRUDTableFilterMultipleAutocompleteInline extends CRUDTableFilterMultipleA
     protected static bool $css_is_loaded = false;
 
     /** @inheritdoc */
-    public function getHtml(Request $request): string
+    public function getHtml(ServerRequestInterface $request): string
     {
         $html = self::loadCSS();
         $html .= parent::getHtml($request);

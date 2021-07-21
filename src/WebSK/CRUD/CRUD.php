@@ -3,7 +3,7 @@
 namespace WebSK\CRUD;
 
 use Closure;
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\Table\CRUDTableJSON;
 use WebSK\Entity\EntityRepository;
 use WebSK\Entity\EntityService;
@@ -146,7 +146,7 @@ class CRUD
      * Возвращает одну страницу списка объектов указанного класса.
      * Сортировка: @TODO.
      *
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $entity_class_name Имя класса модели
      * @param InterfaceCRUDTableFilter[] $filters_arr
      * @param string $order_by
@@ -158,7 +158,7 @@ class CRUD
      * @throws \Exception
      */
     public function getObjIdsArrForClassName(
-        Request $request,
+        ServerRequestInterface $request,
         string $entity_class_name,
         array $filters_arr,
         string $order_by = '',
@@ -210,12 +210,12 @@ class CRUD
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param InterfaceCRUDTableFilter[] $filters_arr
      * @return array
      * @throws \Exception
      */
-    protected function makeSQLConditionsAndPlaceholderValues(Request $request, array $filters_arr): array
+    protected function makeSQLConditionsAndPlaceholderValues(ServerRequestInterface $request, array $filters_arr): array
     {
         $where = '';
         $query_param_values_arr = [];
@@ -243,13 +243,13 @@ class CRUD
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $entity_class_name
      * @param InterfaceCRUDTableFilter[] $filters_arr
      * @return int
      * @throws \Exception
      */
-    protected function getTotalRowsCount(Request $request, string $entity_class_name, array $filters_arr): int
+    protected function getTotalRowsCount(ServerRequestInterface $request, string $entity_class_name, array $filters_arr): int
     {
         $repository_container_id = EntityRepository::getContainerIdByClassName($entity_class_name);
         Assert::assert($this->container->has($repository_container_id), 'Unknown repository ' . $repository_container_id);
@@ -283,11 +283,11 @@ class CRUD
 
     /**
      * @param InterfaceEntity $obj
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return null|InterfaceEntity
      * @throws \ReflectionException
      */
-    public function saveOrUpdateObjectFromFormRequest($obj, Request $request): ?InterfaceEntity
+    public function saveOrUpdateObjectFromFormRequest($obj, ServerRequestInterface $request): ?InterfaceEntity
     {
         $entity_class_name = get_class($obj);
         Assert::assert($entity_class_name);

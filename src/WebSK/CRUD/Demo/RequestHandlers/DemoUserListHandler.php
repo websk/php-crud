@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Demo\RequestHandlers;
 
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUDServiceProvider;
 use WebSK\CRUD\Demo\DemoCompany;
@@ -36,11 +36,11 @@ class DemoUserListHandler extends BaseHandler
     const FILTER_NAME = 'user_name';
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return \Psr\Http\Message\ResponseInterface
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      */
-    public function __invoke(Request $request, Response $response)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
     {
         $crud_table_obj = CRUDServiceProvider::getCrud($this->container)->createTable(
             DemoUser::class,
@@ -116,7 +116,7 @@ class DemoUserListHandler extends BaseHandler
         );
 
         $crud_form_response = $crud_table_obj->processRequest($request, $response);
-        if ($crud_form_response instanceof Response) {
+        if ($crud_form_response instanceof ResponseInterface) {
             return $crud_form_response;
         }
 

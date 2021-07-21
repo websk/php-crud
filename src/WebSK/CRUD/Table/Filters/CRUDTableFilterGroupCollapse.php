@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilter;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
@@ -35,13 +35,13 @@ class CRUDTableFilterGroupCollapse implements InterfaceCRUDTableFilterGroup
     }
 
     /** @inheritdoc */
-    public function sqlConditionAndPlaceholderValue(Request $request): array
+    public function sqlConditionAndPlaceholderValue(ServerRequestInterface $request): array
     {
         return ['', []];
     }
 
     /** @inheritdoc */
-    public function getHtml(Request $request): string
+    public function getHtml(ServerRequestInterface $request): string
     {
         $filters_arr = $this->getFiltersArr();
 

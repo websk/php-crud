@@ -3,8 +3,7 @@
 namespace WebSK\CRUD\Demo\RequestHandlers;
 
 use Psr\Http\Message\ResponseInterface;
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDServiceProvider;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Table\CRUDTableColumn;
@@ -20,11 +19,11 @@ use WebSK\Slim\RequestHandlers\BaseHandler;
 class DemoCompanyJsonHandler extends BaseHandler
 {
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return ResponseInterface|Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      */
-    public function __invoke(Request $request, Response $response)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
     {
         $crud_table_json_obj = CRUDServiceProvider::getCrud($this->container)->createTableJSON(
             DemoCompany::class,

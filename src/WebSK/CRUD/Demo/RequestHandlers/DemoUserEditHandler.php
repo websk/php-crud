@@ -2,9 +2,8 @@
 
 namespace WebSK\CRUD\Demo\RequestHandlers;
 
-use Slim\Http\Request;
-use Slim\Http\Response;
-use Slim\Http\StatusCode;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUDServiceProvider;
 use WebSK\CRUD\Demo\CRUDDemoServiceProvider;
@@ -18,6 +17,7 @@ use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTextarea;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTimestamp;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetUpload;
 use WebSK\Slim\RequestHandlers\BaseHandler;
+use WebSK\Utils\HTTP;
 use WebSK\Views\BreadcrumbItemDTO;
 use WebSK\Views\LayoutDTO;
 use WebSK\Views\PhpRender;
@@ -29,19 +29,19 @@ use WebSK\Views\PhpRender;
 class DemoUserEditHandler extends BaseHandler
 {
     /**
-     * @param Request $request
-     * @param Response $response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
      * @param int|null $demo_user_id
-     * @return \Psr\Http\Message\ResponseInterface|Response
+     * @return \Psr\Http\Message\ResponseInterface
      * @throws \Exception
      */
-    public function __invoke(Request $request, Response $response, ?int $demo_user_id = null)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, ?int $demo_user_id = null)
     {
         $demo_user_service = CRUDDemoServiceProvider::getDemoUserService($this->container);
         $demo_user_obj = $demo_user_service->getById($demo_user_id);
 
         if (!$demo_user_obj) {
-            return $response->withStatus(StatusCode::HTTP_NOT_FOUND);
+            return $response->withStatus(HTTP::STATUS_NOT_FOUND);
         }
 
         $crud_form = CRUDServiceProvider::getCrud($this->container)->createForm(
@@ -86,7 +86,7 @@ class DemoUserEditHandler extends BaseHandler
         );
 
         $crud_form_response = $crud_form->processRequest($request, $response);
-        if ($crud_form_response instanceof Response) {
+        if ($crud_form_response instanceof ResponseInterface) {
             return $crud_form_response;
         }
 

@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Table;
 
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Utils\Sanitize;
-use Slim\Http\Request;
 
 /**
  * Class NullablePostFields
@@ -33,11 +33,11 @@ class NullablePostFields
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $field_name
      * @return null|string
      */
-    public static function optionalFieldValue(Request $request, string $field_name): ?string
+    public static function optionalFieldValue(ServerRequestInterface $request, string $field_name): ?string
     {
         $field_value = $request->getParsedBodyParam($field_name, '');
 

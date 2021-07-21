@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD;
 
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class Pager
@@ -29,11 +29,11 @@ class Pager
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $table_index_on_page
      * @return int
      */
-    public static function getPageOffset(Request $request, string $table_index_on_page): int
+    public static function getPageOffset(ServerRequestInterface $request, string $table_index_on_page): int
     {
         $page_offset = 0;
         $page_offset_param = $request->getParam(self::pageOffsetFormFieldName($table_index_on_page), null);
@@ -49,13 +49,13 @@ class Pager
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $table_index_on_page
      * @param int $default_page_size
      * @return int
      */
     public static function getPageSize(
-        Request $request,
+        ServerRequestInterface $request,
         string $table_index_on_page,
         int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
     ): int
@@ -77,13 +77,13 @@ class Pager
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $table_index_on_page
      * @param int $default_page_size
      * @return int
      */
     protected static function getNextPageStart(
-        Request $request,
+        ServerRequestInterface $request,
         string $table_index_on_page,
         int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
     ): int
@@ -94,13 +94,13 @@ class Pager
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $table_index_on_page
      * @param int $default_page_size
      * @return int
      */
     protected static function getPrevPageStart(
-        Request $request,
+        ServerRequestInterface $request,
         string $table_index_on_page,
         int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
     ): int
@@ -111,11 +111,11 @@ class Pager
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $table_index_on_page
      * @return bool
      */
-    protected static function hasPrevPage(Request $request, string $table_index_on_page): bool
+    protected static function hasPrevPage(ServerRequestInterface $request, string $table_index_on_page): bool
     {
         $start = self::getPageOffset($request, $table_index_on_page);
 
@@ -127,7 +127,7 @@ class Pager
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $table_index_on_page
      * @param int $elements_count Количество элементов на текущей странице. Если меньше размера страницы - значит,
      * следующей страницы нет. Если null - значит оно не передано (т.е. неизвестно),
@@ -136,7 +136,7 @@ class Pager
      * @return bool
      */
     protected static function hasNextPage(
-        Request $request,
+        ServerRequestInterface $request,
         string $table_index_on_page,
         int $elements_count,
         int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
@@ -158,7 +158,7 @@ class Pager
     /**
      * "Дальше" рисуется всегда, если параметр $elements_count не передан
      *
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @param string $table_index_on_page
      * @param int|null $elements_count
      * @param bool $display_total_rows_count
@@ -167,7 +167,7 @@ class Pager
      * @return string
      */
     public static function renderPager(
-        Request $request,
+        ServerRequestInterface $request,
         string $table_index_on_page,
         int $elements_count = null,
         bool $display_total_rows_count = false,

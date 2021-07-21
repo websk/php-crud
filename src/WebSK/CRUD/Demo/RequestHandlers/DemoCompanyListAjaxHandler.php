@@ -3,8 +3,7 @@
 namespace WebSK\CRUD\Demo\RequestHandlers;
 
 use Psr\Http\Message\ResponseInterface;
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDServiceProvider;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Table\CRUDTable;
@@ -24,11 +23,11 @@ class DemoCompanyListAjaxHandler extends BaseHandler
     const FILTER_NAME = 'demo_company_name';
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return ResponseInterface|Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      */
-    public function __invoke(Request $request, Response $response)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
     {
         $crud_table_obj = CRUDServiceProvider::getCrud($this->container)->createTable(
             DemoCompany::class,

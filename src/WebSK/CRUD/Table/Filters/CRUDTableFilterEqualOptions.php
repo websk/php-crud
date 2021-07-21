@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Utils\Sanitize;
-use Slim\Http\Request;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -58,10 +58,10 @@ class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
      * сообщает, нужно ли использовать значения из формы
      * (включая отсутствующие в форме поля - для чекбоксов это означает false)
      * или этот фильтр в форме не приходил и нужно использовать initial значения
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return bool
      */
-    public function useValuesFromForm(Request $request): bool
+    public function useValuesFromForm(ServerRequestInterface $request): bool
     {
         $value = $request->getParam($this->filterIsPassedInputName(), null);
 
@@ -81,10 +81,10 @@ class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return null|string
      */
-    public function getValue(Request $request): ?string
+    public function getValue(ServerRequestInterface $request): ?string
     {
         if (!$this->useValuesFromForm($request)) {
             return $this->getInitialValue();
@@ -149,7 +149,7 @@ class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
     }
 
     /** @inheritdoc */
-    public function getHtml(Request $request): string
+    public function getHtml(ServerRequestInterface $request): string
     {
         $html = '';
 
@@ -214,10 +214,10 @@ class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
     }
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return bool
      */
-    public function isEnabled(Request $request): bool
+    public function isEnabled(ServerRequestInterface $request): bool
     {
         if (!$this->useValuesFromForm($request)) {
             return $this->isInitialIsEnabled();
@@ -233,7 +233,7 @@ class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
     }
 
     /** @inheritdoc */
-    public function sqlConditionAndPlaceholderValue(Request $request): array
+    public function sqlConditionAndPlaceholderValue(ServerRequestInterface $request): array
     {
         if (!$this->isEnabled($request)) {
             return ['', []];

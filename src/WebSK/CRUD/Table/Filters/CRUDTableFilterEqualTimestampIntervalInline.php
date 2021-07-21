@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -13,7 +13,7 @@ class CRUDTableFilterEqualTimestampIntervalInline extends CRUDTableFilterEqualIn
     implements InterfaceCRUDTableFilterVisible
 {
     /** @inheritdoc */
-    public function sqlConditionAndPlaceholderValue(Request $request): array
+    public function sqlConditionAndPlaceholderValue(ServerRequestInterface $request): array
     {
         $where = '';
         $placeholder_values_arr = [];

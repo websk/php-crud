@@ -5,6 +5,8 @@ namespace WebSK\CRUD\Form;
 use Closure;
 use OLOG\CheckClassInterfaces;
 use OLOG\Url;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDCompiler;
 use WebSK\Entity\InterfaceEntity;
 use WebSK\FileManager\FileManager;
@@ -13,8 +15,6 @@ use OLOG\HTML;
 use OLOG\Operations;
 use WebSK\Utils\Messages;
 use WebSK\Utils\Sanitize;
-use Slim\Http\Request;
-use Slim\Http\Response;
 use WebSK\Utils\HTTP;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
@@ -102,13 +102,13 @@ class CRUDForm
     }
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      * @throws \Exception
      * @throws \ReflectionException
      */
-    public function processRequest(Request $request, Response $response): ?Response
+    public function processRequest(ServerRequestInterface $request, ResponseInterface $response): ?ResponseInterface
     {
         if ($request->getMethod() != HTTP::METHOD_POST) {
             return null;
@@ -143,11 +143,11 @@ class CRUDForm
     }
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      */
-    protected function deleteFileFormOperation(Request $request, Response $response): Response
+    protected function deleteFileFormOperation(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $entity_class_name = get_class($this->obj);
         Assert::assert($entity_class_name);
@@ -192,11 +192,11 @@ class CRUDForm
     }
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      */
-    protected function uploadFileFormOperation(Request $request, Response $response): Response
+    protected function uploadFileFormOperation(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $entity_class_name = get_class($this->obj);
         Assert::assert($entity_class_name);
@@ -247,12 +247,12 @@ class CRUDForm
     }
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      * @throws \ReflectionException
      */
-    protected function saveEditorFormOperation(Request $request, Response $response): Response
+    protected function saveEditorFormOperation(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $entity_class_name = get_class($this->obj);
         Assert::assert($entity_class_name);
@@ -286,12 +286,12 @@ class CRUDForm
     }
 
     /**
-     * @param Request $request
-     * @param Response $response
-     * @return Response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @return ResponseInterface
      * @throws \Exception
      */
-    protected function deleteEntityOperation(Request $request, Response $response): Response
+    protected function deleteEntityOperation(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $entity_class_name = get_class($this->obj);
         Assert::assert($entity_class_name);

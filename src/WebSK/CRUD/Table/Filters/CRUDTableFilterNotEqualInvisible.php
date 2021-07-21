@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterInvisible;
 
 /**
@@ -27,7 +27,7 @@ class CRUDTableFilterNotEqualInvisible implements InterfaceCRUDTableFilterInvisi
     }
 
     /** @inheritdoc */
-    public function sqlConditionAndPlaceholderValue(Request $request): array
+    public function sqlConditionAndPlaceholderValue(ServerRequestInterface $request): array
     {
         $filter_value = $this->getFilterValue();
         $column_name = $this->getFieldName();

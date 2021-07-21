@@ -3,7 +3,7 @@
 namespace WebSK\CRUD\Table\Filters;
 
 use OLOG\HTML;
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -36,7 +36,7 @@ class CRUDTableFilterLikeInline implements InterfaceCRUDTableFilterVisible
     }
 
     /** @inheritdoc */
-    public function sqlConditionAndPlaceholderValue(Request $request): array
+    public function sqlConditionAndPlaceholderValue(ServerRequestInterface $request): array
     {
         $where = '';
         $placeholder_values_arr = [];
@@ -55,7 +55,7 @@ class CRUDTableFilterLikeInline implements InterfaceCRUDTableFilterVisible
     }
 
     /** @inheritdoc */
-    public function getHtml(Request $request): string
+    public function getHtml(ServerRequestInterface $request): string
     {
         $html = '';
         $html .= HTML::tag('input', [

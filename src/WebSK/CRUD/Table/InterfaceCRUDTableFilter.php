@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Table;
 
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Interface InterfaceCRUDTableFilter
@@ -13,8 +13,8 @@ interface InterfaceCRUDTableFilter
     /**
      * Возвращает пару из sql-условия и массива значений плейсхолдеров.
      * Массив значений может быть пустой если плейсхолдеры не нужны.
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return array
      */
-    public function sqlConditionAndPlaceholderValue(Request $request): array;
+    public function sqlConditionAndPlaceholderValue(ServerRequestInterface $request): array;
 }

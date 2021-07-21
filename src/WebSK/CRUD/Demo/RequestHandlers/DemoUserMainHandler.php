@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Demo\RequestHandlers;
 
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
 use WebSK\Slim\RequestHandlers\BaseHandler;
 use WebSK\Views\LayoutDTO;
@@ -17,11 +17,11 @@ class DemoUserMainHandler extends BaseHandler
 {
 
     /**
-     * @param Request $request
-     * @param Response $response
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
      * @return \Psr\Http\Message\ResponseInterface
      */
-    public function __invoke(Request $request, Response $response)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
     {
         $content_html = '<div class="list-group">';
         $content_html .= '<a href="' . $this->pathFor(DemoUserListHandler::class) . '" class="list-group-item">Пользователи</a>';

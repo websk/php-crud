@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Table;
 
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Interface InterfaceCRUDTableFilterVisible
@@ -16,8 +16,8 @@ interface InterfaceCRUDTableFilterVisible extends InterfaceCRUDTableFilter
     public function getTitle(): string;
 
     /**
-     * @param Request $request
+     * @param ServerRequestInterface $request
      * @return string
      */
-    public function getHtml(Request $request): string;
+    public function getHtml(ServerRequestInterface $request): string;
 }

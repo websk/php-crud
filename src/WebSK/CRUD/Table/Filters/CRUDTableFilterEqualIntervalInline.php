@@ -3,7 +3,7 @@
 namespace WebSK\CRUD\Table\Filters;
 
 use OLOG\HTML;
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -45,7 +45,7 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
     }
 
     /** @inheritdoc */
-    public function sqlConditionAndPlaceholderValue(Request $request): array
+    public function sqlConditionAndPlaceholderValue(ServerRequestInterface $request): array
     {
         $where = '';
         $placeholder_values_arr = [];
@@ -74,7 +74,7 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
     }
 
     /** @inheritdoc */
-    public function getHtml(Request $request): string
+    public function getHtml(ServerRequestInterface $request): string
     {
         $html = 'с ';
         $html .= HTML::tag('input', [

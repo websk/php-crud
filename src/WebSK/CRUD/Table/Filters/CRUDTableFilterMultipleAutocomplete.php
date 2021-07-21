@@ -2,8 +2,7 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use Slim\Http\Request;
-use WebSK\CRUD\Table\CRUDTableJSON;
+use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 use WebSK\Utils\Sanitize;
 
@@ -68,7 +67,7 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
     }
 
     /** @inheritdoc */
-    public function sqlConditionAndPlaceholderValue(Request $request): array
+    public function sqlConditionAndPlaceholderValue(ServerRequestInterface $request): array
     {
         $placeholder_values_arr = [];
         $where = '';
@@ -93,7 +92,7 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
     }
 
     /** @inheritdoc */
-    public function getHtml(Request $request): string
+    public function getHtml(ServerRequestInterface $request): string
     {
         $html = '';
 
