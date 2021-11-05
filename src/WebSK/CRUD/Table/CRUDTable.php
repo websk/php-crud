@@ -267,12 +267,12 @@ class CRUDTable
     /**
      * @param ServerRequestInterface $request
      * @param string $column_delimiter
+     * @param int $total_rows_count
      * @return string
      */
-    public function csv(ServerRequestInterface $request, string $column_delimiter = self::CSV_COLUMN_DELIMITER): string
+    public function csv(ServerRequestInterface $request, string $column_delimiter = self::CSV_COLUMN_DELIMITER, int &$total_rows_count = 0): string
     {
         $tsv = '';
-        $total_rows_count = 0;
 
         $objs_ids_arr = $this->crud->getObjIdsArrForClassName(
             $request,

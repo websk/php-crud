@@ -52,13 +52,13 @@ class CRUDTableWidgetOptionsEditor implements InterfaceCRUDTableWidget
             $options_arr = $this->getOptionsArr();
             $obj_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName());
             foreach ($options_arr as $value => $option_name) {
-                $disabled = '';
+                $active = '';
                 if ($value == $obj_value) {
-                    $disabled = 'style="opacity:0.5;" disabled';
+                    $active = ' active';
                 }
-                echo '<button class="btn btn-xs btn-default" type="submit" '.
+                echo '<button class="btn btn-xs btn-default' . $active . '" type="submit" '.
                     'name="' . CRUDTable::FIELD_FIELD_VALUE . '" '.
-                    'value="' . $value . '" ' . $disabled . '>' . $option_name . '</button>';
+                    'value="' . $value . '">' . $option_name . '</button>';
             }
         });
     }

@@ -36,7 +36,7 @@ class CRUDTableWidgetOptions implements InterfaceCRUDTableWidget
     {
         $value = CRUDCompiler::fieldValueOrCallableResult($this->getValue(), $entity_obj);
 
-        $html = "UNDEFINED";
+        $html = '';
         $options_arr = $this->getOptionsArr();
         if (array_key_exists($value, $options_arr)) {
             $html = $options_arr[$value];
