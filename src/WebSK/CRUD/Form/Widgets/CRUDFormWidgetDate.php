@@ -34,7 +34,12 @@ class CRUDFormWidgetDate implements InterfaceCRUDFormWidget
         $this->setIsRequired($is_required);
     }
 
-    /** @inheritdoc */
+    /**
+     * @param InterfaceEntity $entity_obj
+     * @param CRUD $crud
+     * @return string
+     * @throws \ReflectionException
+     */
     public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();

@@ -2,12 +2,13 @@
 
 namespace WebSK\CRUD\Demo;
 
+use Psr\Container\ContainerInterface;
 use Slim\App;
-use Slim\Handlers\Strategies\RequestResponseArgs;
+use Slim\Handlers\ErrorHandler;
+use Slim\Psr7\Factory\ResponseFactory;
 use WebSK\Cache\CacheServiceProvider;
 use WebSK\CRUD\CRUDServiceProvider;
 use WebSK\DB\DBWrapper;
-use WebSK\Slim\Facade;
 
 /**
  * Class CRUDApp
@@ -17,11 +18,11 @@ class CRUDDemoApp extends App
 {
     /**
      * CRUDDemoApp constructor.
-     * @param array $config
+     * @param ContainerInterface $container
      */
-    public function __construct($config = [])
+    public function __construct(ContainerInterface $container)
     {
-        parent::__construct($config);
+        parent::__construct(new ResponseFactory(), $container);
 
         $container = $this->getContainer();
 
@@ -30,21 +31,16 @@ class CRUDDemoApp extends App
         CRUDDemoServiceProvider::register($container);
 
         $this->registerRoutes();
-    }
 
-    protected function registerRoutes()
-    {
-        $container = $this->getContainer();
-        $container['foundHandler'] = function () {
-            return new RequestResponseArgs();
-        };
-
-        CRUDDemoRoutes::register($this);
-
-        /** Use facade */
-        Facade::setFacadeApplication($this);
+        $error_middleware = $this->addErrorMiddleware(true, true, true);
+        $error_middleware->setDefaultErrorHandler(ErrorHandler::class);
 
         /** Set DBWrapper db service */
         DBWrapper::setDbService(CRUDDemoServiceProvider::getDemoDBService($container));
+    }
+
+    protected function registerRoutes(): void
+    {
+        CRUDDemoRoutes::register($this);
     }
 }

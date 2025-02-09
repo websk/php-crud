@@ -4,8 +4,8 @@ namespace WebSK\CRUD\Table\Widgets;
 
 use Closure;
 use WebSK\CRUD\CRUD;
-use OLOG\HTML;
 use WebSK\CRUD\CRUDCompiler;
+use WebSK\CRUD\CRUDHtml;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 use WebSK\Entity\InterfaceEntity;
 
@@ -61,7 +61,7 @@ class CRUDTableWidgetHtmlWithLink implements InterfaceCRUDTableWidget
             $link_attrs_arr['target'] = $this->getTarget();
         }
 
-        return HTML::tag('a', $link_attrs_arr, $html);
+        return CRUDHtml::tag('a', $link_attrs_arr, $html);
     }
 
     /**

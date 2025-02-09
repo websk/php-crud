@@ -1,0 +1,18 @@
+<?php
+
+namespace WebSK\CRUD;
+
+class CRUDOperations
+{
+    public const string FIELD_NAME_OPERATION_CODE = '_OPERATION_CODE';
+
+    public const string OPERATION_DELETE_FILE = 'OPERATION_DELETE_FILE';
+    public const string OPERATION_DELETE_ENTITY = 'OPERATION_DELETE_ENTITY';
+    public const string OPERATION_UPLOAD_FILE = 'OPERATION_UPLOAD_FILE';
+    public const string OPERATION_SAVE_EDITOR_FORM = 'OPERATION_SAVE_EDITOR_FORM';
+    public const string OPERATION_UPDATE_ENTITY_FIELD = 'OPERATION_UPDATE_ENTITY_FIELD';
+    public const string OPERATION_ADD_ENTITY = 'OPERATION_ADD_ENTITY';
+    public const string OPERATION_SWAP_ENTITY_WEIGHT = 'OPERATION_SWAP_ENTITY_WEIGHT';
+
+
+}

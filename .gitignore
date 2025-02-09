@@ -1,5 +1,7 @@
 .idea/
 config/config.php
+node_modules
 public/files
 public/assets
 vendor/
+.ai

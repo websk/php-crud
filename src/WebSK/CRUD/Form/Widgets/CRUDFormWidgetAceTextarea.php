@@ -2,6 +2,7 @@
 
 namespace WebSK\CRUD\Form\Widgets;
 
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
@@ -13,13 +14,13 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
 {
-    const ACE_MODE_HTML = 'ace/mode/html';
-    const ACE_MODE_JAVASCRIPT = 'ace/mode/javascript';
-    const ACE_MODE_JSON = 'ace/mode/json';
-    const ACE_MODE_PHP = 'ace/mode/php';
-    const ACE_MODE_SQL = 'ace/mode/sql';
-    const ACE_MODE_XML = 'ace/mode/xml';
-    const ACE_MODE_TEXT = 'ace/mode/text';
+    const string ACE_MODE_HTML = 'ace/mode/html';
+    const string ACE_MODE_JAVASCRIPT = 'ace/mode/javascript';
+    const string ACE_MODE_JSON = 'ace/mode/json';
+    const string ACE_MODE_PHP = 'ace/mode/php';
+    const string ACE_MODE_SQL = 'ace/mode/sql';
+    const string ACE_MODE_XML = 'ace/mode/xml';
+    const string ACE_MODE_TEXT = 'ace/mode/text';
 
     protected string $field_name;
 
@@ -49,8 +50,13 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
         $this->setWrapText($wrap_text);
     }
 
-    /** @inheritdoc */
-    public function html($entity_obj, CRUD $crud): string
+    /**
+     * @param InterfaceEntity $entity_obj
+     * @param CRUD $crud
+     * @return string
+     * @throws \ReflectionException
+     */
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
         static $CRUDFormWidgetAceTextarea_include_script;
 

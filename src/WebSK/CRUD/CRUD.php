@@ -9,7 +9,6 @@ use WebSK\Entity\EntityRepository;
 use WebSK\Entity\EntityService;
 use WebSK\Entity\WeightService;
 use WebSK\Utils\Assert;
-use OLOG\CheckClassInterfaces;
 use Psr\Container\ContainerInterface;
 use WebSK\Entity\InterfaceEntity;
 use WebSK\Entity\InterfaceWeight;
@@ -26,7 +25,9 @@ use WebSK\Utils\Sanitize;
  */
 class CRUD
 {
-    const DEFAULT_PAGE_SIZE = 100;
+    const int DEFAULT_PAGE_SIZE = 100;
+    const string NULL_STRING = 'NULLSTRING';
+    const string IS_NULL_POSTFIX = '___is_null';
 
     protected ContainerInterface $container;
 
@@ -122,7 +123,7 @@ class CRUD
         array $element_obj_arr,
         $url_to_redirect_after_operation = '',
         array $redirect_get_params_arr = [],
-        string $operation_code = CRUDForm::OPERATION_SAVE_EDITOR_FORM,
+        string $operation_code = CRUDOperations::OPERATION_SAVE_EDITOR_FORM,
         bool $hide_submit_button = false,
         string $submit_button_title = 'Сохранить',
         string $submit_button_class = 'btn btn-primary'
@@ -144,8 +145,6 @@ class CRUD
 
     /**
      * Возвращает одну страницу списка объектов указанного класса.
-     * Сортировка: @TODO.
-     *
      * @param ServerRequestInterface $request
      * @param string $entity_class_name Имя класса модели
      * @param InterfaceCRUDTableFilter[] $filters_arr
@@ -168,7 +167,11 @@ class CRUD
         int &$total_rows_count = 0
     ): array
     {
-        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
+        $interfaces_arr = class_implements($entity_class_name);
+        Assert::assert(
+            $interfaces_arr && in_array(InterfaceEntity::class, $interfaces_arr),
+            'Class ' . $entity_class_name . ' does not implement interface ' . InterfaceEntity::class
+        );
 
         $repository_container_id = EntityRepository::getContainerIdByClassName($entity_class_name);
         Assert::assert($this->container->has($repository_container_id), 'Unknown repository ' . $repository_container_id);
@@ -189,7 +192,7 @@ class CRUD
             $query .= ' WHERE ' . $where;
         }
 
-        if ($order_by == '') { //@TODO sanitize $order_by
+        if ($order_by == '') {
             $order_by = Sanitize::sanitizeSqlColumnName($db_id_field_name);
         }
 
@@ -221,9 +224,10 @@ class CRUD
         $query_param_values_arr = [];
 
         foreach ($filters_arr as $filter_obj) {
-            CheckClassInterfaces::exceptionIfClassNotImplementsInterface(
-                get_class($filter_obj),
-                InterfaceCRUDTableFilter::class
+            $interfaces_arr = class_implements(get_class($filter_obj));
+            Assert::assert(
+                $interfaces_arr && in_array(InterfaceCRUDTableFilter::class, $interfaces_arr),
+                'Class ' . get_class($filter_obj) . ' does not implement interface ' . InterfaceCRUDTableFilter::class
             );
 
             list($filter_sql_condition, $filter_placeholder_values_arr) =
@@ -287,62 +291,45 @@ class CRUD
      * @return null|InterfaceEntity
      * @throws \ReflectionException
      */
-    public function saveOrUpdateObjectFromFormRequest($obj, ServerRequestInterface $request): ?InterfaceEntity
+    public function saveOrUpdateObjectFromFormRequest(InterfaceEntity $entity_obj, ServerRequestInterface $request): ?InterfaceEntity
     {
-        $entity_class_name = get_class($obj);
-        Assert::assert($entity_class_name);
-
-        $object_id = $request->getParsedBodyParam(CRUDForm::FIELD_OBJECT_ID);
+        $post_fields_arr = (array)$request->getParsedBody();
 
         $new_prop_values_arr = [];
         $null_fields_arr = [];
-        $reflect = new \ReflectionClass($entity_class_name);
+        $reflect = new \ReflectionClass($entity_obj);
 
         foreach ($reflect->getProperties() as $prop_obj) {
             // игнорируем статические свойства класса - они относятся не к объекту,
             // а только к классу (http://www.php.net/manual/en/language.oop5.static.php),
             // и в них хранятся настройки ActiveRecord и CRUD
-            if (!$prop_obj->isStatic()) {
-                $prop_name = $prop_obj->getName();
+            if ($prop_obj->isStatic()) {
+                continue;
+            }
 
-                $post_fields_arr = $request->getParsedBody();
+            $prop_name = $prop_obj->getName();
 
-                // чтение возможных NULL
-                if (array_key_exists($prop_name . "___is_null", $post_fields_arr)) {
-                    if ($_POST[$prop_name . "___is_null"]) {
-                        $null_fields_arr[$prop_name] = 1;
-                        continue;
-                    }
-                }
-
-                // сейчас если поля нет в форме - оно не будет изменено в объекте.
-                // это позволяет показывать в форме только часть полей, на остальные форма не повлияет
-                if (array_key_exists($prop_name, $post_fields_arr)) {
-                    // Проверка на заполнение обязательных полей делается на уровне СУБД, через нот нулл в таблице
-                    $new_prop_values_arr[$prop_name] = $_POST[$prop_name];
-                }
-
-                // чтение возможных NULL
-                if (array_key_exists($prop_name . "___is_null", $post_fields_arr)) {
-                    if ($_POST[$prop_name . "___is_null"]) {
-                        $null_fields_arr[$prop_name] = 1;
-                    }
+            // чтение возможных NULL
+            if (array_key_exists($prop_name . self::IS_NULL_POSTFIX, $post_fields_arr)) {
+                if ($post_fields_arr[$prop_name . self::IS_NULL_POSTFIX]) {
+                    $null_fields_arr[$prop_name] = 1;
+                    continue;
                 }
             }
+
+            if (!array_key_exists($prop_name, $post_fields_arr) && !$prop_obj->isInitialized($entity_obj)) {
+                throw new \Exception('Поле ' . $prop_name . ' является обязательным');
+            }
+            if (!array_key_exists($prop_name, $post_fields_arr)) {
+                continue;
+            }
+
+            $new_prop_values_arr[$prop_name] = $post_fields_arr[$prop_name];
         }
 
-        $entity_service = $this->getEntityServiceByClassName($entity_class_name);
+        CRUDFieldsAccess::setObjectFieldsFromArray($entity_obj, $new_prop_values_arr, $null_fields_arr);
 
-        $entity_obj = null;
-        if ($object_id) {
-            $entity_obj = $entity_service->getById($object_id);
-        } else {
-            $entity_obj = new $entity_class_name;
-        }
-
-        $entity_obj = CRUDFieldsAccess::setObjectFieldsFromArray($entity_obj, $new_prop_values_arr, $null_fields_arr);
-
-        $entity_service->save($entity_obj);
+        $this->getEntityServiceByClassName($entity_obj::class)->save($entity_obj);
 
         return $entity_obj;
     }
@@ -422,9 +409,6 @@ class CRUD
         $service_container_id = EntityService::getContainerIdByClassName($entity_class_name);
         Assert::assert($service_container_id);
 
-        /** @var EntityService $entity_service */
-        $entity_service = $this->container->get($service_container_id);
-
-        return $entity_service;
+        return $this->container->get($service_container_id);
     }
 }

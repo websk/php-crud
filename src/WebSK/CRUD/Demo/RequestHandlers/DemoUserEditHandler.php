@@ -6,9 +6,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUDServiceProvider;
-use WebSK\CRUD\Demo\CRUDDemoServiceProvider;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Demo\DemoUser;
+use WebSK\CRUD\Demo\DemoUserService;
 use WebSK\CRUD\Form\CRUDFormRow;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetDate;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
@@ -31,13 +31,14 @@ class DemoUserEditHandler extends BaseHandler
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     * @param int|null $demo_user_id
+     * @param array $args
      * @return \Psr\Http\Message\ResponseInterface
      * @throws \Exception
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, ?int $demo_user_id = null)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
-        $demo_user_service = CRUDDemoServiceProvider::getDemoUserService($this->container);
+        $demo_user_id = $args['demo_user_id'];
+        $demo_user_service = $this->container->get(DemoUserService::class);
         $demo_user_obj = $demo_user_service->getById($demo_user_id);
 
         if (!$demo_user_obj) {

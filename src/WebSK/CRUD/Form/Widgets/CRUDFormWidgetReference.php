@@ -2,6 +2,7 @@
 
 namespace WebSK\CRUD\Form\Widgets;
 
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
@@ -32,8 +33,13 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
         $this->setReferencedClassTitleField($referenced_class_title_field);
     }
 
-    /** @inheritdoc */
-    public function html($entity_obj, CRUD $crud): string
+    /**
+     * @param InterfaceEntity $entity_obj
+     * @param CRUD $crud
+     * @return string
+     * @throws \ReflectionException
+     */
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
         $referenced_class_name = $this->getReferencedClassName();

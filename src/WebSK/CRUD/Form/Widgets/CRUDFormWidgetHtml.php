@@ -4,6 +4,7 @@ namespace WebSK\CRUD\Form\Widgets;
 
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
+use WebSK\Entity\InterfaceEntity;
 
 /**
  * Class CRUDFormWidgetHtml
@@ -38,8 +39,12 @@ class CRUDFormWidgetHtml implements InterfaceCRUDFormWidget
         $this->html = $html;
     }
 
-    /** @inheritdoc */
-    public function html($entity_obj, CRUD $crud): string
+    /**
+     * @param InterfaceEntity $entity_obj
+     * @param CRUD $crud
+     * @return string
+     */
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
         return $this->getHtml();
     }

@@ -2,10 +2,10 @@
 
 namespace WebSK\CRUD\Table\Widgets;
 
-use OLOG\HTML;
-use OLOG\Operations;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
+use WebSK\CRUD\CRUDHtml;
+use WebSK\CRUD\CRUDOperations;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 use WebSK\Entity\InterfaceEntity;
@@ -38,9 +38,9 @@ class CRUDTableWidgetTextEditor implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        return HTML::tag('form', ['class' => 'js-text-editor'], function () use ($entity_obj) {
-            echo '<input type="hidden" name="' . Operations::FIELD_NAME_OPERATION_CODE .
-                '" value="' . CRUDTable::OPERATION_UPDATE_ENTITY_FIELD . '">';
+        return CRUDHtml::tag('form', ['class' => 'js-text-editor'], function () use ($entity_obj) {
+            echo '<input type="hidden" name="' . CRUDOperations::FIELD_NAME_OPERATION_CODE .
+                '" value="' . CRUDOperations::OPERATION_UPDATE_ENTITY_FIELD . '">';
             echo '<input type="hidden" name="' . CRUDTable::FIELD_FIELD_NAME .
                 '" value="' . $this->getFieldName() . '">';
             echo '<input type="hidden" name="' . CRUDTable::FIELD_CRUDTABLE_ID .

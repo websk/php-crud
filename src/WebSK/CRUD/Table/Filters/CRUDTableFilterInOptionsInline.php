@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use OLOG\HTML;
 use Psr\Http\Message\ServerRequestInterface;
+use WebSK\CRUD\CRUDHtml;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 use WebSK\Utils\Sanitize;
 
@@ -125,7 +125,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
     /** @inheritdoc */
     public function getHtml(ServerRequestInterface $request): string
     {
-        $html = HTML::div('js-filter', '', function () use ($request) {
+        $html = CRUDHtml::div('js-filter', '', function () use ($request) {
             $input_name = $this->getFilterUniqId();
             /**
              * отдельное поле, наличие которого сообщает что фильтр присутствует в форме

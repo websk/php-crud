@@ -3,6 +3,7 @@
 namespace WebSK\CRUD\Form\Widgets;
 
 use WebSK\CRUD\Form\CRUDFormScript;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
@@ -43,12 +44,12 @@ class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @param object $entity_obj
+     * @param InterfaceEntity $entity_obj
      * @param CRUD $crud
      * @return string
      * @throws \ReflectionException
      */
-    public function html($entity_obj, CRUD $crud): string
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
         $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);

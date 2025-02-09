@@ -3,6 +3,7 @@
 namespace WebSK\CRUD\Demo;
 
 use Slim\App;
+use Slim\Interfaces\RouteCollectorProxyInterface;
 use WebSK\CRUD\Demo\RequestHandlers\DemoCompanyEditHandler;
 use WebSK\CRUD\Demo\RequestHandlers\DemoCompanyJsonHandler;
 use WebSK\CRUD\Demo\RequestHandlers\DemoCompanyListAjaxHandler;
@@ -22,30 +23,30 @@ class CRUDDemoRoutes
     /**
      * @param App $app
      */
-    public static function register(App $app)
+    public static function register(App $app): void
     {
-        $app->get('/', DemoUserMainHandler::class)
-            ->setName(DemoUserMainHandler::class);
+        $app->get('/', DemoUserMainHandler::class)->setName(DemoUserMainHandler::class);
 
-        $app->group('/demo_users', function (App $app) {
-            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '', DemoUserListHandler::class)
+        $app->group('/demo_users', function (RouteCollectorProxyInterface $route_collector_proxy) {
+            $route_collector_proxy->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '', DemoUserListHandler::class)
                 ->setName(DemoUserListHandler::class);
 
-            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST],'/{demo_user_id:\d+}', DemoUserEditHandler::class)
+            $route_collector_proxy->map([HTTP::METHOD_GET, HTTP::METHOD_POST],'/{demo_user_id:\d+}', DemoUserEditHandler::class)
                 ->setName(DemoUserEditHandler::class);
         });
 
-        $app->group('/demo_companies', function (App $app) {
-            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '', DemoCompanyListHandler::class)
+
+        $app->group('/demo_companies', function (RouteCollectorProxyInterface $route_collector_proxy) {
+            $route_collector_proxy->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '', DemoCompanyListHandler::class)
                 ->setName(DemoCompanyListHandler::class);
 
-            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '/ajax', DemoCompanyListAjaxHandler::class)
+            $route_collector_proxy->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '/ajax', DemoCompanyListAjaxHandler::class)
                 ->setName(DemoCompanyListAjaxHandler::class);
 
-            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '/json', DemoCompanyJsonHandler::class)
+            $route_collector_proxy->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '/json', DemoCompanyJsonHandler::class)
                 ->setName(DemoCompanyJsonHandler::class);
 
-            $app->map([HTTP::METHOD_GET, HTTP::METHOD_POST],'/{demo_company_id:\d+}', DemoCompanyEditHandler::class)
+            $route_collector_proxy->map([HTTP::METHOD_GET, HTTP::METHOD_POST], '/{demo_company_id:\d+}', DemoCompanyEditHandler::class)
                 ->setName(DemoCompanyEditHandler::class);
         });
     }

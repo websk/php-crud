@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use OLOG\HTML;
 use Psr\Http\Message\ServerRequestInterface;
+use WebSK\CRUD\CRUDHtml;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
@@ -13,9 +13,9 @@ use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
  */
 class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisible
 {
-    const IS_NULL_POSTFIX = '___null';
-    const ENABLED_POSTFIX = '___enabled';
-    const PASSED_POSTFIX = '___passed';
+    const string IS_NULL_POSTFIX = '___null';
+    const string ENABLED_POSTFIX = '___enabled';
+    const string PASSED_POSTFIX = '___passed';
 
     protected string $title;
 
@@ -128,7 +128,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
     /** @inheritdoc */
     public function getHtml(ServerRequestInterface $request): string
     {
-        $html = HTML::div('js-filter', '', function () use ($request) {
+        $html = CRUDHtml::div('js-filter', '', function () use ($request) {
             $input_name = $this->getFilterUniqId();
             /**
              * отдельное поле, наличие которого сообщает что фильтр присутствует в форме

@@ -6,8 +6,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUDServiceProvider;
-use WebSK\CRUD\Demo\CRUDDemoServiceProvider;
 use WebSK\CRUD\Demo\DemoCompany;
+use WebSK\CRUD\Demo\DemoCompanyService;
 use WebSK\CRUD\Form\CRUDFormRow;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTimestamp;
@@ -26,13 +26,14 @@ class DemoCompanyEditHandler extends BaseHandler
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     * @param int|null $demo_company_id
+     * @param array $args
      * @return ResponseInterface
      * @throws \Exception
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, ?int $demo_company_id = null)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args)
     {
-        $demo_company_service = CRUDDemoServiceProvider::getDemoCompanyService($this->container);
+        $demo_company_id = $args['demo_company_id'];
+        $demo_company_service = $this->container->get(DemoCompanyService::class);
         $demo_company_obj = $demo_company_service->getById($demo_company_id);
 
         if (!$demo_company_obj) {

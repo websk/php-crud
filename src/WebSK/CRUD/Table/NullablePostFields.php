@@ -3,6 +3,7 @@
 namespace WebSK\CRUD\Table;
 
 use Psr\Http\Message\ServerRequestInterface;
+use WebSK\Slim\Request;
 use WebSK\Utils\Sanitize;
 
 /**
@@ -39,10 +40,10 @@ class NullablePostFields
      */
     public static function optionalFieldValue(ServerRequestInterface $request, string $field_name): ?string
     {
-        $field_value = $request->getParsedBodyParam($field_name, '');
+        $field_value = Request::getParsedBodyParam($request, $field_name, '');
 
         // чтение возможных NULL
-        if ($request->getParsedBodyParam($field_name . "___is_null", '') == "1") {
+        if (Request::getParsedBodyParam($request, $field_name . "___is_null", '') == "1") {
             $field_value = null;
         }
 

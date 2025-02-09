@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Form;
 
-use OLOG\Preloader;
+use WebSK\CRUD\CRUDPreloader;
 
 /**
  * Class CRUDFormCreateScript
@@ -21,7 +21,7 @@ class CRUDFormCreateScript
         if (!isset($include_script)) {
             $include_script = false;
 
-            echo Preloader::preloaderJsHtml();
+            echo CRUDPreloader::preloader();
             ?>
             <script>
                 var CRUD = CRUD || {};
@@ -42,19 +42,19 @@ class CRUDFormCreateScript
 
                     requestAjax: function (table_elem, query, data) {
 
-                        OLOG.preloader.show();
+                        CRUDPage.preloader.show();
 
                         $.ajax({
                             type: "POST",
                             url: query,
                             data: data
                         }).success(function (received_html) {
-                            OLOG.preloader.hide();
+                            CRUDPage.preloader.hide();
 
                             var $box = $('<div>', {html: received_html});
                             $(table_elem).html($box.find(table_elem).html());
                         }).fail(function () {
-                            OLOG.preloader.hide();
+                            CRUDPage.preloader.hide();
                         });
                     }
                 };

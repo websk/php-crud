@@ -19,9 +19,9 @@ class DemoUserMainHandler extends BaseHandler
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $content_html = '<div class="list-group">';
         $content_html .= '<a href="' . $this->pathFor(DemoUserListHandler::class) . '" class="list-group-item">Пользователи</a>';

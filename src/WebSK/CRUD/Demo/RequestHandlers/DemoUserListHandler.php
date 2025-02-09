@@ -67,7 +67,7 @@ class DemoUserListHandler extends BaseHandler
                     ),
                 ],
                 function(DemoUser $user_obj) {
-                    return Router::pathFor(DemoUserEditHandler::class, ['demo_user_id' => $user_obj->getId()]);
+                    return Router::urlFor(DemoUserEditHandler::class, ['demo_user_id' => $user_obj->getId()]);
                 }
             ),
             [
@@ -77,7 +77,7 @@ class DemoUserListHandler extends BaseHandler
                     new CRUDTableWidgetTextWithLink(
                         DemoUser::_NAME,
                         function(DemoUser $user_obj) {
-                            return Router::pathFor(DemoUserEditHandler::class, ['demo_user_id' => $user_obj->getId()]);
+                            return Router::urlFor(DemoUserEditHandler::class, ['demo_user_id' => $user_obj->getId()]);
                         }
                     )
                 ),

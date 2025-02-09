@@ -3,16 +3,17 @@
 namespace WebSK\CRUD\Form;
 
 use Closure;
-use OLOG\CheckClassInterfaces;
-use OLOG\Url;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDCompiler;
+use WebSK\CRUD\CRUDHtml;
+use WebSK\CRUD\CRUDOperations;
 use WebSK\Entity\InterfaceEntity;
 use WebSK\FileManager\FileManager;
+use WebSK\Slim\Redirect;
+use WebSK\Slim\Request;
+use WebSK\Slim\Response;
 use WebSK\Utils\Assert;
-use OLOG\HTML;
-use OLOG\Operations;
 use WebSK\Utils\Messages;
 use WebSK\Utils\Sanitize;
 use WebSK\Utils\HTTP;
@@ -25,21 +26,17 @@ use WebSK\CRUD\CRUDFieldsAccess;
  */
 class CRUDForm
 {
-    const OPERATION_SAVE_EDITOR_FORM = 'OPERATION_SAVE_EDITOR_FORM';
-    const OPERATION_DELETE_ENTITY = 'OPERATION_DELETE_ENTITY';
-    const OPERATION_UPLOAD_FILE = 'OPERATION_UPLOAD_FILE';
-    const OPERATION_DELETE_FILE = 'OPERATION_DELETE_FILE';
 
-    const FIELD_CLASS_NAME = '_FIELD_CLASS_NAME';
-    const FIELD_OBJECT_ID = '_FIELD_OBJECT_ID';
-    const FIELD_REDIRECT_URL = '_FIELD_REDIRECT_URL';
-    const FIELD_REDIRECT_URL_GET_PARAMS = '_FIELD_REDIRECT_URL_GET_PARAMS';
-    const FIELD_FORM_ID = '_FIELD_FORM_ID';
+    const string FIELD_CLASS_NAME = '_FIELD_CLASS_NAME';
+    const string FIELD_OBJECT_ID = '_FIELD_OBJECT_ID';
+    const string FIELD_REDIRECT_URL = '_FIELD_REDIRECT_URL';
+    const string FIELD_REDIRECT_URL_GET_PARAMS = '_FIELD_REDIRECT_URL_GET_PARAMS';
+    const string FIELD_FORM_ID = '_FIELD_FORM_ID';
 
-    const FIELD_STORAGE = 'storage';
-    const FIELD_TARGET_FOLDER = 'target_folder';
-    const FIELD_FIELD_NAME = 'field_name';
-    const FIELD_SAVE_AS = 'save_as';
+    const string FIELD_STORAGE = 'storage';
+    const string FIELD_TARGET_FOLDER = 'target_folder';
+    const string FIELD_FIELD_NAME = 'field_name';
+    const string FIELD_SAVE_AS = 'save_as';
 
     protected CRUD $crud;
 
@@ -55,7 +52,7 @@ class CRUDForm
 
     protected string $form_unique_id;
 
-    protected string $operation_code = self::OPERATION_SAVE_EDITOR_FORM;
+    protected string $operation_code = CRUDOperations::OPERATION_SAVE_EDITOR_FORM;
 
     protected bool $hide_submit_button = false;
 
@@ -67,7 +64,7 @@ class CRUDForm
      * CRUDForm constructor.
      * @param CRUD $crud
      * @param string $form_unique_id
-     * @param InterfaceEntity $obj
+     * @param InterfaceEntity $entity_obj
      * @param array $element_obj_arr
      * @param string|Closure $url_to_redirect_after_operation
      * @param array $redirect_get_params_arr
@@ -79,11 +76,11 @@ class CRUDForm
     public function __construct(
         CRUD $crud,
         string $form_unique_id,
-        InterfaceEntity $obj,
+        InterfaceEntity $entity_obj,
         array $element_obj_arr,
         $url_to_redirect_after_operation = '',
         array $redirect_get_params_arr = [],
-        string $operation_code = self::OPERATION_SAVE_EDITOR_FORM,
+        string $operation_code = CRUDOperations::OPERATION_SAVE_EDITOR_FORM,
         bool $hide_submit_button = false,
         string $submit_button_title = 'Сохранить',
         string $submit_button_class = 'btn btn-primary'
@@ -91,7 +88,7 @@ class CRUDForm
     {
         $this->crud = $crud;
         $this->form_unique_id = $form_unique_id;
-        $this->obj = $obj;
+        $this->obj = $entity_obj;
         $this->element_obj_arr = $element_obj_arr;
         $this->url_to_redirect_after_operation = $url_to_redirect_after_operation;
         $this->redirect_get_params_arr = $redirect_get_params_arr;
@@ -114,24 +111,24 @@ class CRUDForm
             return null;
         }
 
-        $form_id = $request->getParsedBodyParam(self::FIELD_FORM_ID);
+        $form_id = Request::getParsedBodyParam($request, self::FIELD_FORM_ID);
 
-        $operation_code = $request->getParsedBodyParam(Operations::FIELD_NAME_OPERATION_CODE);
+        $operation_code = Request::getParsedBodyParam($request, CRUDOperations::FIELD_NAME_OPERATION_CODE);
 
         switch ($operation_code) {
-            case self::OPERATION_DELETE_ENTITY:
+            case CRUDOperations::OPERATION_DELETE_ENTITY:
                 if ($form_id != $this->form_unique_id) {
                     return null;
                 }
                 return $this->deleteEntityOperation($request, $response);
-            case self::OPERATION_SAVE_EDITOR_FORM:
+            case CRUDOperations::OPERATION_SAVE_EDITOR_FORM:
                 if ($form_id != $this->form_unique_id) {
                     return null;
                 }
                 return $this->saveEditorFormOperation($request, $response);
-            case self::OPERATION_UPLOAD_FILE:
+            case CRUDOperations::OPERATION_UPLOAD_FILE:
                 return $this->uploadFileFormOperation($request, $response);
-            case self::OPERATION_DELETE_FILE:
+            case CRUDOperations::OPERATION_DELETE_FILE:
                 return $this->deleteFileFormOperation($request, $response);
         }
 
@@ -139,7 +136,7 @@ class CRUDForm
             return null;
         }
 
-        return $response->withRedirect($request->getUri());
+        return Redirect::redirect($response, $request->getUri());
     }
 
     /**
@@ -152,7 +149,11 @@ class CRUDForm
         $entity_class_name = get_class($this->obj);
         Assert::assert($entity_class_name);
 
-        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
+        $interfaces_arr = class_implements($entity_class_name);
+        Assert::assert(
+            $interfaces_arr && in_array(InterfaceEntity::class, $interfaces_arr),
+            'Class ' . $entity_class_name . ' does not implement interface ' . InterfaceEntity::class
+        );
 
         $entity_id = $this->obj->getId();
         Assert::assert($entity_id);
@@ -160,24 +161,25 @@ class CRUDForm
         $entity_service = $this->crud->getEntityServiceByClassName($entity_class_name);
         $entity_obj = $entity_service->getById($entity_id);
 
-        $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
+        $field_name = Request::getParsedBodyParam($request, self::FIELD_FIELD_NAME);
 
         $file_name = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
         $json_arr['file'] = $file_name;
 
-        $storage = $request->getParsedBodyParam(self::FIELD_STORAGE);
+        $storage = Request::getParsedBodyParam($request, self::FIELD_STORAGE);
 
         $file_manager = new FileManager($storage);
 
-        $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
+        $target_folder = Request::getParsedBodyParam($request, self::FIELD_TARGET_FOLDER);
 
         $file_path = $target_folder . DIRECTORY_SEPARATOR . $file_name;
 
-        if ($file_manager->getStorage()->has($file_path)) {
-            $is_deleted = $file_manager->deleteFileIfExist($file_path);
+        if ($file_manager->getStorage()->fileExists($file_path)) {
 
-            if (!$is_deleted) {
+            try {
+                $file_manager->deleteFileIfExist($file_path);
+            } catch (\Throwable $exception) {
                 $json_arr['error'] = 'Не удалось удалить файл';
             }
         }
@@ -185,10 +187,10 @@ class CRUDForm
         $blank_entity_obj = new $entity_class_name();
         $blank_field_value = CRUDFieldsAccess::getObjectFieldValue($blank_entity_obj, $field_name);
 
-        $entity_obj = CRUDFieldsAccess::setObjectFieldsFromArray($entity_obj, [$field_name => $blank_field_value]);
+        CRUDFieldsAccess::setObjectFieldsFromArray($entity_obj, [$field_name => $blank_field_value]);
         $entity_service->save($entity_obj);
 
-        return $response->withJson($json_arr);
+        return Response::responseWithJson($response, $json_arr);
     }
 
     /**
@@ -201,7 +203,11 @@ class CRUDForm
         $entity_class_name = get_class($this->obj);
         Assert::assert($entity_class_name);
 
-        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
+        $interfaces_arr = class_implements($entity_class_name);
+        Assert::assert(
+            $interfaces_arr && in_array(InterfaceEntity::class, $interfaces_arr),
+            'Class ' . $entity_class_name . ' does not implement interface ' . InterfaceEntity::class
+        );
 
         $entity_id = $this->obj->getId();
         Assert::assert($entity_id);
@@ -211,7 +217,7 @@ class CRUDForm
 
         $old_file_name = '';
 
-        $field_name = $request->getParsedBodyParam(self::FIELD_FIELD_NAME);
+        $field_name = Request::getParsedBodyParam($request, self::FIELD_FIELD_NAME);
 
         $file = $_FILES['file_' .  $field_name];
 
@@ -221,29 +227,29 @@ class CRUDForm
             'name' => $file_name,
         ];
 
-        $storage = $request->getParsedBodyParam(self::FIELD_STORAGE);
+        $storage = Request::getParsedBodyParam($request, self::FIELD_STORAGE);
 
         $file_manager = new FileManager($storage);
 
-        $target_folder = $request->getParsedBodyParam(self::FIELD_TARGET_FOLDER);
-        $save_as = $request->getParsedBodyParam(self::FIELD_SAVE_AS, '');
+        $target_folder = Request::getParsedBodyParam($request, self::FIELD_TARGET_FOLDER);
+        $save_as = Request::getParsedBodyParam($request, self::FIELD_SAVE_AS, '');
 
         $file_name = $file_manager->storeUploadedFile($file, $target_folder, $save_as, $error);
 
         if ($error) {
             $json_arr['files'][0]['error'] = $error;
-            return $response->withJson($json_arr);
+            return Response::responseWithJson($response, $json_arr);
         }
 
         if ($old_file_name) {
             $file_manager->deleteFileIfExist($target_folder . DIRECTORY_SEPARATOR .  $old_file_name);
         }
 
-        $entity_obj = CRUDFieldsAccess::setObjectFieldsFromArray($entity_obj, [$field_name => $file_name]);
+        CRUDFieldsAccess::setObjectFieldsFromArray($entity_obj, [$field_name => $file_name]);
 
         $entity_service->save($entity_obj);
 
-        return $response->withJson($json_arr);
+        return Response::responseWithJson($response, $json_arr);
     }
 
     /**
@@ -257,7 +263,11 @@ class CRUDForm
         $entity_class_name = get_class($this->obj);
         Assert::assert($entity_class_name);
 
-        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
+        $interfaces_arr = class_implements($entity_class_name);
+        Assert::assert(
+            $interfaces_arr && in_array(InterfaceEntity::class, $interfaces_arr),
+            'Class ' . $entity_class_name . ' does not implement interface ' . InterfaceEntity::class
+        );
 
         $obj = $this->crud->saveOrUpdateObjectFromFormRequest($this->obj, $request);
 
@@ -279,10 +289,10 @@ class CRUDForm
                 $redirect_url = $redirect_url . '?' . http_build_query($params_arr);
             }
 
-            return $response->withRedirect($redirect_url);
+            return Redirect::redirect($response, $redirect_url);
         }
 
-        return $response->withRedirect($request->getUri());
+        return Redirect::redirect($response, $request->getUri());
     }
 
     /**
@@ -296,7 +306,11 @@ class CRUDForm
         $entity_class_name = get_class($this->obj);
         Assert::assert($entity_class_name);
 
-        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceEntity::class);
+        $interfaces_arr = class_implements($entity_class_name);
+        Assert::assert(
+            $interfaces_arr && in_array(InterfaceEntity::class, $interfaces_arr),
+            'Class ' . $entity_class_name . ' does not implement interface ' . InterfaceEntity::class
+        );
 
         $entity_id = $this->obj->getId();
         Assert::assert($entity_id);
@@ -324,10 +338,10 @@ class CRUDForm
                 $redirect_url = $redirect_url . '?' . http_build_query($params_arr);
             }
 
-            return $response->withRedirect($redirect_url);
+            return Redirect::redirect($response, $redirect_url);
         }
 
-        return $response->withRedirect($request->getUri());
+        return Redirect::redirect($response, $request->getUri());
     }
 
     /**
@@ -342,35 +356,36 @@ class CRUDForm
             $form_element_id = $this->form_unique_id;
         }
 
-        $html = '';
-        $html .= Operations::operationCodeHiddenField($this->operation_code);
-        $html .= '<input type="hidden" name="' . self::FIELD_CLASS_NAME . '" '.
+        $content_html = '';
+        $content_html .= '<input type="hidden" name="' . CRUDOperations::FIELD_NAME_OPERATION_CODE . '" value="' . Sanitize::sanitizeAttrValue($this->operation_code) . '">';
+
+        $content_html .= '<input type="hidden" name="' . self::FIELD_CLASS_NAME . '" '.
             'value="' . Sanitize::sanitizeAttrValue(get_class($this->obj)) . '">';
-        $html .= '<input type="hidden" name="' . self::FIELD_OBJECT_ID . '" '.
+        $content_html .= '<input type="hidden" name="' . self::FIELD_OBJECT_ID . '" '.
             'value="' . Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($this->obj)) . '">';
-        $html .= '<input type="hidden" name="' . self::FIELD_FORM_ID . '" '.
+        $content_html .= '<input type="hidden" name="' . self::FIELD_FORM_ID . '" '.
             'value="' . Sanitize::sanitizeAttrValue($this->form_unique_id) . '">';
 
         foreach ($this->element_obj_arr as $element_obj) {
             Assert::assert($element_obj instanceof InterfaceCRUDFormRow);
-            $html .= $element_obj->html($this->obj, $this->crud);
+            $content_html .= $element_obj->html($this->obj, $this->crud);
         }
 
-        $html .= '<div class="row">';
-        $html .= '<div class="col-sm-8 col-sm-offset-4">';
+        $content_html .= '<div class="row">';
+        $content_html .= '<div class="col-sm-8 col-sm-offset-4">';
         if (!$this->hide_submit_button) {
-            $html .= '<button style="width: 100%" type="submit" class="' . $this->submit_button_class . '">' . $this->submit_button_title . '</button>';
+            $content_html .= '<button style="width: 100%" type="submit" class="' . $this->submit_button_class . '">' . $this->submit_button_title . '</button>';
         }
-        $html .= '</div>';
-        $html .= '</div>';
+        $content_html .= '</div>';
+        $content_html .= '</div>';
 
-        $form_html = HTML::tag('form', [
+        $form_html = CRUDHtml::tag('form', [
             'id' => $form_element_id,
             'class' => 'form-horizontal',
             'role' => 'form',
-            'action' => Url::getCurrentUrl(), // Иначе при поиске из CRUDFormWidgetReferenceAjax window.location изменяется
+            'action' => $_SERVER['REQUEST_URI'], // Иначе при поиске из CRUDFormWidgetReferenceAjax window.location изменяется
             'method' => 'post'
-        ], $html);
+        ], $content_html);
 
         // Загрузка скриптов
         $form_html .= CRUDFormScript::getHtml($form_element_id);

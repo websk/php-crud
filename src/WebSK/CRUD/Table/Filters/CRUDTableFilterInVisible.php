@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use OLOG\HTML;
 use Psr\Http\Message\ServerRequestInterface;
+use WebSK\CRUD\CRUDHtml;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -22,7 +22,7 @@ class CRUDTableFilterInVisible implements InterfaceCRUDTableFilterVisible
 
     protected string $placeholder = '';
 
-    const DEFAULT_SEPARATOR = ';';
+    const string DEFAULT_SEPARATOR = ';';
     protected string $separator = self::DEFAULT_SEPARATOR;
 
     /**
@@ -83,7 +83,7 @@ class CRUDTableFilterInVisible implements InterfaceCRUDTableFilterVisible
     public function getHtml(ServerRequestInterface $request): string
     {
         $html = '';
-        $html .= HTML::tag('input', [
+        $html .= CRUDHtml::tag('input', [
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterUniqId(),
             'id' => $this->getFilterUniqId(),

@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Table;
 
-use OLOG\Preloader;
+use WebSK\CRUD\CRUDPreloader;
 
 /**
  * @TODO functions phpdoc
@@ -23,7 +23,7 @@ class CRUDTableScript
         if (!isset($include_script)) {
             $include_script = false;
 
-            echo Preloader::preloaderJsHtml();
+            echo CRUDPreloader::preloader();
             ?>
             <script>
                 var CRUD = CRUD || {};
@@ -219,10 +219,10 @@ class CRUDTableScript
                             url: this.url,
                             data: data,
                             beforeSend: function () {
-                                OLOG.preloader.show();
+                                CRUDPage.preloader.show();
                             },
                             complete: function () {
-                                OLOG.preloader.hide();
+                                CRUDPage.preloader.hide();
                             },
                             success: function (received_html) {
                                 _this.tableRender(received_html);

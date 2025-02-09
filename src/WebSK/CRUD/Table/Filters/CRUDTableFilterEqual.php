@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use OLOG\HTML;
 use Psr\Http\Message\ServerRequestInterface;
+use WebSK\CRUD\CRUDHtml;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -73,7 +73,7 @@ class CRUDTableFilterEqual implements InterfaceCRUDTableFilterVisible
     public function getHtml(ServerRequestInterface $request): string
     {
         $html = '';
-        $html .= HTML::tag('input', [
+        $html .= CRUDHtml::tag('input', [
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterUniqId(),
             'id' => $this->getFilterUniqId(),

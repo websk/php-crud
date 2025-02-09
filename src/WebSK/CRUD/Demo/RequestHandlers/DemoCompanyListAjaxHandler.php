@@ -12,6 +12,7 @@ use WebSK\CRUD\Table\Filters\CRUDTableFilterLikeInline;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetReferenceSelect;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetText;
 use WebSK\Slim\RequestHandlers\BaseHandler;
+use WebSK\Views\PhpRender;
 
 /**
  * Class DemoCompanyListAjaxHandler
@@ -50,6 +51,8 @@ class DemoCompanyListAjaxHandler extends BaseHandler
             CRUDTable::FILTERS_POSITION_INLINE
         );
 
-        return $response->write($crud_table_obj->html($request));
+        $response->getBody()->write($crud_table_obj->html($request));
+
+        return $response;
     }
 }

@@ -2,7 +2,7 @@
 
 namespace WebSK\CRUD\Form;
 
-use OLOG\Preloader;
+use WebSK\CRUD\CRUDPreloader;
 
 /**
  * Class CRUDFormScript
@@ -20,7 +20,7 @@ class CRUDFormScript
         if (!isset($include_script)) {
             $include_script = false;
 
-            echo Preloader::preloaderJsHtml();
+            echo CRUDPreloader::preloader();
             ?>
             <style>
                 .required-class {

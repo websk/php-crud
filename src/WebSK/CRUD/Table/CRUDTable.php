@@ -4,11 +4,12 @@ namespace WebSK\CRUD\Table;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use WebSK\CRUD\CRUDHtml;
+use WebSK\CRUD\CRUDMagnificPopup;
+use WebSK\CRUD\CRUDOperations;
+use WebSK\Slim\Redirect;
+use WebSK\Slim\Request;
 use WebSK\Utils\Assert;
-use OLOG\CheckClassInterfaces;
-use OLOG\HTML;
-use OLOG\MagnificPopup;
-use OLOG\Operations;
 use WebSK\Entity\InterfaceWeight;
 use WebSK\Utils\HTTP;
 use WebSK\CRUD\CRUD;
@@ -25,11 +26,6 @@ use WebSK\Utils\Messages;
 class CRUDTable
 {
     const KEY_LIST_COLUMNS = 'LIST_COLUMNS';
-
-    const OPERATION_ADD_ENTITY = 'OPERATION_ADD_ENTITY';
-    const OPERATION_DELETE_ENTITY = 'OPERATION_DELETE_ENTITY';
-    const OPERATION_SWAP_ENTITY_WEIGHT = 'OPERATION_SWAP_ENTITY_WEIGHT';
-    const OPERATION_UPDATE_ENTITY_FIELD = 'OPERATION_UPDATE_ENTITY_FIELD';
 
     const FILTERS_POSITION_LEFT = 'FILTERS_POSITION_LEFT';
     const FILTERS_POSITION_RIGHT = 'FILTERS_POSITION_RIGHT';
@@ -134,7 +130,7 @@ class CRUDTable
 
         // оборачиваем в отдельный div для выдачи только таблицы аяксом -
         // иначе корневой элемент документа не будет доступен в jquery селекторах
-        $html = HTML::div($table_container_element_id, '', function () use (
+        $html = CRUDHtml::div($table_container_element_id, '', function () use (
             $request
         ) {
 
@@ -361,13 +357,13 @@ class CRUDTable
             return null;
         }
 
-        $operation_code = $request->getParsedBodyParam(Operations::FIELD_NAME_OPERATION_CODE);
+        $operation_code = Request::getParsedBodyParam($request, CRUDOperations::FIELD_NAME_OPERATION_CODE);
         switch ($operation_code) {
-            case self::OPERATION_DELETE_ENTITY:
+            case CRUDOperations::OPERATION_DELETE_ENTITY:
                 return $this->deleteEntityOperation($request, $response);
-            case self::OPERATION_SWAP_ENTITY_WEIGHT:
+            case CRUDOperations::OPERATION_SWAP_ENTITY_WEIGHT:
                 return $this->swapEntityWeightOperation($request, $response);
-            case self::OPERATION_UPDATE_ENTITY_FIELD:
+            case CRUDOperations::OPERATION_UPDATE_ENTITY_FIELD:
                 return $this->updateEntityFieldOperation($request, $response);
         }
 
@@ -382,22 +378,22 @@ class CRUDTable
      */
     public function deleteEntityOperation(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $entity_class_name = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_CLASS_NAME);
+        $entity_class_name = Request::getParsedBodyParam($request, CRUDTableWidgetDelete::FIELD_CLASS_NAME);
         Assert::assert($entity_class_name);
 
-        $entity_id = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_OBJECT_ID);
+        $entity_id = Request::getParsedBodyParam($request, CRUDTableWidgetDelete::FIELD_OBJECT_ID);
         Assert::assert($entity_id);
 
         $this->crud->deleteObject($entity_class_name, $entity_id);
 
         Messages::setMessage('Удаление выполнено успешно');
 
-        $redirect_url = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_REDIRECT_AFTER_DELETE_URL, '');
+        $redirect_url = Request::getParsedBodyParam($request, CRUDTableWidgetDelete::FIELD_REDIRECT_AFTER_DELETE_URL, '');
         if ($redirect_url != '') {
-            return $response->withRedirect($redirect_url);
+            return Redirect::redirect($response, $redirect_url);
         }
 
-        return $response->withRedirect($request->getUri());
+        return Redirect::redirect($response, $request->getUri());
     }
 
     /**
@@ -408,15 +404,19 @@ class CRUDTable
      */
     public function swapEntityWeightOperation(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $entity_class_name = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_CLASS_NAME);
+        $entity_class_name = Request::getParsedBodyParam($request, CRUDTableWidgetDelete::FIELD_CLASS_NAME);
         Assert::assert($entity_class_name);
 
-        CheckClassInterfaces::exceptionIfClassNotImplementsInterface($entity_class_name, InterfaceWeight::class);
+        $interfaces_arr = class_implements($entity_class_name);
+        Assert::assert(
+            $interfaces_arr && in_array(InterfaceWeight::class, $interfaces_arr),
+            'Class ' . $entity_class_name . ' does not implement interface ' . InterfaceWeight::class
+        );
 
-        $entity_id = $request->getParsedBodyParam(CRUDTableWidgetDelete::FIELD_OBJECT_ID);
+        $entity_id = Request::getParsedBodyParam($request, CRUDTableWidgetDelete::FIELD_OBJECT_ID);
         Assert::assert($entity_id);
 
-        $context_fields_names_str = $request->getParsedBodyParam(
+        $context_fields_names_str = Request::getParsedBodyParam($request,
             CRUDTableWidgetWeight::FORMFIELD_CONTEXT_FIELDS_NAME,
             ''
         );
@@ -432,7 +432,7 @@ class CRUDTable
 
         $this->crud->swapWeights($entity_class_name, $entity_id, $context_arr);
 
-        return $response->withRedirect($request->getUri());
+        return Redirect::redirect($response, $request->getUri());
     }
 
     /**
@@ -444,19 +444,19 @@ class CRUDTable
      */
     public function updateEntityFieldOperation(ServerRequestInterface $request, ResponseInterface $response): ?ResponseInterface
     {
-        $table_id_from_request = $request->getParsedBodyParam(CRUDTable::FIELD_CRUDTABLE_ID, '');
+        $table_id_from_request = Request::getParsedBodyParam($request, CRUDTable::FIELD_CRUDTABLE_ID, '');
         // проверяем, что операция выполняется для таблицы из запроса, потому что класс модели мы берем из таблицы
         if ($table_id_from_request != $this->table_id) {
             return  null;
         }
 
-        $entity_field_name = $request->getParsedBodyParam(CRUDTable::FIELD_FIELD_NAME);
+        $entity_field_name = Request::getParsedBodyParam($request, CRUDTable::FIELD_FIELD_NAME);
         Assert::assert(!is_null($entity_field_name));
 
-        $value = $request->getParsedBodyParam(CRUDTable::FIELD_FIELD_VALUE);
+        $value = Request::getParsedBodyParam($request, CRUDTable::FIELD_FIELD_VALUE);
         Assert::assert(!is_null($value));
 
-        $entity_id = $request->getParsedBodyParam(CRUDTable::FIELD_ENTITY_ID);
+        $entity_id = Request::getParsedBodyParam($request, CRUDTable::FIELD_ENTITY_ID);
         Assert::assert(!is_null($entity_id));
 
         // @TODO: owner check!!!
@@ -466,12 +466,11 @@ class CRUDTable
         $reflect = new \ReflectionClass($obj);
 
         $property_obj = $reflect->getProperty($entity_field_name);
-        $property_obj->setAccessible(true);
         $property_obj->setValue($obj, $value);
 
         $this->crud->saveObject($obj);
 
-        return $response->withRedirect($request->getUri());
+        return Redirect::redirect($response, $request->getUri());
     }
 
     /**
@@ -534,7 +533,7 @@ class CRUDTable
             return '';
         }
 
-        $html = HTML::div('filters-inline', '', function () use (
+        $html = CRUDHtml::div('filters-inline', '', function () use (
             $request,
             $table_index_on_page,
             $filters_arr
@@ -595,12 +594,12 @@ class CRUDTable
         $html = '';
 
         $create_form_element_id = 'collapse_' . rand(1, 999999);
-        $html .= MagnificPopup::button(
+        $html .= CRUDMagnificPopup::button(
             $create_form_element_id,
             'btn btn-sm btn-default' . $button_create_position_class_name,
             self::CREATE_BUTTON_TEXT
         );
-        $html .= MagnificPopup::popupHtml($create_form_element_id, $create_form_html);
+        $html .= CRUDMagnificPopup::popupHtml($create_form_element_id, $create_form_html);
 
         if (!$table_has_filters) {
             $html .= '<div style="display: inline-block; width: 100%"></div>';

@@ -11,7 +11,7 @@ use WebSK\Entity\InterfaceEntity;
  */
 class CRUDFieldsAccess
 {
-    const DEFAULT_ID_FIELD_NAME = 'id';
+    const string DEFAULT_ID_FIELD_NAME = 'id';
 
     /**
      * @param InterfaceEntity $entity_obj
@@ -85,8 +85,6 @@ class CRUDFieldsAccess
             'Field "' . $field_name . '" not found in object. Object class: "' . $obj_class_name . '"'
         );
 
-        $field_prop_obj->setAccessible(true);
-
         if (!$field_prop_obj->isInitialized($entity_obj)) {
             return null;
         }
@@ -98,30 +96,28 @@ class CRUDFieldsAccess
      * @param InterfaceEntity $entity_obj
      * @param array $values_arr
      * @param array $null_fields_arr - список полей объекта, в которые надо внести NULL
-     * @return InterfaceEntity
      * @throws \ReflectionException
      */
     public static function setObjectFieldsFromArray(
         InterfaceEntity $entity_obj,
         array $values_arr,
         array $null_fields_arr = []
-    ): InterfaceEntity
+    ): void
     {
-        $cloned_obj = clone $entity_obj;
-        $reflect = new \ReflectionClass($cloned_obj);
+        $reflect = new \ReflectionClass($entity_obj);
 
         foreach ($values_arr as $key => $value) {
             $property_obj = $reflect->getProperty($key);
-            $property_obj->setAccessible(true);
-            $property_obj->setValue($cloned_obj, $value);
+
+            if ($property_obj->getType()) {
+                settype($value, $property_obj->getType()->getName());
+            }
+            $property_obj->setValue($entity_obj, $value);
         }
 
         foreach ($null_fields_arr as $key => $value) {
             $property_obj = $reflect->getProperty($key);
-            $property_obj->setAccessible(true);
-            $property_obj->setValue($cloned_obj, null);
+            $property_obj->setValue($entity_obj, null);
         }
-
-        return $cloned_obj;
     }
 }

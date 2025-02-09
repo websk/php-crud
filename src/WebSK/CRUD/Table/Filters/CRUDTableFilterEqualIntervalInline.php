@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use OLOG\HTML;
 use Psr\Http\Message\ServerRequestInterface;
+use WebSK\CRUD\CRUDHtml;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -77,7 +77,7 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
     public function getHtml(ServerRequestInterface $request): string
     {
         $html = 'с ';
-        $html .= HTML::tag('input', [
+        $html .= CRUDHtml::tag('input', [
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterStartUniqId(),
             'id' => $this->getFilterStartUniqId(),
@@ -85,7 +85,7 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
         ], '');
 
         $html .= ' по ';
-        $html .= HTML::tag('input', [
+        $html .= CRUDHtml::tag('input', [
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterEndUniqId(),
             'id' => $this->getFilterEndUniqId(),

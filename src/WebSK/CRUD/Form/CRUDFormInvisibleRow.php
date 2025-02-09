@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Form;
 
-use OLOG\HTML;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDHtml;
 
 /**
  * Class CRUDFormInvisibleRow
@@ -25,7 +25,7 @@ class CRUDFormInvisibleRow implements InterfaceCRUDFormRow
     /** @inheritdoc */
     public function html($obj, CRUD $crud): string
     {
-        return HTML::tag('div', ['style' => 'display: none;'], $this->getWidgetObj()->html($obj, $crud));
+        return CRUDHtml::tag('div', ['style' => 'display: none;'], $this->getWidgetObj()->html($obj, $crud));
     }
 
     /**

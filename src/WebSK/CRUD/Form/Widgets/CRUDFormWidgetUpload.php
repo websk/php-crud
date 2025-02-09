@@ -3,12 +3,13 @@
 namespace WebSK\CRUD\Form\Widgets;
 
 use Closure;
-use OLOG\Operations;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\CRUDFieldsAccess;
+use WebSK\CRUD\CRUDOperations;
 use WebSK\CRUD\Form\CRUDForm;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 
 /**
@@ -17,9 +18,9 @@ use WebSK\Utils\Sanitize;
  */
 class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 {
-    const DEFAULT_MAX_FILE_SIZE = 52428800;
+    const int DEFAULT_MAX_FILE_SIZE = 52428800;
 
-    const FILE_TYPE_IMAGE = 'image';
+    const string FILE_TYPE_IMAGE = 'image';
 
     protected string $field_name;
 
@@ -75,8 +76,13 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         $this->setFormActionUrl($form_action_url);
     }
 
-    /** @inheritdoc */
-    public function html($entity_obj, CRUD $crud): string
+    /**
+     * @param InterfaceEntity $entity_obj
+     * @param CRUD $crud
+     * @return string
+     * @throws \ReflectionException
+     */
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
         static $crud_form_widget_blueimp_file_upload_include_script;
 
@@ -87,12 +93,12 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
         $file_url = CRUDCompiler::fieldValueOrCallableResult($this->getUrl(), $entity_obj);
 
-        $html = '';
+        $content_html = '';
 
         if (!isset($crud_form_widget_blueimp_file_upload_include_script)) {
             $cdn_blueimp_file_upload_path = 'https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/10.7.0';
 
-            $html .= '<link rel="stylesheet" href="' . $cdn_blueimp_file_upload_path . '/css/jquery.fileupload.css">' .
+            $content_html .= '<link rel="stylesheet" href="' . $cdn_blueimp_file_upload_path . '/css/jquery.fileupload.css">' .
                 '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload.js"></script>' .
                 '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload-process.js"></script>' .
                 '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload-validate.js"></script>';
@@ -162,7 +168,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     $.ajax({
                         dataType: 'json',
                         data: {
-                            '<?php echo Operations::FIELD_NAME_OPERATION_CODE; ?>': '<?php echo CRUDForm::OPERATION_DELETE_FILE; ?>',
+                            '<?php echo CRUDOperations::FIELD_NAME_OPERATION_CODE; ?>': '<?php echo CRUDOperations::OPERATION_DELETE_FILE; ?>',
                             '<?php echo CRUDForm::FIELD_STORAGE; ?>': '<?php echo Sanitize::sanitizeAttrValue($this->getStorage()); ?>',
                             '<?php echo CRUDForm::FIELD_TARGET_FOLDER; ?>': '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>',
                             '<?php echo CRUDForm::FIELD_FIELD_NAME; ?>': '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>',
@@ -193,7 +199,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                     url: url,
                     dataType: 'json',
                     formData: [
-                        {name: '<?php echo Operations::FIELD_NAME_OPERATION_CODE; ?>', value: '<?php echo CRUDForm::OPERATION_UPLOAD_FILE; ?>'},
+                        {name: '<?php echo CRUDOperations::FIELD_NAME_OPERATION_CODE; ?>', value: '<?php echo CRUDOperations::OPERATION_UPLOAD_FILE; ?>'},
                         {name: '<?php echo CRUDForm::FIELD_STORAGE; ?>', value: '<?php echo Sanitize::sanitizeAttrValue($this->getStorage()); ?>'},
                         {name: '<?php echo CRUDForm::FIELD_TARGET_FOLDER; ?>', value: '<?php echo addslashes(Sanitize::sanitizeAttrValue($this->getTargetFolder())); ?>'},
                         {name: '<?php echo CRUDForm::FIELD_FIELD_NAME; ?>', value: '<?php echo Sanitize::sanitizeAttrValue($this->getFieldName()); ?>'},
@@ -263,9 +269,9 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
             });
         </script>
         <?php
-        $html .= ob_get_clean();
+        $content_html .= ob_get_clean();
 
-        return $html;
+        return $content_html;
     }
 
     /**

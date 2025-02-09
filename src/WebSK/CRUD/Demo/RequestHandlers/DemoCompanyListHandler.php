@@ -47,7 +47,7 @@ class DemoCompanyListHandler extends BaseHandler
                     new CRUDFormRow('Название компании', new CRUDFormWidgetInput(DemoCompany::_NAME)),
                 ],
                 function(DemoCompany $demo_company_obj) {
-                    return Router::pathFor(DemoCompanyEditHandler::class, ['demo_company_id' => $demo_company_obj->getId()]);
+                    return Router::urlFor(DemoCompanyEditHandler::class, ['demo_company_id' => $demo_company_obj->getId()]);
                 }
             ),
             [
@@ -57,7 +57,7 @@ class DemoCompanyListHandler extends BaseHandler
                     new CRUDTableWidgetTextWithLink(
                         DemoCompany::_NAME,
                         function(DemoCompany $demo_company_obj) {
-                            return Router::pathFor(DemoCompanyEditHandler::class, ['demo_company_id' => $demo_company_obj->getId()]);
+                            return Router::urlFor(DemoCompanyEditHandler::class, ['demo_company_id' => $demo_company_obj->getId()]);
                         }
                     )
                 ),

@@ -1,0 +1,17 @@
+CREATE TABLE crud_demo_company (id int NOT NULL AUTO_INCREMENT PRIMARY KEY, created_at_ts int NOT NULL DEFAULT 0) ENGINE InnoDB DEFAULT CHARSET utf8 /* c982h38h23h032 */;
+ALTER TABLE crud_demo_company ADD COLUMN `name` varchar(255) DEFAULT '' /* c03094vj34v */;
+CREATE TABLE crud_demo_users (id int NOT NULL AUTO_INCREMENT PRIMARY KEY, created_at_ts int NOT NULL DEFAULT 0) ENGINE InnoDB DEFAULT CHARSET utf8 /* c982h38h23h032 */;
+ALTER TABLE crud_demo_users ADD COLUMN `name` varchar(255) DEFAULT '' /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `first_name` varchar(255) DEFAULT '' /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `last_name` varchar(255) DEFAULT '' /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `email` varchar(100) DEFAULT '' /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `photo` varchar(100) NOT NULL DEFAULT '' /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `birthday` varchar(20) DEFAULT '' /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `phone` varchar(100) DEFAULT NULL /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `city` varchar(100) DEFAULT '' /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `address` varchar(250) DEFAULT '' /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `company_id` INT DEFAULT NULL /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `comment` mediumtext /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD COLUMN `passw` varchar(50) DEFAULT NULL /* c03094vj34v */;
+ALTER TABLE crud_demo_users ADD KEY email (email) /* 832hf0c923hj093 */;
+ALTER TABLE crud_demo_users ADD CONSTRAINT FK_users_company FOREIGN KEY (company_id) REFERENCES crud_demo_company (id) /* c334j0493j049 */;

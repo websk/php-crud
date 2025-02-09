@@ -2,8 +2,8 @@
 
 namespace WebSK\CRUD\Table\Filters;
 
-use OLOG\HTML;
 use Psr\Http\Message\ServerRequestInterface;
+use WebSK\CRUD\CRUDHtml;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -61,7 +61,7 @@ class CRUDTableFilterLike implements InterfaceCRUDTableFilterVisible
     /** @inheritdoc */
     public function getHtml(ServerRequestInterface $request): string
     {
-        $html = HTML::tag('input', [
+        $html = CRUDHtml::tag('input', [
             'name' => $this->getFilterUniqId(),
             'value' => $request->getParam($this->getFilterUniqId(), ''),
             'class' => 'form-control',

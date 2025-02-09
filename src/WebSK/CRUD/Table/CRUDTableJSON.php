@@ -2,10 +2,10 @@
 
 namespace WebSK\CRUD\Table;
 
-use OLOG\Assert;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
+use WebSK\Utils\Assert;
 
 /**
  * Class CRUDTableJSON

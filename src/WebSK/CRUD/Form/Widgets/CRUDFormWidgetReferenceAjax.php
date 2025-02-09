@@ -2,8 +2,9 @@
 
 namespace WebSK\CRUD\Form\Widgets;
 
-use OLOG\Preloader;
 use WebSK\CRUD\CRUDCompiler;
+use WebSK\CRUD\CRUDPreloader;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
@@ -15,7 +16,7 @@ use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
  */
 class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
 {
-    const REFERENCED_ID_PLACEHOLDER = 'REFERENCED_ID';
+    const string REFERENCED_ID_PLACEHOLDER = 'REFERENCED_ID';
 
     protected string $field_name;
 
@@ -56,8 +57,13 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         $this->setIsRequired($is_required);
     }
 
-    /** @inheritdoc */
-    public function html($entity_obj, CRUD $crud): string
+    /**
+     * @param InterfaceEntity $entity_obj
+     * @param CRUD $crud
+     * @return string
+     * @throws \ReflectionException
+     */
+    public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
         $field_name = $this->getFieldName();
         $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
@@ -96,7 +102,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         }
 
         $html = '';
-        $html .= Preloader::preloaderJsHtml();
+        $html .= CRUDPreloader::preloader();
 
         $select_element_id = 'js_select_' . rand(1, 999999);
         $choose_form_element_id = 'collapse_' . rand(1, 999999);
@@ -141,16 +147,16 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
             });
 
             $('#<?php echo $choose_form_element_id ?>').on('shown.bs.modal', function (e) {
-                OLOG.preloader.show();
+                CRUDPage.preloader.show();
                 $.ajax({
                     url: "<?php echo $this->getAjaxActionUrl() ?>"
                 }).success(function (received_html) {
                     $('#<?php echo $choose_form_element_id ?> .modal-body').html(received_html);
-                    OLOG.preloader.hide();
+                    CRUDPage.preloader.hide();
                 }).error(function (err) {
                     $('#<?php echo $choose_form_element_id ?> .modal-body')
                         .html('<div class="alert alert-danger">' + err.status + ': ' + err.statusText + '</div>');
-                    OLOG.preloader.hide();
+                    CRUDPage.preloader.hide();
                 });
             });
 

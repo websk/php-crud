@@ -10,16 +10,14 @@ use Psr\Container\ContainerInterface;
  */
 class CRUDServiceProvider
 {
-    const CRUD_CONTAINER_ID = 'crud';
-
     /**
      * @param ContainerInterface $container
      */
     public static function register(ContainerInterface $container)
     {
-        $container[self::CRUD_CONTAINER_ID] = function (ContainerInterface $container): CRUD {
+        $container->set(CRUD::class, function (ContainerInterface $container): CRUD {
             return new CRUD($container);
-        };
+        });
     }
 
     /**
@@ -28,6 +26,6 @@ class CRUDServiceProvider
      */
     public static function getCrud(ContainerInterface $container): CRUD
     {
-        return $container[self::CRUD_CONTAINER_ID];
+        return $container->get(CRUD::class);
     }
 }

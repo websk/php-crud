@@ -45,6 +45,8 @@ class DemoCompanyJsonHandler extends BaseHandler
             ]
         );
 
-        return $response->write($crud_table_json_obj->json($request));
+        $response->getBody()->write($crud_table_json_obj->json($request));
+
+        return $response;
     }
 }
