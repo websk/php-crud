@@ -25,7 +25,7 @@ composer require websk/php-crud
 * Сделать самоподписанный сертификат для `php-crud.devbox`:
 
   ```shell
-  $ mkcert php-crud.devbox
+  mkcert php-crud.devbox
   ```
 
 * Скопировать полученные файлы _wildcard.php-crud.devbox.pem и _wildcard.php-crud.devbox.pem в `var/docker/nginx/sites`
@@ -69,13 +69,13 @@ composer require websk/php-crud
 * Выполняем миграции БД
 
   ```shell
-  docker compose exec php-fpm php vendor/bin/websk_db_migration.php migrations:migration_auto`
+  docker compose exec php-fpm php vendor/bin/websk_db_migration.php migrations:migration_auto
   ```
   
   or run handle process migration:
 
   ```shell
-  docker compose exec php-fpm php vendor/bin/websk_db_migration.php migrations:migration_handle`
+  docker compose exec php-fpm php vendor/bin/websk_db_migration.php migrations:migration_handle
   ```
 
 * Install static
