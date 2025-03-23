@@ -5,7 +5,7 @@ namespace WebSK\CRUD\Demo\RequestHandlers;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
-use WebSK\CRUD\CRUDServiceProvider;
+use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Demo\DemoUser;
 use WebSK\CRUD\Form\CRUDFormRow;
@@ -32,34 +32,37 @@ use WebSK\Views\PhpRender;
  */
 class DemoUserListHandler extends BaseHandler
 {
-    const FILTER_EMAIL = 'user_email';
-    const FILTER_NAME = 'user_name';
+    /** @Inject */
+    protected CRUD $crud_service;
+
+    const string FILTER_EMAIL = 'user_email';
+    const string FILTER_NAME = 'user_name';
 
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $crud_table_obj = CRUDServiceProvider::getCrud($this->container)->createTable(
+        $crud_table_obj = $this->crud_service->createTable(
             DemoUser::class,
-            CRUDServiceProvider::getCrud($this->container)->createForm(
+            $this->crud_service->createForm(
                 'demo_user_create',
                 new DemoUser(),
                 [
-                    new CRUDFormRow('Имя на сайте', new CRUDFormWidgetInput(DemoUser::_NAME)),
+                    new CRUDFormRow('Имя на сайте', new CRUDFormWidgetInput(DemoUser::_NAME, false, true)),
                     new CRUDFormRow('Имя', new CRUDFormWidgetInput(DemoUser::_FIRST_NAME)),
                     new CRUDFormRow('Фамилия', new CRUDFormWidgetInput(DemoUser::_LAST_NAME)),
-                    new CRUDFormRow('Email', new CRUDFormWidgetInput(DemoUser::_EMAIL)),
+                    new CRUDFormRow('Email', new CRUDFormWidgetInput(DemoUser::_EMAIL, false, true)),
                     new CRUDFormRow(
                         'Компания',
                         new CRUDFormWidgetReferenceAjax(
                             DemoUser::_COMPANY_ID,
                             DemoCompany::class,
                             DemoCompany::_NAME,
-                            $this->pathFor(DemoCompanyListAjaxHandler::class),
-                            $this->pathFor(
+                            $this->urlFor(DemoCompanyListAjaxHandler::class),
+                            $this->urlFor(
                                 DemoCompanyEditHandler::class,
                                 ['demo_company_id' => CRUDFormWidgetReferenceAjax::REFERENCED_ID_PLACEHOLDER]
                             )
@@ -104,7 +107,7 @@ class DemoUserListHandler extends BaseHandler
                     DemoUser::_COMPANY_ID,
                     DemoCompany::_ID,
                     DemoCompany::_NAME,
-                    $this->pathFor(DemoCompanyJsonHandler::class)
+                    $this->urlFor(DemoCompanyJsonHandler::class)
                 ),
             ],
             DemoUser::_CREATED_AT_TS . ' DESC',

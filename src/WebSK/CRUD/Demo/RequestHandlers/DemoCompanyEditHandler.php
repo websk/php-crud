@@ -2,17 +2,17 @@
 
 namespace WebSK\CRUD\Demo\RequestHandlers;
 
+use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
-use WebSK\CRUD\CRUDServiceProvider;
+use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Demo\DemoCompanyService;
 use WebSK\CRUD\Form\CRUDFormRow;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTimestamp;
 use WebSK\Slim\RequestHandlers\BaseHandler;
-use WebSK\Utils\HTTP;
 use WebSK\Views\BreadcrumbItemDTO;
 use WebSK\Views\LayoutDTO;
 use WebSK\Views\PhpRender;
@@ -23,24 +23,28 @@ use WebSK\Views\PhpRender;
  */
 class DemoCompanyEditHandler extends BaseHandler
 {
+    /** @Inject */
+    protected CRUD $crud_service;
+
+    /** @Inject */
+    protected DemoCompanyService $demo_company_service;
+
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     * @param array $args
+     * @param int $demo_company_id
      * @return ResponseInterface
      * @throws \Exception
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, int $demo_company_id): ResponseInterface
     {
-        $demo_company_id = $args['demo_company_id'];
-        $demo_company_service = $this->container->get(DemoCompanyService::class);
-        $demo_company_obj = $demo_company_service->getById($demo_company_id);
+        $demo_company_obj = $this->demo_company_service->getById($demo_company_id);
 
         if (!$demo_company_obj) {
-            return $response->withStatus(HTTP::STATUS_NOT_FOUND);
+            return $response->withStatus(StatusCodeInterface::STATUS_NOT_FOUND);
         }
 
-        $crud_form = CRUDServiceProvider::getCrud($this->container)->createForm(
+        $crud_form = $this->crud_service->createForm(
             'demo_company_edit',
             $demo_company_obj,
             [
@@ -62,7 +66,7 @@ class DemoCompanyEditHandler extends BaseHandler
 
         $breadcrumbs_arr = [
             new BreadcrumbItemDTO('Главная', '/'),
-            new BreadcrumbItemDTO('Компании', $this->pathFor(DemoCompanyListHandler::class)),
+            new BreadcrumbItemDTO('Компании', $this->urlFor(DemoCompanyListHandler::class)),
         ];
         $layout_dto->setBreadcrumbsDtoArr($breadcrumbs_arr);
 

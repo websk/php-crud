@@ -2160,26 +2160,27 @@
         },
         {
             "name": "slim/php-view",
-            "version": "3.2.0",
+            "version": "3.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/slimphp/PHP-View.git",
-                "reference": "67f2a616a9336350834013485361f2b2aa049f6e"
+                "reference": "ef1821663a6a028b9e446e8c6818fd257bf70313"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/slimphp/PHP-View/zipball/67f2a616a9336350834013485361f2b2aa049f6e",
-                "reference": "67f2a616a9336350834013485361f2b2aa049f6e",
+                "url": "https://api.github.com/repos/slimphp/PHP-View/zipball/ef1821663a6a028b9e446e8c6818fd257bf70313",
+                "reference": "ef1821663a6a028b9e446e8c6818fd257bf70313",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.4 || ^8.0",
-                "psr/http-message": "^1.0"
+                "psr/http-message": "^1.1 || ^2.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^9.5",
-                "slim/psr7": "^1.5",
-                "squizlabs/php_codesniffer": "^3.7"
+                "phpstan/phpstan": "^1",
+                "phpunit/phpunit": "^9 || ^10",
+                "slim/psr7": "^1.6",
+                "squizlabs/php_codesniffer": "^3.10"
             },
             "type": "library",
             "autoload": {
@@ -2209,9 +2210,9 @@
             ],
             "support": {
                 "issues": "https://github.com/slimphp/PHP-View/issues",
-                "source": "https://github.com/slimphp/PHP-View/tree/3.2.0"
+                "source": "https://github.com/slimphp/PHP-View/tree/3.4.0"
             },
-            "time": "2022-07-01T18:27:31+00:00"
+            "time": "2024-07-19T18:54:54+00:00"
         },
         {
             "name": "slim/psr7",
@@ -2796,16 +2797,16 @@
         },
         {
             "name": "websk/php-entity",
-            "version": "2.2.0",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/websk/php-entity.git",
-                "reference": "1e92461c8c8e66d8131c440e205e05ee30a8b277"
+                "reference": "a08bfd346cb7c983d135105e37a1298ebde486d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websk/php-entity/zipball/1e92461c8c8e66d8131c440e205e05ee30a8b277",
-                "reference": "1e92461c8c8e66d8131c440e205e05ee30a8b277",
+                "url": "https://api.github.com/repos/websk/php-entity/zipball/a08bfd346cb7c983d135105e37a1298ebde486d9",
+                "reference": "a08bfd346cb7c983d135105e37a1298ebde486d9",
                 "shasum": ""
             },
             "require": {
@@ -2825,9 +2826,9 @@
             "description": "PHP Entity",
             "support": {
                 "issues": "https://github.com/websk/php-entity/issues",
-                "source": "https://github.com/websk/php-entity/tree/2.2.0"
+                "source": "https://github.com/websk/php-entity/tree/2.2.1"
             },
-            "time": "2024-09-01T13:27:51+00:00"
+            "time": "2025-03-15T16:53:32+00:00"
         },
         {
             "name": "websk/php-filemanager",
@@ -2866,25 +2867,24 @@
         },
         {
             "name": "websk/php-slim",
-            "version": "2.2.0",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/websk/php-slim.git",
-                "reference": "bde252019a36fd3a355e5900459bd6dd74f78549"
+                "reference": "459df625c02d0e31db24a7567563c92890cdd8d7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websk/php-slim/zipball/bde252019a36fd3a355e5900459bd6dd74f78549",
-                "reference": "bde252019a36fd3a355e5900459bd6dd74f78549",
+                "url": "https://api.github.com/repos/websk/php-slim/zipball/459df625c02d0e31db24a7567563c92890cdd8d7",
+                "reference": "459df625c02d0e31db24a7567563c92890cdd8d7",
                 "shasum": ""
             },
             "require": {
+                "fig/http-message-util": "1.1.5",
                 "php": "^8.3",
                 "slim/http": "1.3.0",
-                "slim/php-view": "3.2.0",
                 "slim/psr7": "1.6.1",
-                "slim/slim": "4.14.*",
-                "websk/php-utils": "2.0.*"
+                "slim/slim": "4.14.*"
             },
             "type": "library",
             "autoload": {
@@ -2897,9 +2897,9 @@
             "homepage": "https://websk.ru/",
             "support": {
                 "issues": "https://github.com/websk/php-slim/issues",
-                "source": "https://github.com/websk/php-slim/tree/2.2.0"
+                "source": "https://github.com/websk/php-slim/tree/2.2.1"
             },
-            "time": "2024-09-01T13:24:14+00:00"
+            "time": "2025-03-15T15:56:13+00:00"
         },
         {
             "name": "websk/php-utils",
@@ -2937,21 +2937,22 @@
         },
         {
             "name": "websk/php-view",
-            "version": "2.2.0",
+            "version": "2.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/websk/php-view.git",
-                "reference": "59ede97abaaa5e623eaf004bb3ac17bc25b5ce6f"
+                "reference": "f200ca2dadc29630c626519336ecb09df410a2f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websk/php-view/zipball/59ede97abaaa5e623eaf004bb3ac17bc25b5ce6f",
-                "reference": "59ede97abaaa5e623eaf004bb3ac17bc25b5ce6f",
+                "url": "https://api.github.com/repos/websk/php-view/zipball/f200ca2dadc29630c626519336ecb09df410a2f8",
+                "reference": "f200ca2dadc29630c626519336ecb09df410a2f8",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
                 "php": "^8.3",
+                "slim/php-view": "3.4.*",
                 "websk/php-config": "2.0.*",
                 "websk/php-slim": "2.2.*",
                 "websk/php-utils": "2.0.*"
@@ -2965,9 +2966,9 @@
             "notification-url": "https://packagist.org/downloads/",
             "support": {
                 "issues": "https://github.com/websk/php-view/issues",
-                "source": "https://github.com/websk/php-view/tree/2.2.0"
+                "source": "https://github.com/websk/php-view/tree/2.2.1"
             },
-            "time": "2024-09-01T13:28:49+00:00"
+            "time": "2025-03-15T16:02:17+00:00"
         }
     ],
     "packages-dev": [],

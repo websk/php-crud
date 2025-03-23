@@ -10,42 +10,42 @@ use WebSK\Entity\Entity;
  */
 class DemoUser extends Entity
 {
-    const DB_TABLE_NAME = 'crud_demo_users';
+    const string DB_TABLE_NAME = 'crud_demo_users';
 
-    const _NAME = 'name';
+    const string _NAME = 'name';
     protected string $name = '';
 
-    const _FIRST_NAME = 'first_name';
+    const string _FIRST_NAME = 'first_name';
     protected string $first_name = '';
 
-    const _LAST_NAME = 'last_name';
+    const string _LAST_NAME = 'last_name';
     protected string $last_name = '';
 
-    const _EMAIL = 'email';
+    const string _EMAIL = 'email';
     protected string $email = '';
 
-    const _BIRTHDAY = 'birthday';
+    const string _BIRTHDAY = 'birthday';
     protected string $birthday = '';
 
-    const _PHONE = 'phone';
+    const string _PHONE = 'phone';
     protected ?string $phone = null;
 
-    const _CITY = 'city';
+    const string _CITY = 'city';
     protected string $city = '';
 
-    const _ADDRESS = 'address';
+    const string _ADDRESS = 'address';
     protected string $address = '';
 
-    const _COMPANY_ID = 'company_id';
+    const string _COMPANY_ID = 'company_id';
     protected ?int $company_id = null;
 
-    const _COMMENT = 'comment';
+    const string _COMMENT = 'comment';
     protected string $comment = '';
 
-    const _PHOTO = 'photo';
+    const string _PHOTO = 'photo';
     protected string $photo = '';
 
-    const _PASSW = 'passw';
+    const string _PASSW = 'passw';
     protected ?string $passw = null;
 
     /**

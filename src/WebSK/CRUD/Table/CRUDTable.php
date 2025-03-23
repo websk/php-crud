@@ -2,6 +2,7 @@
 
 namespace WebSK\CRUD\Table;
 
+use Fig\Http\Message\RequestMethodInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDHtml;
@@ -11,7 +12,6 @@ use WebSK\Slim\Redirect;
 use WebSK\Slim\Request;
 use WebSK\Utils\Assert;
 use WebSK\Entity\InterfaceWeight;
-use WebSK\Utils\HTTP;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Form\CRUDForm;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDelete;
@@ -353,7 +353,7 @@ class CRUDTable
             }
         }
 
-        if ($request->getMethod() != HTTP::METHOD_POST) {
+        if ($request->getMethod() != RequestMethodInterface::METHOD_POST) {
             return null;
         }
 

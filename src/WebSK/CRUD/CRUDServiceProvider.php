@@ -13,19 +13,10 @@ class CRUDServiceProvider
     /**
      * @param ContainerInterface $container
      */
-    public static function register(ContainerInterface $container)
+    public static function register(ContainerInterface $container): void
     {
         $container->set(CRUD::class, function (ContainerInterface $container): CRUD {
             return new CRUD($container);
         });
-    }
-
-    /**
-     * @param ContainerInterface $container
-     * @return CRUD
-     */
-    public static function getCrud(ContainerInterface $container): CRUD
-    {
-        return $container->get(CRUD::class);
     }
 }

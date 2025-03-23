@@ -4,7 +4,7 @@ namespace WebSK\CRUD\Demo\RequestHandlers;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use WebSK\CRUD\CRUDServiceProvider;
+use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\CRUDTableColumn;
@@ -12,7 +12,6 @@ use WebSK\CRUD\Table\Filters\CRUDTableFilterLikeInline;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetReferenceSelect;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetText;
 use WebSK\Slim\RequestHandlers\BaseHandler;
-use WebSK\Views\PhpRender;
 
 /**
  * Class DemoCompanyListAjaxHandler
@@ -21,16 +20,19 @@ use WebSK\Views\PhpRender;
 class DemoCompanyListAjaxHandler extends BaseHandler
 {
 
-    const FILTER_NAME = 'demo_company_name';
+    const string FILTER_NAME = 'demo_company_name';
+
+    /** @Inject */
+    protected CRUD $crud_service;
 
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $crud_table_obj = CRUDServiceProvider::getCrud($this->container)->createTable(
+        $crud_table_obj = $this->crud_service->createTable(
             DemoCompany::class,
             null,
             [

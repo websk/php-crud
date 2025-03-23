@@ -2,10 +2,11 @@
 
 namespace WebSK\CRUD\Demo\RequestHandlers;
 
+use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
-use WebSK\CRUD\CRUDServiceProvider;
+use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Demo\DemoUser;
 use WebSK\CRUD\Demo\DemoUserService;
@@ -17,7 +18,6 @@ use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTextarea;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTimestamp;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetUpload;
 use WebSK\Slim\RequestHandlers\BaseHandler;
-use WebSK\Utils\HTTP;
 use WebSK\Views\BreadcrumbItemDTO;
 use WebSK\Views\LayoutDTO;
 use WebSK\Views\PhpRender;
@@ -28,24 +28,28 @@ use WebSK\Views\PhpRender;
  */
 class DemoUserEditHandler extends BaseHandler
 {
+    /** @Inject */
+    protected DemoUserService $demo_user_service;
+
+    /** @Inject */
+    protected CRUD $crud_service;
+
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     * @param array $args
-     * @return \Psr\Http\Message\ResponseInterface
+     * @param int $demo_user_id
+     * @return ResponseInterface
      * @throws \Exception
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $args)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, int $demo_user_id): ResponseInterface
     {
-        $demo_user_id = $args['demo_user_id'];
-        $demo_user_service = $this->container->get(DemoUserService::class);
-        $demo_user_obj = $demo_user_service->getById($demo_user_id);
+        $demo_user_obj = $this->demo_user_service->getById($demo_user_id);
 
         if (!$demo_user_obj) {
-            return $response->withStatus(HTTP::STATUS_NOT_FOUND);
+            return $response->withStatus(StatusCodeInterface::STATUS_NOT_FOUND);
         }
 
-        $crud_form = CRUDServiceProvider::getCrud($this->container)->createForm(
+        $crud_form = $this->crud_service->createForm(
             'user_edit',
             $demo_user_obj,
             [
@@ -61,8 +65,8 @@ class DemoUserEditHandler extends BaseHandler
                         DemoUser::_COMPANY_ID,
                         DemoCompany::class,
                         DemoCompany::_NAME,
-                        $this->pathFor(DemoCompanyListAjaxHandler::class),
-                        $this->pathFor(
+                        $this->urlFor(DemoCompanyListAjaxHandler::class),
+                        $this->urlFor(
                             DemoCompanyEditHandler::class,
                             ['demo_company_id' => CRUDFormWidgetReferenceAjax::REFERENCED_ID_PLACEHOLDER]
                         )
@@ -99,7 +103,7 @@ class DemoUserEditHandler extends BaseHandler
 
         $breadcrumbs_arr = [
             new BreadcrumbItemDTO('Главная', '/'),
-            new BreadcrumbItemDTO('Пользователи', $this->pathFor(DemoUserListHandler::class)),
+            new BreadcrumbItemDTO('Пользователи', $this->urlFor(DemoUserListHandler::class)),
         ];
         $layout_dto->setBreadcrumbsDtoArr($breadcrumbs_arr);
 

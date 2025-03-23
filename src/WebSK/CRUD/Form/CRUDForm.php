@@ -3,6 +3,7 @@
 namespace WebSK\CRUD\Form;
 
 use Closure;
+use Fig\Http\Message\RequestMethodInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDCompiler;
@@ -16,7 +17,6 @@ use WebSK\Slim\Response;
 use WebSK\Utils\Assert;
 use WebSK\Utils\Messages;
 use WebSK\Utils\Sanitize;
-use WebSK\Utils\HTTP;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
 
@@ -107,7 +107,7 @@ class CRUDForm
      */
     public function processRequest(ServerRequestInterface $request, ResponseInterface $response): ?ResponseInterface
     {
-        if ($request->getMethod() != HTTP::METHOD_POST) {
+        if ($request->getMethod() != RequestMethodInterface::METHOD_POST) {
             return null;
         }
 

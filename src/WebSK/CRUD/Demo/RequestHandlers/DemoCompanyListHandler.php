@@ -5,7 +5,7 @@ namespace WebSK\CRUD\Demo\RequestHandlers;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
-use WebSK\CRUD\CRUDServiceProvider;
+use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Form\CRUDFormRow;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
@@ -28,23 +28,25 @@ use WebSK\Views\PhpRender;
  */
 class DemoCompanyListHandler extends BaseHandler
 {
+    const string FILTER_NAME = 'demo_company_name';
 
-    const FILTER_NAME = 'demo_company_name';
+    /** @Inject */
+    protected CRUD $crud_service;
 
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $crud_table_obj = CRUDServiceProvider::getCrud($this->container)->createTable(
+        $crud_table_obj = $this->crud_service->createTable(
             DemoCompany::class,
-            CRUDServiceProvider::getCrud($this->container)->createForm(
+            $this->crud_service->createForm(
                 'demo_company_create',
                 new DemoCompany(),
                 [
-                    new CRUDFormRow('Название компании', new CRUDFormWidgetInput(DemoCompany::_NAME)),
+                    new CRUDFormRow('Название компании', new CRUDFormWidgetInput(DemoCompany::_NAME, false, true)),
                 ],
                 function(DemoCompany $demo_company_obj) {
                     return Router::urlFor(DemoCompanyEditHandler::class, ['demo_company_id' => $demo_company_obj->getId()]);

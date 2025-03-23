@@ -17,6 +17,9 @@ class CRUDDemoServiceProvider
     const string DEMO_DB_SERVICE_CONTAINER_ID = 'crud.demo_db_service';
     const string DEMO_DB_ID = 'db_demo_crud';
 
+    const string SETTINGS_CONTAINER_ID = 'settings';
+    const string PARAM_DB = 'db';
+
     /**
      * @param ContainerInterface $container
      */
@@ -28,6 +31,9 @@ class CRUDDemoServiceProvider
          */
         $container->set(self::DEMO_DB_SERVICE_CONTAINER_ID, function (ContainerInterface $container): DBService {
             $db_config = $container['settings']['db'][self::DEMO_DB_ID];
+            $db_config = $container->get(
+                self::SETTINGS_CONTAINER_ID . '.' . self::PARAM_DB . '.' . self::DEMO_DB_ID
+            );
 
             $db_connector = new DBConnectorMySQL(
                 $db_config['host'],
@@ -88,14 +94,5 @@ class CRUDDemoServiceProvider
                 $container->get(self::DEMO_DB_SERVICE_CONTAINER_ID)
             );
         });
-    }
-
-    /**
-     * @param ContainerInterface $container
-     * @return DBService
-     */
-    public static function getDemoDBService(ContainerInterface $container): DBService
-    {
-        return $container->get(self::DEMO_DB_SERVICE_CONTAINER_ID);
     }
 }

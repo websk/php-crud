@@ -4,7 +4,7 @@ namespace WebSK\CRUD\Demo\RequestHandlers;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use WebSK\CRUD\CRUDServiceProvider;
+use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Table\CRUDTableColumn;
 use WebSK\CRUD\Table\Filters\CRUDTableFilterInVisible;
@@ -18,14 +18,17 @@ use WebSK\Slim\RequestHandlers\BaseHandler;
  */
 class DemoCompanyJsonHandler extends BaseHandler
 {
+    /** @Inject */
+    protected CRUD $crud_service;
+
     /**
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
      * @return ResponseInterface
      */
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response)
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $crud_table_json_obj = CRUDServiceProvider::getCrud($this->container)->createTableJSON(
+        $crud_table_json_obj = $this->crud_service->createTableJSON(
             DemoCompany::class,
             [
                 new CRUDTableColumn(

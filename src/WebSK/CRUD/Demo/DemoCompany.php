@@ -10,9 +10,9 @@ use WebSK\Entity\Entity;
  */
 class DemoCompany extends Entity
 {
-    const DB_TABLE_NAME = 'crud_demo_company';
+    const string DB_TABLE_NAME = 'crud_demo_company';
 
-    const _NAME = 'name';
+    const string _NAME = 'name';
     protected string $name = '';
 
     /**
