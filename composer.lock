@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e6783e868c999559f2f943f85125be11",
+    "content-hash": "8d81089f03a173a7d2ec4975651d668a",
     "packages": [
         {
             "name": "aws/aws-crt-php",
@@ -2641,25 +2641,26 @@
         },
         {
             "name": "ulrichsg/getopt-php",
-            "version": "v3.4.0",
+            "version": "v4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/getopt-php/getopt-php.git",
-                "reference": "9121d7c2c51a6a59ee407c49a13b4d8cfae71075"
+                "reference": "9313ecde04f7bed262716e3a4d32a5e2cea3ffad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/getopt-php/getopt-php/zipball/9121d7c2c51a6a59ee407c49a13b4d8cfae71075",
-                "reference": "9121d7c2c51a6a59ee407c49a13b4d8cfae71075",
+                "url": "https://api.github.com/repos/getopt-php/getopt-php/zipball/9313ecde04f7bed262716e3a4d32a5e2cea3ffad",
+                "reference": "9313ecde04f7bed262716e3a4d32a5e2cea3ffad",
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
-                "php": ">=5.4.0"
+                "php": "^7.1 || ^8.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8",
-                "squizlabs/php_codesniffer": "^2.7"
+                "phpunit/phpunit": "*",
+                "squizlabs/php_codesniffer": "^3.5.8",
+                "tflori/phpunit-printer": "*"
             },
             "type": "library",
             "autoload": {
@@ -2681,13 +2682,13 @@
                     "email": "thflori@gmail.com"
                 }
             ],
-            "description": "Command line arguments parser for PHP 5.4 - 7.3",
+            "description": "Command line arguments parser for PHP 7.1 and above",
             "homepage": "http://getopt-php.github.io/getopt-php",
             "support": {
                 "issues": "https://github.com/getopt-php/getopt-php/issues",
-                "source": "https://github.com/getopt-php/getopt-php/tree/v3.4.0"
+                "source": "https://github.com/getopt-php/getopt-php/tree/v4.0.4"
             },
-            "time": "2020-07-14T06:09:04+00:00"
+            "time": "2025-02-11T14:42:04+00:00"
         },
         {
             "name": "websk/php-cache",
@@ -2759,24 +2760,22 @@
         },
         {
             "name": "websk/php-db",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/websk/php-db.git",
-                "reference": "dbf5019e61b6bfacf36f94fee78e299ae7e8aedf"
+                "reference": "4d867ad132ddde644c5e40e7cf5797153be846b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websk/php-db/zipball/dbf5019e61b6bfacf36f94fee78e299ae7e8aedf",
-                "reference": "dbf5019e61b6bfacf36f94fee78e299ae7e8aedf",
+                "url": "https://api.github.com/repos/websk/php-db/zipball/4d867ad132ddde644c5e40e7cf5797153be846b6",
+                "reference": "4d867ad132ddde644c5e40e7cf5797153be846b6",
                 "shasum": ""
             },
             "require": {
                 "ext-pdo": "*",
                 "php": "^8.3",
-                "ulrichsg/getopt-php": "^3.0",
-                "websk/php-config": "2.0.*",
-                "websk/php-utils": "2.0.*"
+                "ulrichsg/getopt-php": "^v4.0.4"
             },
             "bin": [
                 "bin/websk_db_migration.php"
@@ -2791,30 +2790,30 @@
             "description": "DB Service",
             "support": {
                 "issues": "https://github.com/websk/php-db/issues",
-                "source": "https://github.com/websk/php-db/tree/2.0.0"
+                "source": "https://github.com/websk/php-db/tree/2.1.0"
             },
-            "time": "2024-08-22T07:54:54+00:00"
+            "time": "2025-03-25T05:30:14+00:00"
         },
         {
             "name": "websk/php-entity",
-            "version": "2.2.1",
+            "version": "2.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/websk/php-entity.git",
-                "reference": "a08bfd346cb7c983d135105e37a1298ebde486d9"
+                "reference": "9988880c8042ff530082f57ba0b62e5730d34d89"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websk/php-entity/zipball/a08bfd346cb7c983d135105e37a1298ebde486d9",
-                "reference": "a08bfd346cb7c983d135105e37a1298ebde486d9",
+                "url": "https://api.github.com/repos/websk/php-entity/zipball/9988880c8042ff530082f57ba0b62e5730d34d89",
+                "reference": "9988880c8042ff530082f57ba0b62e5730d34d89",
                 "shasum": ""
             },
             "require": {
                 "ext-pdo": "*",
                 "php": "^8.3",
                 "websk/php-cache": "2.2.*",
-                "websk/php-db": "2.0.*",
-                "websk/php-utils": "2.0.*"
+                "websk/php-db": "2.1.*",
+                "websk/php-utils": "2.1.*"
             },
             "type": "library",
             "autoload": {
@@ -2826,9 +2825,9 @@
             "description": "PHP Entity",
             "support": {
                 "issues": "https://github.com/websk/php-entity/issues",
-                "source": "https://github.com/websk/php-entity/tree/2.2.1"
+                "source": "https://github.com/websk/php-entity/tree/2.2.2"
             },
-            "time": "2025-03-15T16:53:32+00:00"
+            "time": "2025-03-25T05:53:03+00:00"
         },
         {
             "name": "websk/php-filemanager",
@@ -2867,16 +2866,16 @@
         },
         {
             "name": "websk/php-slim",
-            "version": "2.2.1",
+            "version": "2.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/websk/php-slim.git",
-                "reference": "459df625c02d0e31db24a7567563c92890cdd8d7"
+                "reference": "c45d2e5ebb2537db2a9fefec4d1743148720e066"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websk/php-slim/zipball/459df625c02d0e31db24a7567563c92890cdd8d7",
-                "reference": "459df625c02d0e31db24a7567563c92890cdd8d7",
+                "url": "https://api.github.com/repos/websk/php-slim/zipball/c45d2e5ebb2537db2a9fefec4d1743148720e066",
+                "reference": "c45d2e5ebb2537db2a9fefec4d1743148720e066",
                 "shasum": ""
             },
             "require": {
@@ -2897,29 +2896,28 @@
             "homepage": "https://websk.ru/",
             "support": {
                 "issues": "https://github.com/websk/php-slim/issues",
-                "source": "https://github.com/websk/php-slim/tree/2.2.1"
+                "source": "https://github.com/websk/php-slim/tree/2.2.2"
             },
-            "time": "2025-03-15T15:56:13+00:00"
+            "time": "2025-03-24T07:04:37+00:00"
         },
         {
             "name": "websk/php-utils",
-            "version": "2.0.0",
+            "version": "2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/websk/php-utils.git",
-                "reference": "ba0e4ab23f2e91f24769d2c74042e6b993724974"
+                "reference": "1fe69ffbf539aa62aa536b1ac11b09759f41e71e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websk/php-utils/zipball/ba0e4ab23f2e91f24769d2c74042e6b993724974",
-                "reference": "ba0e4ab23f2e91f24769d2c74042e6b993724974",
+                "url": "https://api.github.com/repos/websk/php-utils/zipball/1fe69ffbf539aa62aa536b1ac11b09759f41e71e",
+                "reference": "1fe69ffbf539aa62aa536b1ac11b09759f41e71e",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "ext-mbstring": "*",
-                "php": "^8.3",
-                "websk/php-config": "2.0.*"
+                "php": "^8.3"
             },
             "type": "library",
             "autoload": {
@@ -2931,22 +2929,22 @@
             "description": "PHP utils",
             "support": {
                 "issues": "https://github.com/websk/php-utils/issues",
-                "source": "https://github.com/websk/php-utils/tree/2.0.0"
+                "source": "https://github.com/websk/php-utils/tree/2.1.1"
             },
-            "time": "2024-08-08T07:42:18+00:00"
+            "time": "2025-03-25T05:39:40+00:00"
         },
         {
             "name": "websk/php-view",
-            "version": "2.2.1",
+            "version": "2.2.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/websk/php-view.git",
-                "reference": "f200ca2dadc29630c626519336ecb09df410a2f8"
+                "reference": "b3b450cc15802f16d27848bb77066251e7e26539"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/websk/php-view/zipball/f200ca2dadc29630c626519336ecb09df410a2f8",
-                "reference": "f200ca2dadc29630c626519336ecb09df410a2f8",
+                "url": "https://api.github.com/repos/websk/php-view/zipball/b3b450cc15802f16d27848bb77066251e7e26539",
+                "reference": "b3b450cc15802f16d27848bb77066251e7e26539",
                 "shasum": ""
             },
             "require": {
@@ -2955,7 +2953,7 @@
                 "slim/php-view": "3.4.*",
                 "websk/php-config": "2.0.*",
                 "websk/php-slim": "2.2.*",
-                "websk/php-utils": "2.0.*"
+                "websk/php-utils": "2.1.*"
             },
             "type": "library",
             "autoload": {
@@ -2966,9 +2964,9 @@
             "notification-url": "https://packagist.org/downloads/",
             "support": {
                 "issues": "https://github.com/websk/php-view/issues",
-                "source": "https://github.com/websk/php-view/tree/2.2.1"
+                "source": "https://github.com/websk/php-view/tree/2.2.2"
             },
-            "time": "2025-03-15T16:02:17+00:00"
+            "time": "2025-03-25T05:55:05+00:00"
         }
     ],
     "packages-dev": [],
