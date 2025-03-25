@@ -68,7 +68,7 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
      * @param string|null $input_name
      * @return string
      */
-    public function htmlForValue(string $field_value = null, string $input_name = null): string
+    public function htmlForValue(?string $field_value = null, ?string $input_name = null): string
     {
         $field_name = $this->getFieldName();
         $html = '';

@@ -91,7 +91,7 @@ class CRUDTable
     public function __construct(
         CRUD $crud,
         string $entity_class_name,
-        CRUDForm $create_form_obj = null,
+        ?CRUDForm $create_form_obj = null,
         array $column_obj_arr = [],
         array $filters_arr = [],
         string $order_by = '',

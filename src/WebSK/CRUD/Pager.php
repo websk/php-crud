@@ -169,7 +169,7 @@ class Pager
     public static function renderPager(
         ServerRequestInterface $request,
         string $table_index_on_page,
-        int $elements_count = null,
+        ?int $elements_count = null,
         bool $display_total_rows_count = false,
         int $total_rows_count = 0,
         int $default_page_size = CRUD::DEFAULT_PAGE_SIZE

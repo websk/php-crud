@@ -30,7 +30,7 @@ class CRUDTableWidgetTimestamp implements InterfaceCRUDTableWidget
      * @param string $format
      * @param \DateTimeZone|null $timezone
      */
-    public function __construct(string $timestamp, string $format = "Y-m-d H:i:s", $timezone = null)
+    public function __construct(string $timestamp, string $format = "Y-m-d H:i:s", ?\DateTimeZone $timezone = null)
     {
         $this->setTimestamp($timestamp);
         $this->setFormat($format);
