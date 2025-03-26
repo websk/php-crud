@@ -1,4 +1,4 @@
-# php-crud
+# WebSK php-crud
 
 ## Install
 
