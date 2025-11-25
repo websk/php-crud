@@ -312,7 +312,7 @@ class CRUD
             // чтение возможных NULL
             if (array_key_exists($prop_name . self::IS_NULL_POSTFIX, $post_fields_arr)) {
                 if ($post_fields_arr[$prop_name . self::IS_NULL_POSTFIX]) {
-                    $null_fields_arr[$prop_name] = 1;
+                    $null_fields_arr[] = $prop_name;
                     continue;
                 }
             }

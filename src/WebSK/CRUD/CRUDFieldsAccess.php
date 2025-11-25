@@ -106,8 +106,8 @@ class CRUDFieldsAccess
     {
         $reflect = new \ReflectionClass($entity_obj);
 
-        foreach ($values_arr as $key => $value) {
-            $property_obj = $reflect->getProperty($key);
+        foreach ($values_arr as $field_name => $value) {
+            $property_obj = $reflect->getProperty($field_name);
 
             if ($property_obj->getType()) {
                 settype($value, $property_obj->getType()->getName());
@@ -115,8 +115,8 @@ class CRUDFieldsAccess
             $property_obj->setValue($entity_obj, $value);
         }
 
-        foreach ($null_fields_arr as $key => $value) {
-            $property_obj = $reflect->getProperty($key);
+        foreach ($null_fields_arr as $field_name) {
+            $property_obj = $reflect->getProperty($field_name);
             $property_obj->setValue($entity_obj, null);
         }
     }

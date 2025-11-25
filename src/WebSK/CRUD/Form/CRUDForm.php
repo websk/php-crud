@@ -187,7 +187,13 @@ class CRUDForm
         $blank_entity_obj = new $entity_class_name();
         $blank_field_value = CRUDFieldsAccess::getObjectFieldValue($blank_entity_obj, $field_name);
 
-        CRUDFieldsAccess::setObjectFieldsFromArray($entity_obj, [$field_name => $blank_field_value]);
+        $null_fields_arr = [];
+        if (is_null($blank_field_value)) {
+            $null_fields_arr[] = $field_name;
+        }
+
+        CRUDFieldsAccess::setObjectFieldsFromArray($entity_obj, [$field_name => $blank_field_value], $null_fields_arr);
+
         $entity_service->save($entity_obj);
 
         return Response::responseWithJson($response, $json_arr);

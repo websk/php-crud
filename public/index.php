@@ -5,6 +5,7 @@ use Jgut\Slim\PHPDI\ContainerBuilder;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Factory\ServerRequestCreatorFactory;
 use WebSK\Config\ConfWrapper;
+use WebSK\CRUD\Demo\CRUDDemoApp;
 use WebSK\Slim\Facade;
 
 require '../vendor/autoload.php';
@@ -22,7 +23,7 @@ $container->set(ServerRequestInterface::class, function () {
 });
 ConfWrapper::setConfig($config['settings']);
 
-$app = new \WebSK\CRUD\Demo\CRUDDemoApp($container);
+$app = new CRUDDemoApp($container);
 
 Facade::setFacadeApplication($app);
 
