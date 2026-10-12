@@ -6,7 +6,6 @@ use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\CRUDOperations;
 use WebSK\Entity\InterfaceEntity;
 use WebSK\Entity\InterfaceWeight;
-use WebSK\Utils\Assert;
 use WebSK\CRUD\CRUD;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUDFieldsAccess;
@@ -21,6 +20,7 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
 {
     const string FORMFIELD_CONTEXT_FIELDS_NAME = 'context_field_names';
 
+    /** @var array<string, string|\Closure(InterfaceEntity): mixed> */
     protected array $context_fields_arr = [];
 
     protected string $button_text = '';
@@ -29,7 +29,7 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
 
     /**
      * CRUDTableWidgetWeight constructor.
-     * @param array $context_fields_arr
+     * @param array<string, string|\Closure(InterfaceEntity): mixed> $context_fields_arr
      * @param string $button_text
      * @param string $button_class_str
      */
@@ -46,15 +46,13 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        Assert::assert($entity_obj);
-
         $entity_class_name = get_class($entity_obj);
 
-        $interfaces_arr = class_implements($entity_class_name);
-        Assert::assert(
-            $interfaces_arr && in_array(InterfaceWeight::class, $interfaces_arr),
-            'Class ' . $entity_class_name . ' does not implement interface ' . InterfaceWeight::class
-        );
+        if (!$entity_obj instanceof InterfaceWeight) {
+            throw new \InvalidArgumentException(
+                'Class ' . $entity_class_name . ' does not implement interface ' . InterfaceWeight::class
+            );
+        }
 
         $content_html = '';
         $content_html .= '<form style="display: inline;" method="post">';
@@ -63,13 +61,16 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
             Sanitize::sanitizeAttrValue(implode(',', array_keys($this->getContextFieldsArr()))) . '">';
 
         foreach ($this->getContextFieldsArr() as $context_field_name => $context_field_value) {
-            $context_field_value = CRUDCompiler::fieldValueOrCallableResult($context_field_value, $entity_obj);
+            $context_field_value = CRUDCompiler::nullableString(
+                CRUDCompiler::fieldValueOrCallableResult($context_field_value, $entity_obj),
+                $context_field_name
+            );
             $content_html .= NullablePostFields::hiddenFieldHtml($context_field_name, $context_field_value);
         }
 
         $content_html .= '<input type="hidden" name="_class_name" value="' . Sanitize::sanitizeAttrValue(get_class($entity_obj)) . '">';
         $content_html .= '<input type="hidden" name="_id" value="' .
-            Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($entity_obj)) . '">';
+            Sanitize::sanitizeAttrValue((string) CRUDFieldsAccess::getObjId($entity_obj)) . '">';
 
         $content_html .= '<button class="' . $this->getButtonClassStr() . '" type="submit">' . $this->getButtonText() . '</button>';
 
@@ -79,7 +80,7 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @return array
+     * @return array<string, string|\Closure(InterfaceEntity): mixed>
      */
     public function getContextFieldsArr(): array
     {
@@ -87,7 +88,7 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @param array $context_fields_arr
+     * @param array<string, string|\Closure(InterfaceEntity): mixed> $context_fields_arr
      */
     public function setContextFieldsArr(array $context_fields_arr): void
     {

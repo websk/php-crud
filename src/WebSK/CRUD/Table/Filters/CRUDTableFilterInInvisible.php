@@ -13,12 +13,13 @@ class CRUDTableFilterInInvisible implements InterfaceCRUDTableFilterInvisible
 {
     protected string $field_name;
 
+    /** @var list<mixed> */
     protected array $filter_value_arr;
 
     /**
      * CRUDTableFilterInInvisible constructor.
      * @param string $field_name
-     * @param array $filter_value_arr
+     * @param list<mixed> $filter_value_arr
      */
     public function __construct(string $field_name, array $filter_value_arr)
     {
@@ -64,7 +65,7 @@ class CRUDTableFilterInInvisible implements InterfaceCRUDTableFilterInvisible
     }
 
     /**
-     * @return array
+     * @return list<mixed>
      */
     public function getFilterValueArr(): array
     {
@@ -72,7 +73,7 @@ class CRUDTableFilterInInvisible implements InterfaceCRUDTableFilterInvisible
     }
 
     /**
-     * @param array $filter_value_arr
+     * @param list<mixed> $filter_value_arr
      */
     public function setFilterValueArr(array $filter_value_arr): void
     {

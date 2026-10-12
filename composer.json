@@ -1,30 +1,74 @@
 {
   "name": "websk/php-crud",
   "description": "CRUD",
+  "license": "MIT",
   "require": {
     "php": "^8.3",
-    "slim/slim": "4.14.*",
-    "juliangut/slim-php-di": "3.4",
-    "doctrine/annotations": "1.13.2",
-    "websk/php-cache": "2.2.*",
-    "websk/php-config": "2.0.*",
-    "websk/php-db": "2.1.*",
-    "websk/php-filemanager": "2.0.*",
-    "websk/php-utils": "2.1.*",
-    "websk/php-entity": "2.2.*",
-    "websk/php-slim": "2.3.*",
-    "websk/php-view": "2.3.*",
+    "ext-fileinfo": "*",
     "ext-json": "*",
-    "ext-mbstring": "*"
+    "ext-mbstring": "*",
+    "ext-pdo": "*",
+    "juliangut/slim-php-di": "^4.2",
+    "slim/slim": "^4.15",
+    "websk/php-cache": "3.0.*",
+    "websk/php-config": "2.2.*",
+    "websk/php-db": "3.0.*",
+    "websk/php-entity": "3.0.*",
+    "websk/php-filemanager": "3.0.*",
+    "websk/php-slim": "2.4.*",
+    "websk/php-utils": "3.0.*",
+    "websk/php-view": "3.1.*"
+  },
+  "require-dev": {
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^12.5"
   },
   "autoload": {
-    "psr-0": {
-      "": "src/"
+    "psr-4": {
+      "WebSK\\": "src/WebSK/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "WebSK\\CRUD\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "lint": "find src tests config public views -name '*.php' -print0 | xargs -0 -n1 php -l",
+    "test": "php -d error_reporting=E_ALL vendor/bin/phpunit",
+    "phpstan": "php -d error_reporting=E_ALL vendor/bin/phpstan analyse --no-progress --debug",
+    "check": [
+      "@lint",
+      "@test",
+      "@phpstan"
+    ]
   },
   "config": {
     "allow-plugins": {
       "php-http/discovery": true
     }
+  },
+  "archive": {
+    "exclude": [
+      "/.ai",
+      "/.DS_Store",
+      "/.idea",
+      "/.phpunit.cache",
+      "/config/config.php",
+      "/dist",
+      "/node_modules",
+      "/public/assets",
+      "/public/files",
+      "/var/.DS_Store",
+      "/var/docker/.env",
+      "/var/docker/data",
+      "/var/docker/logs",
+      "/var/docker/nginx/rootCA-key.pem",
+      "/var/docker/nginx/rootCA.pem",
+      "/var/docker/nginx/ssl",
+      "/var/docker/nginx/sites/*.key",
+      "/var/docker/nginx/sites/*.pem",
+      "/vendor"
+    ]
   }
 }

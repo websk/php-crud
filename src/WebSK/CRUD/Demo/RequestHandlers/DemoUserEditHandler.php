@@ -2,11 +2,11 @@
 
 namespace WebSK\CRUD\Demo\RequestHandlers;
 
-use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Demo\DemoUser;
 use WebSK\CRUD\Demo\DemoUserService;
@@ -17,6 +17,7 @@ use WebSK\CRUD\Form\Widgets\CRUDFormWidgetReferenceAjax;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTextarea;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTimestamp;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetUpload;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Slim\RequestHandlers\BaseHandler;
 use WebSK\Views\BreadcrumbItemDTO;
 use WebSK\Views\LayoutDTO;
@@ -28,10 +29,10 @@ use WebSK\Views\PhpRender;
  */
 class DemoUserEditHandler extends BaseHandler
 {
-    /** @Inject */
+    #[\DI\Attribute\Inject]
     protected DemoUserService $demo_user_service;
 
-    /** @Inject */
+    #[\DI\Attribute\Inject]
     protected CRUD $crud_service;
 
     /**
@@ -44,10 +45,6 @@ class DemoUserEditHandler extends BaseHandler
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, int $demo_user_id): ResponseInterface
     {
         $demo_user_obj = $this->demo_user_service->getById($demo_user_id);
-
-        if (!$demo_user_obj) {
-            return $response->withStatus(StatusCodeInterface::STATUS_NOT_FOUND);
-        }
 
         $crud_form = $this->crud_service->createForm(
             'user_edit',
@@ -80,10 +77,13 @@ class DemoUserEditHandler extends BaseHandler
                         DemoUser::_PHOTO,
                         'files',
                         'images' . DIRECTORY_SEPARATOR . 'users',
-                        function(DemoUser $user_obj) {
+                        function(InterfaceEntity $user_obj): string {
+                            if (!$user_obj instanceof DemoUser) {
+                                throw new \InvalidArgumentException('Expected ' . DemoUser::class);
+                            }
                             return $user_obj->getPhoto() ? '/files/images/users/' . $user_obj->getPhoto() : '';
                         },
-                        $demo_user_obj->getId(),
+                        CRUDCompiler::entityId($demo_user_obj),
                         CRUDFormWidgetUpload::FILE_TYPE_IMAGE
                     )
                 )
@@ -107,6 +107,6 @@ class DemoUserEditHandler extends BaseHandler
         ];
         $layout_dto->setBreadcrumbsDtoArr($breadcrumbs_arr);
 
-        return PhpRender::renderLayout($response, ConfWrapper::value('layout.main'), $layout_dto);
+        return PhpRender::renderLayout($response, CRUDCompiler::string(ConfWrapper::value('layout.main'), 'layout.main'), $layout_dto);
     }
 }

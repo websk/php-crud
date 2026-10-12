@@ -6,6 +6,7 @@ use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\CRUDHtml;
 use WebSK\CRUD\CRUDOperations;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 use WebSK\Entity\InterfaceEntity;
@@ -48,7 +49,10 @@ class CRUDTableWidgetTextEditor implements InterfaceCRUDTableWidget
             echo '<input type="hidden" name="' . CRUDTable::FIELD_ENTITY_ID .
                 '" value="' . $entity_obj->getId() . '">';
             echo '<input type="text" name="' . CRUDTable::FIELD_FIELD_VALUE .
-                '" value="' .  CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName()) . '">';
+                '" value="' . CRUDCompiler::string(
+                    CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName()),
+                    $this->getFieldName()
+                ) . '">';
             echo '<button class="btn btn-xs btn-default glyphicon glyphicon-ok" type="submit"></button>';
         });
     }

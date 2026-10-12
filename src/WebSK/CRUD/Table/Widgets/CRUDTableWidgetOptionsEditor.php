@@ -6,6 +6,7 @@ use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
 use WebSK\CRUD\CRUDHtml;
 use WebSK\CRUD\CRUDOperations;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Table\CRUDTable;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 use WebSK\Entity\InterfaceEntity;
@@ -18,6 +19,7 @@ class CRUDTableWidgetOptionsEditor implements InterfaceCRUDTableWidget
 {
     protected string $field_name;
 
+    /** @var array<int|string, string> */
     protected array $options_arr;
 
     protected string $crudtable_id;
@@ -25,7 +27,7 @@ class CRUDTableWidgetOptionsEditor implements InterfaceCRUDTableWidget
     /**
      * CRUDTableWidgetOptionsEditor constructor.
      * @param string $field_name
-     * @param array $options_arr
+     * @param array<int|string, string> $options_arr
      * @param string $crudtable_id
      */
     public function __construct(string $field_name, array $options_arr, string $crudtable_id)
@@ -47,10 +49,16 @@ class CRUDTableWidgetOptionsEditor implements InterfaceCRUDTableWidget
                 'value="' . $this->getCrudtableId() . '">';
             echo '<input type="hidden" name="' . CRUDTable::FIELD_ENTITY_ID . '" value="' . $entity_obj->getId() . '">';
             echo '<input type="hidden" name="' . CRUDTable::FIELD_FIELD_VALUE . '" '.
-                'value="' .  CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName()) . '">';
+                'value="' . CRUDCompiler::string(
+                    CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName()),
+                    $this->getFieldName()
+                ) . '">';
 
             $options_arr = $this->getOptionsArr();
-            $obj_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName());
+            $obj_value = CRUDCompiler::nullableString(
+                CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName()),
+                $this->getFieldName()
+            );
             foreach ($options_arr as $value => $option_name) {
                 $active = '';
                 if ($value == $obj_value) {
@@ -80,7 +88,7 @@ class CRUDTableWidgetOptionsEditor implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @return array
+     * @return array<int|string, string>
      */
     public function getOptionsArr(): array
     {
@@ -88,7 +96,7 @@ class CRUDTableWidgetOptionsEditor implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @param array $options_arr
+     * @param array<int|string, string> $options_arr
      */
     public function setOptionsArr(array $options_arr): void
     {

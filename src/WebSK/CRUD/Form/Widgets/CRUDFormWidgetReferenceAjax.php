@@ -2,6 +2,7 @@
 
 namespace WebSK\CRUD\Form\Widgets;
 
+use Closure;
 use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\CRUDPreloader;
 use WebSK\Entity\InterfaceEntity;
@@ -22,10 +23,11 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
 
     protected string $ajax_action_url;
 
+    /** @var class-string<InterfaceEntity> */
     protected string $referenced_class_name;
 
-    /** @var string|Closure */
-    protected $referenced_class_title_field;
+    /** @var string|Closure(InterfaceEntity): mixed */
+    protected string|Closure $referenced_class_title_field;
 
     protected ?string $editor_url;
 
@@ -34,8 +36,8 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     /**
      * CRUDFormWidgetReferenceAjax constructor.
      * @param string $field_name
-     * @param string $referenced_class_name
-     * @param string|Closure $referenced_class_title_field
+     * @param class-string<InterfaceEntity> $referenced_class_name
+     * @param string|Closure(InterfaceEntity): mixed $referenced_class_title_field
      * @param string $ajax_action_url
      * @param null|string $editor_url
      * @param bool $is_required
@@ -43,7 +45,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     public function __construct(
         string $field_name,
         string $referenced_class_name,
-        $referenced_class_title_field,
+        string|Closure $referenced_class_title_field,
         string $ajax_action_url,
         ?string $editor_url = null,
         bool $is_required = false
@@ -83,15 +85,24 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         }
 
         if (!is_null($field_value)) {
-            if (CRUDCompiler::isClosure($referenced_class_title_field)) {
-                $referenced_obj_title = $referenced_class_title_field($entity_obj);
+            if ($referenced_class_title_field instanceof Closure) {
+                $title = $referenced_class_title_field($entity_obj);
             } else {
-                $referenced_obj = $crud->createAndLoadObject($referenced_class_name, $field_value);
-                $referenced_obj_title = CRUDFieldsAccess::getObjectFieldValue(
+                $referenced_id = filter_var($field_value, FILTER_VALIDATE_INT);
+                if ($referenced_id === false) {
+                    throw new \UnexpectedValueException('Referenced entity ID must be an integer');
+                }
+                $referenced_obj = $crud->createAndLoadObject($referenced_class_name, $referenced_id);
+                $title = CRUDFieldsAccess::getObjectFieldValue(
                     $referenced_obj,
                     $referenced_class_title_field
                 );
             }
+
+            if (!is_scalar($title) && $title !== null) {
+                throw new \UnexpectedValueException('Referenced entity title must be scalar or null');
+            }
+            $referenced_obj_title = (string) $title;
 
             $disabled_btn_link = '';
         }
@@ -108,7 +119,8 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         $choose_form_element_id = 'collapse_' . rand(1, 999999);
 
         $html .= '<input type="hidden" id="' . Sanitize::sanitizeAttrValue($select_element_id) . '" ' .
-            'name="' . Sanitize::sanitizeAttrValue($input_name) . '" value="' . $field_value . '" ' .
+            'name="' . Sanitize::sanitizeAttrValue($input_name) . '" value="' .
+            Sanitize::sanitizeAttrValue(is_scalar($field_value) ? (string) $field_value : '') . '" ' .
             'data-field="' . Sanitize::sanitizeAttrValue($select_element_id) . '_text" ' . $is_required_str . '/>';
         $html .= '<input type="hidden" id="' . Sanitize::sanitizeAttrValue($select_element_id) . '_is_null" ' .
             'name="' . Sanitize::sanitizeAttrValue($input_name) . '___is_null" value="' . $is_null_value . '"/>';
@@ -189,7 +201,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         </script>
 
         <?php
-        $html .= ob_get_clean();
+        $html .= ob_get_clean() ?: '';
 
         return $html;
     }
@@ -200,7 +212,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
      * @param string $contents_html
      * @return string
      */
-    protected static function modal($modal_element_id, $title, $contents_html = ''): string
+    protected static function modal(string $modal_element_id, string $title, string $contents_html = ''): string
     {
         $html = '<div class="modal fade" id="' . $modal_element_id . '" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
 		<div class="modal-dialog" role="document">
@@ -252,7 +264,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return string
+     * @return class-string<InterfaceEntity>
      */
     public function getReferencedClassName(): string
     {
@@ -260,7 +272,7 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @param string $referenced_class_name
+     * @param class-string<InterfaceEntity> $referenced_class_name
      */
     public function setReferencedClassName(string $referenced_class_name): void
     {
@@ -268,17 +280,17 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return string|Closure
+     * @return string|Closure(InterfaceEntity): mixed
      */
-    public function getReferencedClassTitleField(): string
+    public function getReferencedClassTitleField(): string|Closure
     {
         return $this->referenced_class_title_field;
     }
 
     /**
-     * @param string|Closure $referenced_class_title_field
+     * @param string|Closure(InterfaceEntity): mixed $referenced_class_title_field
      */
-    public function setReferencedClassTitleField($referenced_class_title_field): void
+    public function setReferencedClassTitleField(string|Closure $referenced_class_title_field): void
     {
         $this->referenced_class_title_field = $referenced_class_title_field;
     }

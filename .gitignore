@@ -5,3 +5,7 @@ public/files
 public/assets
 vendor/
 .ai
+.DS_Store
+**/.DS_Store
+/.phpunit.cache/
+/dist/

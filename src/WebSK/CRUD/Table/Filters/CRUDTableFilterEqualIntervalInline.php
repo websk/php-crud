@@ -4,6 +4,7 @@ namespace WebSK\CRUD\Table\Filters;
 
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDHtml;
+use WebSK\CRUD\RequestParams;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -51,8 +52,8 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
         $placeholder_values_arr = [];
 
         // для этого виджета галка включения не выводится: если в поле пустая строка - он игрорируется
-        $value_start = $request->getParam($this->getFilterStartUniqId(), '');
-        $value_end = $request->getParam($this->getFilterEndUniqId(), '');
+        $value_start = RequestParams::queryString($request, $this->getFilterStartUniqId());
+        $value_end = RequestParams::queryString($request, $this->getFilterEndUniqId());
 
         $column_name = $this->getFieldName();
         $column_name = preg_replace("/[^a-zA-Z0-9_]+/", "", $column_name);
@@ -81,7 +82,7 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterStartUniqId(),
             'id' => $this->getFilterStartUniqId(),
-            'value' => $request->getParam($this->getFilterStartUniqId(), '')
+            'value' => RequestParams::queryString($request, $this->getFilterStartUniqId())
         ], '');
 
         $html .= ' по ';
@@ -89,7 +90,7 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterEndUniqId(),
             'id' => $this->getFilterEndUniqId(),
-            'value' => $request->getParam($this->getFilterEndUniqId(), '')
+            'value' => RequestParams::queryString($request, $this->getFilterEndUniqId())
         ], '');
 
         ob_start();

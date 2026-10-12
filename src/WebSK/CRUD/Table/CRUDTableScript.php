@@ -16,7 +16,7 @@ class CRUDTableScript
      * @param string $table_class
      * @param string $query_url
      */
-    public static function render(string $table_class, string $query_url)
+    public static function render(string $table_class, string $query_url): void
     {
         static $include_script;
 
@@ -255,6 +255,6 @@ class CRUDTableScript
         ob_start();
         self::render($table_class, $query_url);
 
-        return ob_get_clean();
+        return ob_get_clean() ?: '';
     }
 }

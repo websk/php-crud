@@ -6,6 +6,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Form\CRUDFormRow;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
@@ -30,7 +31,7 @@ class DemoCompanyListHandler extends BaseHandler
 {
     const string FILTER_NAME = 'demo_company_name';
 
-    /** @Inject */
+    #[\DI\Attribute\Inject]
     protected CRUD $crud_service;
 
     /**
@@ -48,8 +49,10 @@ class DemoCompanyListHandler extends BaseHandler
                 [
                     new CRUDFormRow('Название компании', new CRUDFormWidgetInput(DemoCompany::_NAME, false, true)),
                 ],
-                function(DemoCompany $demo_company_obj) {
-                    return Router::urlFor(DemoCompanyEditHandler::class, ['demo_company_id' => $demo_company_obj->getId()]);
+                function(\WebSK\Entity\InterfaceEntity $demo_company_obj): string {
+                    return Router::urlFor(DemoCompanyEditHandler::class, [
+                        'demo_company_id' => CRUDCompiler::entityId($demo_company_obj)
+                    ]);
                 }
             ),
             [
@@ -58,8 +61,10 @@ class DemoCompanyListHandler extends BaseHandler
                     'Имя',
                     new CRUDTableWidgetTextWithLink(
                         DemoCompany::_NAME,
-                        function(DemoCompany $demo_company_obj) {
-                            return Router::urlFor(DemoCompanyEditHandler::class, ['demo_company_id' => $demo_company_obj->getId()]);
+                        function(\WebSK\Entity\InterfaceEntity $demo_company_obj): string {
+                            return Router::urlFor(DemoCompanyEditHandler::class, [
+                                'demo_company_id' => CRUDCompiler::entityId($demo_company_obj)
+                            ]);
                         }
                     )
                 ),
@@ -93,6 +98,6 @@ class DemoCompanyListHandler extends BaseHandler
         ];
         $layout_dto->setBreadcrumbsDtoArr($breadcrumbs_arr);
 
-        return PhpRender::renderLayout($response, ConfWrapper::value('layout.main'), $layout_dto);
+        return PhpRender::renderLayout($response, CRUDCompiler::string(ConfWrapper::value('layout.main'), 'layout.main'), $layout_dto);
     }
 }

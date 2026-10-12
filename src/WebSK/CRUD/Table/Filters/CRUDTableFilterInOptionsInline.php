@@ -4,6 +4,7 @@ namespace WebSK\CRUD\Table\Filters;
 
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDHtml;
+use WebSK\CRUD\RequestParams;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 use WebSK\Utils\Sanitize;
 
@@ -21,8 +22,10 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
 
     protected bool $initial_is_enabled = false;
 
+    /** @var list<string> */
     protected array $initial_value = [];
 
+    /** @var array<string, list<string>> */
     protected array $options_arr;
 
     protected bool $show_null_checkbox = false;
@@ -34,9 +37,9 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
      * @param string $filter_uniq_id
      * @param string $title
      * @param string $field_name
-     * @param array $options_arr
+     * @param array<string, list<string>> $options_arr
      * @param bool $initial_is_enabled
-     * @param array $initial_value
+     * @param list<string> $initial_value
      * @param bool $show_null_checkbox
      * @param string $btn_all_text
      */
@@ -69,7 +72,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
      */
     public function useValuesFromForm(ServerRequestInterface $request): bool
     {
-        $value = $request->getParam($this->filterIsPassedInputName(), null);
+        $value = \WebSK\CRUD\RequestParams::query($request, $this->filterIsPassedInputName(), null);
 
         if (is_null($value)) {
             return false;
@@ -88,7 +91,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
 
     /**
      * @param ServerRequestInterface $request
-     * @return null|array
+     * @return null|list<string>
      */
     public function getValue(ServerRequestInterface $request): ?array
     {
@@ -96,8 +99,8 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
             return $this->getInitialValue();
         }
 
-        $value = (array)$request->getParam($this->getFilterUniqId(), []);
-        $is_null = $request->getParam($this->nullCheckboxInputName(), '');
+        $value = RequestParams::queryStringList($request, $this->getFilterUniqId());
+        $is_null = RequestParams::queryString($request, $this->nullCheckboxInputName());
 
         if ($is_null != '') {
             $value = null;
@@ -138,7 +141,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
             echo '<span onclick="f' . $input_name . '_changeFiltres(this);" class="btn btn-xs btn-default ' .
                 ($this->isEnabled($request) ? '' : 'active') . '">' . $this->getBtnAllText() . '</span>';
 
-            $value_arr = $this->isEnabled($request) ? $this->getValue($request) : [];
+            $value_arr = $this->isEnabled($request) ? ($this->getValue($request) ?? []) : [];
             foreach ($value_arr as $value) {
                 echo '<input type="hidden" name="' . $input_name . '[]" ' . 'value="' . Sanitize::sanitizeAttrValue($value) . '">';
             }
@@ -203,7 +206,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
             return $this->isInitialIsEnabled();
         }
 
-        $is_enabled_from_form = $request->getParam($this->enabledCheckboxInputName(), '');
+        $is_enabled_from_form = \WebSK\CRUD\RequestParams::query($request, $this->enabledCheckboxInputName(), '');
 
         if ($is_enabled_from_form != '') {
             return true;
@@ -299,7 +302,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
     }
 
     /**
-     * @return array
+     * @return list<string>
      */
     public function getInitialValue(): array
     {
@@ -307,7 +310,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
     }
 
     /**
-     * @param array $initial_value
+     * @param list<string> $initial_value
      */
     public function setInitialValue(array $initial_value): void
     {
@@ -315,7 +318,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
     }
 
     /**
-     * @return array
+     * @return array<string, list<string>>
      */
     public function getOptionsArr(): array
     {
@@ -323,7 +326,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
     }
 
     /**
-     * @param array $options_arr
+     * @param array<string, list<string>> $options_arr
      */
     public function setOptionsArr(array $options_arr): void
     {

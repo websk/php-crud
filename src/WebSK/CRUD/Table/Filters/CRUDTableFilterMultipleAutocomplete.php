@@ -5,6 +5,7 @@ namespace WebSK\CRUD\Table\Filters;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 use WebSK\Utils\Sanitize;
+use WebSK\CRUD\RequestParams;
 
 /**
  * Class CRUDTableFilterMultipleAutocomplete
@@ -72,10 +73,9 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
         $placeholder_values_arr = [];
         $where = '';
 
-        $value = $request->getParam($this->getFilterUniqId(), '');
+        $value = RequestParams::queryStringList($request, $this->getFilterUniqId());
 
-        if ($value != '') {
-            if (count($value) > 0) {
+        if ($value !== []) {
                 $column_name = $this->getFieldName();
                 $column_name = preg_replace("/[^a-zA-Z0-9_]+/", "", $column_name);
 
@@ -85,7 +85,6 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
                     $placeholder_values_arr[] = $val;
                 }
                 $where = $column_name . " IN (" . implode(',', $in_arr) . ")";
-            }
         }
 
         return [$where, $placeholder_values_arr];
@@ -112,10 +111,11 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
         $config['input_id'] = $input_id;
         $config['ajax_url'] = $this->getRemoteDataSourceUrl();
         $config['field_value_name'] = $this->getReferenceFilterValue();
-        if ($request->getParam($this->getFieldName())) {
+        $selected_values = RequestParams::queryStringList($request, $this->getFieldName());
+        if ($selected_values !== []) {
             $config['field_value_val'] = implode(
                 CRUDTableFilterInVisible::DEFAULT_SEPARATOR,
-                $request->getParam($this->getFieldName())
+                $selected_values
             );
         }
         $config['field_text_name'] = $this->getReferenceFilterText();

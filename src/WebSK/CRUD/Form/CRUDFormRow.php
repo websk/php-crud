@@ -35,9 +35,7 @@ class CRUDFormRow implements InterfaceCRUDFormRow
     {
         $html = '';
 
-        $required = false; // TODO
-
-        $html .= '<div class="form-group ' . ($required ? 'required' : '') . '">';
+        $html .= '<div class="form-group">';
         $html .= '<label class="col-sm-4 text-right control-label">' . $this->getTitle() . '</label>';
 
         $html .= '<div class="col-sm-8">';

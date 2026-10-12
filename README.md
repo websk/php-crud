@@ -1,88 +1,118 @@
 # WebSK php-crud
 
+CRUD forms, tables, filters and widgets for WebSK applications based on Slim 4 and PHP-DI.
+
+## Requirements
+
+- PHP 8.3 or newer, including PHP 8.5
+- Composer 2
+- PHP extensions: `fileinfo`, `json`, `mbstring`, `pdo`
+
 ## Install
 
 https://packagist.org/packages/websk/php-crud
 
-install dependency using Composer
+Install the package with Composer:
 
 ```shell
 composer require websk/php-crud
 ```
 
 ## Config
-* CRUD no special configs
+
+CRUD requires no package-specific configuration. Register `CRUDServiceProvider` in a mutable PSR-11 container. PHP-DI 7 applications can use `MutableContainerAdapter` while registering legacy WebSK service providers.
+
+## Development
+
+Run all PHP checks with:
+
+```shell
+composer check
+```
+
+This command runs syntax checks, PHPUnit and PHPStan at level `max`.
+
+Build static demo assets with:
+
+```shell
+npm ci
+npm run build
+```
 
 ## Demo
 
-* Установить mkcert, https://github.com/FiloSottile/mkcert
+* Install [mkcert](https://github.com/FiloSottile/mkcert).
 
-* Выполнить:
+* Initialize its local CA:
   ```shell
   mkcert --install
   ```
 
-* Сделать самоподписанный сертификат для `php-crud.devbox`:
+* Create a local certificate for `php-crud.devbox`:
 
   ```shell
   mkcert php-crud.devbox
   ```
 
-* Скопировать полученные файлы _wildcard.php-crud.devbox.pem и _wildcard.php-crud.devbox.pem в `var/docker/nginx/sites`
+* Copy the generated certificate and key to `var/docker/nginx/sites` using the names referenced by the nginx configuration.
 
-* Прописать в `/etc/hosts` или аналог в Windows `%WINDIR%\System32\drivers\etc\hosts`
+* Add the host to `/etc/hosts`, or `%WINDIR%\System32\drivers\etc\hosts` on Windows:
 
     ```
     127.0.0.1 php-crud.devbox
     ```
 
-* Создаем локальный конфиг, при необходимости вносим изменения:
+* Create the local application configuration and adjust it if needed:
 
   ```shell
   cp config/config.example.php config/config.php
   ```
 
-* Заходим в директорию с docker-compose:
+* Enter the Docker directory:
 
   ```shell
   cd var/docker
   ```
 
-* Создаем локальный env файл, при необходимости вносим изменения:
+* Create the local environment file and adjust it if needed:
 
   ```shell
   cp .example.env .env
   ```
 
-* Собираем и запускаем докер-контейнеры:
+* Build and start the containers. The PHP-FPM image uses PHP 8.5:
 
   ```shell
   docker compose up -d --build
   ```
 
-* Устанавливаем зависимости для проекта
+* Install project dependencies:
 
   ```shell
   docker compose exec php-fpm composer install
   ```
 
-* Выполняем миграции БД
+* Run database migrations:
 
   ```shell
   docker compose exec php-fpm php vendor/bin/websk_db_migration.php migrations:migration_auto
   ```
   
-  or run handle process migration:
+  Or run migrations interactively:
 
   ```shell
   docker compose exec php-fpm php vendor/bin/websk_db_migration.php migrations:migration_handle
   ```
 
-* Install static
+* Build static assets:
 
   ```shell
-  npm install
+  npm ci
   npm run build
   ```
 
-* open `https://php-crud.devbox`
+* Open `https://php-crud.devbox`.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).

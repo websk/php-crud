@@ -17,4 +17,6 @@ interface InterfaceCRUDTableColumn
      * @return InterfaceCRUDTableWidget
      */
     public function getWidgetObj(): InterfaceCRUDTableWidget;
+
+    public function getFieldName(): ?string;
 }

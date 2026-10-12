@@ -4,6 +4,7 @@ namespace WebSK\CRUD\Table\Filters;
 
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDHtml;
+use WebSK\CRUD\RequestParams;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
@@ -27,6 +28,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
 
     protected string $initial_value = '';
 
+    /** @var array<int|string, string> */
     protected array $options_arr;
 
     protected bool $show_null_checkbox = false;
@@ -38,7 +40,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
      * @param string $filter_uniq_id
      * @param string $title
      * @param string $field_name
-     * @param array $options_arr
+     * @param array<int|string, string> $options_arr
      * @param bool $initial_is_enabled
      * @param string $initial_value
      * @param bool $show_null_checkbox
@@ -72,7 +74,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
      */
     public function useValuesFromForm(ServerRequestInterface $request): bool
     {
-        $value = $request->getParam($this->filterIsPassedInputName(), null);
+        $value = \WebSK\CRUD\RequestParams::query($request, $this->filterIsPassedInputName(), null);
 
         if (is_null($value)) {
             return false;
@@ -99,8 +101,8 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
             return $this->getInitialValue();
         }
 
-        $value = $request->getParam($this->getFilterUniqId(), '');
-        $is_null = $request->getParam($this->nullCheckboxInputName(), '');
+        $value = RequestParams::queryString($request, $this->getFilterUniqId());
+        $is_null = RequestParams::queryString($request, $this->nullCheckboxInputName());
 
         if ($is_null != '') {
             $value = null;
@@ -142,7 +144,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
                 ($this->isEnabled($request) ? '' : 'active') . '">' . $this->getBtnAllText() . '</span>';
 
             echo '<input type="hidden" name="' . $input_name . '" ' .
-                'value="' . ($this->isEnabled($request) ? $this->getValue($request) : '') . '">';
+                'value="' . ($this->isEnabled($request) ? ($this->getValue($request) ?? '') : '') . '">';
             $options_arr = $this->getOptionsArr();
             foreach ($options_arr as $value => $title) {
                 echo '<span data-value="' . $value . '" data-enabled="1" ' .
@@ -200,7 +202,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
             return $this->isInitialIsEnabled();
         }
 
-        $is_enabled_from_form = $request->getParam($this->enabledCheckboxInputName(), '');
+        $is_enabled_from_form = \WebSK\CRUD\RequestParams::query($request, $this->enabledCheckboxInputName(), '');
 
         if ($is_enabled_from_form != '') {
             return true;
@@ -307,7 +309,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
     }
 
     /**
-     * @return array
+     * @return array<int|string, string>
      */
     public function getOptionsArr(): array
     {
@@ -315,7 +317,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
     }
 
     /**
-     * @param array $options_arr
+     * @param array<int|string, string> $options_arr
      */
     public function setOptionsArr(array $options_arr): void
     {

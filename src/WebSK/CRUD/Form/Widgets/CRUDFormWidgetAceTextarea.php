@@ -6,6 +6,7 @@ use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
 
 /**
@@ -62,6 +63,7 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
 
         $field_name = $this->getFieldName();
         $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
+        $field_value = CRUDCompiler::nullableString($field_value, $field_name);
 
         $html = '';
 

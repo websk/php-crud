@@ -6,6 +6,7 @@ use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
 
 /**
@@ -16,6 +17,7 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
 {
     protected string $field_name;
 
+    /** @var array<int|string, string> */
     protected array $options_arr;
 
     protected bool $show_null_checkbox = false;
@@ -27,7 +29,7 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
     /**
      * CRUDFormWidgetRadios constructor.
      * @param string $field_name
-     * @param array $options_arr
+     * @param array<int|string, string> $options_arr
      * @param bool $show_null_checkbox
      * @param bool $is_required
      * @param bool $disabled
@@ -58,7 +60,7 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
         $field_name = $this->getFieldName();
         $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
-        return $this->htmlForValue($field_value);
+        return $this->htmlForValue(CRUDCompiler::nullableString($field_value, $field_name));
     }
 
     /**
@@ -98,7 +100,7 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
             }
 
             $html .= '<label class="radio-inline"><input type="radio" name="' .
-                Sanitize::sanitizeAttrValue($input_name) . '" value="' . Sanitize::sanitizeAttrValue($value) . '" ' .
+                Sanitize::sanitizeAttrValue($input_name) . '" value="' . Sanitize::sanitizeAttrValue((string) $value) . '" ' .
                 $selected_html_attr . ' ' . $is_required_str . ' ' . $disabled . '> ' . Sanitize::sanitizeTagContent($title) . '</label>';
         }
 
@@ -130,7 +132,7 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
                 })();
             </script>
             <?php
-            $html .= ob_get_clean();
+            $html .= ob_get_clean() ?: '';
         }
 
         $html .= '</div>';
@@ -155,7 +157,7 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return array
+     * @return array<int|string, string>
      */
     public function getOptionsArr(): array
     {
@@ -163,7 +165,7 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @param array $options_arr
+     * @param array<int|string, string> $options_arr
      */
     public function setOptionsArr(array $options_arr): void
     {

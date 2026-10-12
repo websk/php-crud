@@ -126,7 +126,7 @@ class CRUDFormScript
     {
         ob_start();
         self::render($form_id);
-        return ob_get_clean();
+        return ob_get_clean() ?: '';
     }
 
     /**

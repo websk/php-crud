@@ -4,6 +4,7 @@ namespace WebSK\CRUD\Table\Filters;
 
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDHtml;
+use WebSK\CRUD\RequestParams;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -41,7 +42,7 @@ class CRUDTableFilterLikeInline implements InterfaceCRUDTableFilterVisible
         $where = '';
         $placeholder_values_arr = [];
 
-        $value = $request->getParam($this->getFilterUniqId(), '');
+        $value = RequestParams::queryString($request, $this->getFilterUniqId());
 
         $column_name = $this->getFieldName();
         $column_name = preg_replace("/[^a-zA-Z0-9_]+/", "", $column_name);
@@ -62,7 +63,7 @@ class CRUDTableFilterLikeInline implements InterfaceCRUDTableFilterVisible
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterUniqId(),
             'id' => $this->getFilterUniqId(),
-            'value' => $request->getParam($this->getFilterUniqId(), ''),
+            'value' => RequestParams::queryString($request, $this->getFilterUniqId()),
             'class' => 'form-control'
         ], '');
 

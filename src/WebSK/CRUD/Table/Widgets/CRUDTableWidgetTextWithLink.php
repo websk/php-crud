@@ -53,9 +53,15 @@ class CRUDTableWidgetTextWithLink implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        $url = CRUDCompiler::fieldValueOrCallableResult($this->getLink(), $entity_obj);
+        $url = CRUDCompiler::string(
+            CRUDCompiler::fieldValueOrCallableResult($this->getLink(), $entity_obj),
+            'Link URL'
+        );
 
-        $text = CRUDCompiler::fieldValueOrCallableResult($this->getText(), $entity_obj);
+        $text = CRUDCompiler::string(
+            CRUDCompiler::fieldValueOrCallableResult($this->getText(), $entity_obj),
+            'Link text'
+        );
         if (trim($text) == '') {
             $text = '#EMPTY#';
         }

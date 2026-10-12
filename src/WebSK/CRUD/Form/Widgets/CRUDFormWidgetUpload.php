@@ -28,8 +28,8 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
     protected string $target_folder;
 
-    /** @var string|Closure */
-    protected $url;
+    /** @var string|Closure(InterfaceEntity): mixed */
+    protected string|Closure $url;
 
     protected string $save_as = '';
 
@@ -39,6 +39,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
     protected int $max_file_size = self::DEFAULT_MAX_FILE_SIZE;
 
+    /** @var list<string> */
     protected array $allowed_extensions = [];
 
     /**
@@ -46,10 +47,10 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
      * @param string $field_name
      * @param string $storage
      * @param string $target_folder
-     * @param string|Closure $url
+     * @param string|Closure(InterfaceEntity): mixed $url
      * @param string $save_as
      * @param string $file_type
-     * @param array $allowed_extensions
+     * @param list<string> $allowed_extensions
      * @param int $max_file_size
      * @param string $form_action_url
      */
@@ -57,7 +58,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         string $field_name,
         string $storage,
         string $target_folder,
-        $url,
+        string|Closure $url,
         string $save_as = '',
         string $file_type = '',
         array $allowed_extensions = [],
@@ -88,10 +89,14 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
         $field_name = $this->getFieldName();
         $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
+        $field_value = CRUDCompiler::nullableString($field_value, $field_name);
 
         $element_id = 'fileupload_' . Sanitize::sanitizeAttrValue($field_name) . '_' . rand(1, 999999);
 
-        $file_url = CRUDCompiler::fieldValueOrCallableResult($this->getUrl(), $entity_obj);
+        $file_url = CRUDCompiler::string(
+            CRUDCompiler::fieldValueOrCallableResult($this->getUrl(), $entity_obj),
+            'File URL'
+        );
 
         $content_html = '';
 
@@ -269,7 +274,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
             });
         </script>
         <?php
-        $content_html .= ob_get_clean();
+        $content_html .= ob_get_clean() ?: '';
 
         return $content_html;
     }
@@ -323,17 +328,17 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return Closure|string
+     * @return string|Closure(InterfaceEntity): mixed
      */
-    public function getUrl()
+    public function getUrl(): string|Closure
     {
         return $this->url;
     }
 
     /**
-     * @param Closure|string $url
+     * @param string|Closure(InterfaceEntity): mixed $url
      */
-    public function setUrl($url): void
+    public function setUrl(string|Closure $url): void
     {
         $this->url = $url;
     }
@@ -371,7 +376,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return array
+     * @return list<string>
      */
     public function getAllowedExtensions(): array
     {
@@ -379,7 +384,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @param array $allowed_extensions
+     * @param list<string> $allowed_extensions
      */
     public function setAllowedExtensions(array $allowed_extensions): void
     {
@@ -403,17 +408,17 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getSaveAs()
+    public function getSaveAs(): string
     {
         return $this->save_as;
     }
 
     /**
-     * @param mixed $save_as
+     * @param string $save_as
      */
-    public function setSaveAs($save_as): void
+    public function setSaveAs(string $save_as): void
     {
         $this->save_as = $save_as;
     }

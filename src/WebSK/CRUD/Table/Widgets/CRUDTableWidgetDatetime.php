@@ -34,7 +34,10 @@ class CRUDTableWidgetDatetime implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        $datetime = CRUDCompiler::fieldValueOrCallableResult($this->getDatetime(), $entity_obj);
+        $datetime = CRUDCompiler::string(
+            CRUDCompiler::fieldValueOrCallableResult($this->getDatetime(), $entity_obj),
+            'Datetime'
+        );
         $date_obj = new \DateTime($datetime);
         $date = $date_obj->format($this->getFormat());
 

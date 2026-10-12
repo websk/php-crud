@@ -18,12 +18,13 @@ class CRUDTableWidgetOptions implements InterfaceCRUDTableWidget
     /** @var string|Closure */
     protected $value;
 
+    /** @var array<int|string, string> */
     protected array $options_arr;
 
     /**
      * CRUDTableWidgetOptions constructor.
      * @param string $value
-     * @param array $options_arr
+     * @param array<int|string, string> $options_arr
      */
     public function __construct(string $value, array $options_arr)
     {
@@ -38,6 +39,9 @@ class CRUDTableWidgetOptions implements InterfaceCRUDTableWidget
 
         if (is_bool($value)) {
             $value = (int)$value;
+        }
+        if (!is_int($value) && !is_string($value)) {
+            throw new \UnexpectedValueException('Option value must be an integer or string');
         }
 
         $html = '';
@@ -65,7 +69,7 @@ class CRUDTableWidgetOptions implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @return array
+     * @return array<int|string, string>
      */
     public function getOptionsArr(): array
     {
@@ -73,7 +77,7 @@ class CRUDTableWidgetOptions implements InterfaceCRUDTableWidget
     }
 
     /**
-     * @param array $options_arr
+     * @param array<int|string, string> $options_arr
      */
     public function setOptionsArr(array $options_arr): void
     {

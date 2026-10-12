@@ -5,7 +5,7 @@ namespace WebSK\CRUD\Table;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
-use WebSK\Utils\Assert;
+use WebSK\Entity\InterfaceEntity;
 
 /**
  * Class CRUDTableJSON
@@ -20,10 +20,13 @@ class CRUDTableJSON
 
     protected CRUD $crud;
 
+    /** @var class-string<InterfaceEntity> */
     protected string $entity_class_name;
 
+    /** @var list<InterfaceCRUDTableColumn> */
     protected array $column_obj_arr;
 
+    /** @var list<InterfaceCRUDTableFilter> */
     protected array $filters_arr;
 
     protected string $order_by = '';
@@ -31,9 +34,9 @@ class CRUDTableJSON
     /**
      * CRUDTable constructor.
      * @param CRUD $crud
-     * @param string $entity_class_name
-     * @param InterfaceCRUDTableColumn[] $column_obj_arr
-     * @param InterfaceCRUDTableFilter[] $filters_arr
+     * @param class-string<InterfaceEntity> $entity_class_name
+     * @param list<InterfaceCRUDTableColumn> $column_obj_arr
+     * @param list<InterfaceCRUDTableFilter> $filters_arr
      * @param string $order_by
      */
     public function __construct(
@@ -53,7 +56,7 @@ class CRUDTableJSON
     /**
      * @param ServerRequestInterface $request
      */
-    public function json(ServerRequestInterface $request)
+    public function json(ServerRequestInterface $request): string
     {
         $data_arr = [];
 
@@ -67,14 +70,9 @@ class CRUDTableJSON
 
         foreach ($objs_ids_arr as $obj_id) {
             $entity_obj = $this->crud->createAndLoadObject($this->entity_class_name, $obj_id);
+            /** @var array<string, mixed> $data_item */
             $data_item = [];
             foreach ($this->column_obj_arr as $column_obj) {
-                Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
-
-                $widget_obj = $column_obj->getWidgetObj();
-                Assert::assert($widget_obj);
-                Assert::assert($widget_obj instanceof InterfaceCRUDTableWidget);
-
                 $field_name = $column_obj->getFieldName();
                 if (!$field_name) {
                     continue;
@@ -88,6 +86,6 @@ class CRUDTableJSON
             $data_arr[] = $data_item;
         }
 
-        return json_encode($data_arr);
+        return json_encode($data_arr, JSON_THROW_ON_ERROR);
     }
 }

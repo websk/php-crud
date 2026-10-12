@@ -58,7 +58,7 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
         $content_html .= '<input type="hidden" name="' . self::FIELD_CLASS_NAME . '" ' .
             'value="' . Sanitize::sanitizeAttrValue(get_class($entity_obj)) . '">';
         $content_html .= '<input type="hidden" name="' . self::FIELD_OBJECT_ID . '" ' .
-            'value="' . Sanitize::sanitizeAttrValue(CRUDFieldsAccess::getObjId($entity_obj)) . '">';
+            'value="' . Sanitize::sanitizeAttrValue((string) CRUDFieldsAccess::getObjId($entity_obj)) . '">';
 
         if ($this->getRedirectAfterDeleteUrl() != '') {
             $content_html .= '<input type="hidden" name="' . self::FIELD_REDIRECT_AFTER_DELETE_URL . '" ' .

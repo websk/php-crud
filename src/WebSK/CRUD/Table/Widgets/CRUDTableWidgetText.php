@@ -30,7 +30,10 @@ class CRUDTableWidgetText implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        $html = CRUDCompiler::fieldValueOrCallableResult($this->getText(), $entity_obj);
+        $html = CRUDCompiler::nullableString(
+            CRUDCompiler::fieldValueOrCallableResult($this->getText(), $entity_obj),
+            'Text'
+        );
 
         return Sanitize::sanitizeTagContent($html);
     }

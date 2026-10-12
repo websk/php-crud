@@ -11,12 +11,12 @@ use Psr\Container\ContainerInterface;
 class CRUDServiceProvider
 {
     /**
-     * @param ContainerInterface $container
+     * @param ContainerInterface&\ArrayAccess<array-key, mixed> $container
      */
-    public static function register(ContainerInterface $container): void
+    public static function register(ContainerInterface&\ArrayAccess $container): void
     {
-        $container->set(CRUD::class, function (ContainerInterface $container): CRUD {
+        $container[CRUD::class] = static function (ContainerInterface $container): CRUD {
             return new CRUD($container);
-        });
+        };
     }
 }

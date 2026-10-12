@@ -20,22 +20,24 @@ class CRUDFieldsAccess
      */
     public static function getObjId(InterfaceEntity $entity_obj): ?int
     {
-        Assert::assert($entity_obj);
-
-        $obj_class_name = get_class($entity_obj);
-        $obj_id_field_name = self::getIdFieldName($obj_class_name);
-
-        return self::getObjectFieldValue($entity_obj, $obj_id_field_name);
+        return $entity_obj->getId();
     }
 
     /**
      * @param string $entity_class_name
      * @return string
      */
+    /** @param class-string $entity_class_name */
     public static function getIdFieldName(string $entity_class_name): string
     {
-        if (defined($entity_class_name . '::DB_ID_FIELD_NAME')) {
-            return $entity_class_name::DB_ID_FIELD_NAME;
+        $constant_name = $entity_class_name . '::DB_ID_FIELD_NAME';
+        if (defined($constant_name)) {
+            $value = constant($constant_name);
+            if (!is_string($value) || $value === '') {
+                throw new \UnexpectedValueException($constant_name . ' must be a non-empty string.');
+            }
+
+            return $value;
         }
 
         return self::DEFAULT_ID_FIELD_NAME;
@@ -47,7 +49,7 @@ class CRUDFieldsAccess
      * @return bool
      * @throws \ReflectionException
      */
-    public static function objectHasProperty(InterfaceEntity$obj, $field_name): bool
+    public static function objectHasProperty(InterfaceEntity $obj, string $field_name): bool
     {
         $obj_class_name = get_class($obj);
         $reflect = new \ReflectionClass($obj_class_name);
@@ -66,24 +68,17 @@ class CRUDFieldsAccess
      * @throws \Exception
      * @throws \ReflectionException
      */
-    public static function getObjectFieldValue(InterfaceEntity $entity_obj, string $field_name)
+    public static function getObjectFieldValue(InterfaceEntity $entity_obj, string $field_name): mixed
     {
         $obj_class_name = get_class($entity_obj);
 
         $reflect = new \ReflectionClass($obj_class_name);
-        $field_prop_obj = null;
-
-        foreach ($reflect->getProperties() as $prop_obj) {
-            if ($prop_obj->getName() == $field_name) {
-                $field_prop_obj = $prop_obj;
-                break;
-            }
+        if (!$reflect->hasProperty($field_name)) {
+            throw new \UnexpectedValueException(
+                'Field "' . $field_name . '" not found in object. Object class: "' . $obj_class_name . '"'
+            );
         }
-
-        Assert::assert(
-            $field_prop_obj,
-            'Field "' . $field_name . '" not found in object. Object class: "' . $obj_class_name . '"'
-        );
+        $field_prop_obj = $reflect->getProperty($field_name);
 
         if (!$field_prop_obj->isInitialized($entity_obj)) {
             return null;
@@ -94,8 +89,8 @@ class CRUDFieldsAccess
 
     /**
      * @param InterfaceEntity $entity_obj
-     * @param array $values_arr
-     * @param array $null_fields_arr - список полей объекта, в которые надо внести NULL
+     * @param array<string, mixed> $values_arr
+     * @param list<string> $null_fields_arr - список полей объекта, в которые надо внести NULL
      * @throws \ReflectionException
      */
     public static function setObjectFieldsFromArray(
@@ -109,8 +104,9 @@ class CRUDFieldsAccess
         foreach ($values_arr as $field_name => $value) {
             $property_obj = $reflect->getProperty($field_name);
 
-            if ($property_obj->getType()) {
-                settype($value, $property_obj->getType()->getName());
+            $property_type = $property_obj->getType();
+            if ($property_type instanceof \ReflectionNamedType && $property_type->isBuiltin() && $value !== null) {
+                settype($value, $property_type->getName());
             }
             $property_obj->setValue($entity_obj, $value);
         }

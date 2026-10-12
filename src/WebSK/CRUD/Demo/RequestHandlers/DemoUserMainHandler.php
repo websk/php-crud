@@ -5,6 +5,7 @@ namespace WebSK\CRUD\Demo\RequestHandlers;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\Slim\RequestHandlers\BaseHandler;
 use WebSK\Views\LayoutDTO;
 use WebSK\Views\PhpRender;
@@ -32,6 +33,6 @@ class DemoUserMainHandler extends BaseHandler
         $layout_dto->setTitle('Компании');
         $layout_dto->setContentHtml($content_html);
 
-        return PhpRender::renderLayout($response, ConfWrapper::value('layout.main'), $layout_dto);
+        return PhpRender::renderLayout($response, CRUDCompiler::string(ConfWrapper::value('layout.main'), 'layout.main'), $layout_dto);
     }
 }

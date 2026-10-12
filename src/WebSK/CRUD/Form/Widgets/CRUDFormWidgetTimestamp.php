@@ -7,6 +7,7 @@ use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
 
 /**
@@ -53,6 +54,12 @@ class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
     {
         $field_name = $this->getFieldName();
         $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
+        if ($field_value !== null && !is_int($field_value)) {
+            if (!is_string($field_value) || filter_var($field_value, FILTER_VALIDATE_INT) === false) {
+                throw new \UnexpectedValueException($field_name . ' must contain an integer timestamp or null');
+            }
+            $field_value = (int) $field_value;
+        }
 
         $is_required_str = '';
         if ($this->is_required) {
@@ -78,7 +85,7 @@ class CRUDFormWidgetTimestamp implements InterfaceCRUDFormWidget
 
         ob_start(); ?>
         <input type="hidden" id="<?= $uniqid ?>_input" name="<?= Sanitize::sanitizeAttrValue($field_name) ?>"
-               value="<?= Sanitize::sanitizeTagContent($field_value) ?>"
+               value="<?= Sanitize::sanitizeTagContent(CRUDCompiler::nullableString($field_value, $field_name)) ?>"
                data-field="<?= $uniqid ?>_date" <?= $is_required_str ?>>
         <div class="input-group date" id="<?= $uniqid ?>">
             <input id="<?= $uniqid ?>_date" type="text" class="form-control" value="<?= $field_value_attr ?>"<?php echo $disabled; ?>>

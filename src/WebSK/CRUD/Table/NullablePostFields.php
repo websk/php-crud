@@ -3,7 +3,7 @@
 namespace WebSK\CRUD\Table;
 
 use Psr\Http\Message\ServerRequestInterface;
-use WebSK\Slim\Request;
+use WebSK\CRUD\RequestParams;
 use WebSK\Utils\Sanitize;
 
 /**
@@ -14,10 +14,10 @@ class NullablePostFields
 {
     /**
      * @param string $field_name
-     * @param string $field_value
+     * @param null|string $field_value
      * @return string
      */
-    public static function hiddenFieldHtml(string $field_name, string $field_value): string
+    public static function hiddenFieldHtml(string $field_name, ?string $field_value): string
     {
         $is_null_value = '';
         if (is_null($field_value)) {
@@ -40,10 +40,10 @@ class NullablePostFields
      */
     public static function optionalFieldValue(ServerRequestInterface $request, string $field_name): ?string
     {
-        $field_value = Request::getParsedBodyParam($request, $field_name, '');
+        $field_value = RequestParams::parsedString($request, $field_name, '');
 
         // чтение возможных NULL
-        if (Request::getParsedBodyParam($request, $field_name . "___is_null", '') == "1") {
+        if (RequestParams::parsedString($request, $field_name . "___is_null", '') === "1") {
             $field_value = null;
         }
 

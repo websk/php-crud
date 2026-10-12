@@ -12,7 +12,7 @@
 # Note: Base Image name format {image-tag}-{php-version}
 #
 
-FROM laradock/php-fpm:latest-8.3
+FROM laradock/php-fpm:latest-8.5
 
 # always run apt update when start and after add new source list, then clean up at end.
 RUN set -xe; \
@@ -83,18 +83,7 @@ RUN if [ ${INSTALL_ZIP_ARCHIVE} = true ]; then \
 # PHP Memcached:
 #####################################
 
-RUN curl -L -o /tmp/memcached.tar.gz "https://github.com/php-memcached-dev/php-memcached/archive/v3.1.5.tar.gz" \
-        && mkdir -p memcached \
-        && tar -C memcached -zxvf /tmp/memcached.tar.gz --strip 1 \
-        && ( \
-            cd memcached \
-            && phpize \
-            && ./configure \
-            && make -j$(nproc) \
-            && make install \
-        ) \
-        && rm -r memcached \
-        && rm /tmp/memcached.tar.gz \
+RUN pecl install memcached \
         && docker-php-ext-enable memcached
 
 #####################################
@@ -135,7 +124,7 @@ RUN apt-get install wget -y && \
 # Check PHP version:
 #####################################
 
-RUN php -v | head -n 1 | grep -q "PHP 8.3."
+RUN php -v | head -n 1 | grep -q "PHP 8.5."
 
 #
 #--------------------------------------------------------------------------

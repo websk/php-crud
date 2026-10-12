@@ -6,6 +6,7 @@ use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
 
 /**
@@ -18,6 +19,7 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
 
     protected string $field_name;
 
+    /** @var array<int|string, string> */
     protected array $options_arr;
 
     protected bool $show_null_checkbox = false;
@@ -29,7 +31,7 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
     /**
      * CRUDFormWidgetOptions constructor.
      * @param string $field_name
-     * @param array $options_arr
+     * @param array<int|string, string> $options_arr
      * @param bool $show_null_checkbox
      * @param bool $is_required
      * @param bool $disabled
@@ -60,7 +62,7 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
         $field_name = $this->getFieldName();
         $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
 
-        return $this->htmlForValue($field_value);
+        return $this->htmlForValue(CRUDCompiler::nullableString($field_value, $field_name));
     }
 
     /**
@@ -86,7 +88,7 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
                 $selected_html_attr = 'selected';
             }
 
-            $options .= '<option value="' . Sanitize::sanitizeAttrValue($value) . '" ' . $selected_html_attr . '>' . Sanitize::sanitizeTagContent($title) . '</option>';
+            $options .= '<option value="' . Sanitize::sanitizeAttrValue((string) $value) . '" ' . $selected_html_attr . '>' . Sanitize::sanitizeTagContent($title) . '</option>';
         }
 
         $is_null_checked = '';
@@ -156,7 +158,7 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return array
+     * @return array<int|string, string>
      */
     public function getOptionsArr(): array
     {
@@ -164,7 +166,7 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @param array $options_arr
+     * @param array<int|string, string> $options_arr
      */
     public function setOptionsArr(array $options_arr): void
     {

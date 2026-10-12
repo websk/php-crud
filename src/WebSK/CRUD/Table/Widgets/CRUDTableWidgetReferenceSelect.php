@@ -7,6 +7,7 @@ use WebSK\Utils\Sanitize;
 use WebSK\Entity\InterfaceEntity;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Table\InterfaceCRUDTableWidget;
 
 /**
@@ -52,8 +53,8 @@ class CRUDTableWidgetReferenceSelect implements InterfaceCRUDTableWidget
         }
 
         return '<button class="btn btn-xs btn-default js-ajax-form-select" type="submit" ' .
-            'data-id="' . Sanitize::sanitizeAttrValue($id) . '" ' .
-            'data-title="' . Sanitize::sanitizeAttrValue($obj_title) . '">Выбор</button>';
+            'data-id="' . Sanitize::sanitizeAttrValue(CRUDCompiler::nullableString($id, 'Entity ID')) . '" ' .
+            'data-title="' . Sanitize::sanitizeAttrValue(CRUDCompiler::nullableString($obj_title, 'Title')) . '">Выбор</button>';
     }
 
     /**

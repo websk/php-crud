@@ -42,9 +42,15 @@ class CRUDTableWidgetHtmlWithLink implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        $url = CRUDCompiler::fieldValueOrCallableResult($this->getLink(), $entity_obj);
+        $url = CRUDCompiler::string(
+            CRUDCompiler::fieldValueOrCallableResult($this->getLink(), $entity_obj),
+            'Link URL'
+        );
 
-        $html = CRUDCompiler::fieldValueOrCallableResult($this->getHtml(), $entity_obj);
+        $html = CRUDCompiler::string(
+            CRUDCompiler::fieldValueOrCallableResult($this->getHtml(), $entity_obj),
+            'Link HTML'
+        );
         $html = trim($html);
 
         if ($html == '') {

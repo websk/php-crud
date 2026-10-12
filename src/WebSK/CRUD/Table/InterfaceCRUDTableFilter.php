@@ -16,5 +16,6 @@ interface InterfaceCRUDTableFilter
      * @param ServerRequestInterface $request
      * @return array
      */
+    /** @return array{string, array<int|string, mixed>} */
     public function sqlConditionAndPlaceholderValue(ServerRequestInterface $request): array;
 }

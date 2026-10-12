@@ -18,7 +18,7 @@ use WebSK\Slim\RequestHandlers\BaseHandler;
  */
 class DemoCompanyJsonHandler extends BaseHandler
 {
-    /** @Inject */
+    #[\DI\Attribute\Inject]
     protected CRUD $crud_service;
 
     /**

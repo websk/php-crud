@@ -8,9 +8,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDHtml;
 use WebSK\CRUD\CRUDMagnificPopup;
 use WebSK\CRUD\CRUDOperations;
+use WebSK\CRUD\RequestParams;
+use WebSK\Entity\InterfaceEntity;
 use WebSK\Slim\Redirect;
-use WebSK\Slim\Request;
-use WebSK\Utils\Assert;
 use WebSK\Entity\InterfaceWeight;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Form\CRUDForm;
@@ -52,14 +52,15 @@ class CRUDTable
 
     protected CRUD $crud;
 
+    /** @var class-string<InterfaceEntity> */
     protected string $entity_class_name;
 
     protected ?CRUDForm $create_form_obj = null;
 
-    /** @var InterfaceCRUDTableColumn[] */
+    /** @var list<InterfaceCRUDTableColumn> */
     protected array $column_obj_arr;
 
-    /** @var InterfaceCRUDTableFilter[] */
+    /** @var list<InterfaceCRUDTableFilter> */
     protected array $filters_arr;
 
     protected string $order_by = '';
@@ -77,10 +78,10 @@ class CRUDTable
     /**
      * CRUDTable constructor.
      * @param CRUD $crud
-     * @param string $entity_class_name
+     * @param class-string<InterfaceEntity> $entity_class_name
      * @param null|CRUDForm $create_form_obj
-     * @param InterfaceCRUDTableColumn[] $column_obj_arr
-     * @param InterfaceCRUDTableFilter[] $filters_arr
+     * @param list<InterfaceCRUDTableColumn> $column_obj_arr
+     * @param list<InterfaceCRUDTableFilter> $filters_arr
      * @param string $order_by
      * @param string $table_id
      * @param string $filters_position
@@ -172,7 +173,6 @@ class CRUDTable
 
             $has_nonempty_th = false;
             foreach ($this->column_obj_arr as $column_obj) {
-                Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
                 if ($column_obj->getTitle() != '') {
                     $has_nonempty_th = true;
                 }
@@ -181,7 +181,6 @@ class CRUDTable
             if ($has_nonempty_th) {
                 echo '<thead><tr>';
                 foreach ($this->column_obj_arr as $column_obj) {
-                    Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
                     echo '<th>' . $column_obj->getTitle() . '</th>';
                 }
                 echo '</tr></thead>';
@@ -208,9 +207,7 @@ class CRUDTable
                 $obj_obj = $this->crud->createAndLoadObject($this->entity_class_name, $obj_id);
                 echo '<tr>';
                 foreach ($this->column_obj_arr as $column_obj) {
-                    Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
                     $widget_obj = $column_obj->getWidgetObj();
-                    Assert::assert($widget_obj);
 
                     $col_width_attr = '';
 
@@ -283,7 +280,6 @@ class CRUDTable
 
         $has_nonempty_th = false;
         foreach ($this->column_obj_arr as $column_obj) {
-            Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
             if ($column_obj->getTitle() != '') {
                 $has_nonempty_th = true;
             }
@@ -292,7 +288,6 @@ class CRUDTable
         if ($has_nonempty_th) {
             $row_html = '';
             foreach ($this->column_obj_arr as $column_obj) {
-                Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
                 $row_html .= $this->csvCellRender((string) $column_obj->getTitle(), $column_delimiter);
             }
             $tsv .= $this->csvRowRender($row_html);
@@ -303,11 +298,7 @@ class CRUDTable
             $obj_obj = $this->crud->createAndLoadObject($this->entity_class_name, $obj_id);
 
             foreach ($this->column_obj_arr as $column_obj) {
-                Assert::assert($column_obj instanceof InterfaceCRUDTableColumn);
-
                 $widget_obj = $column_obj->getWidgetObj();
-                Assert::assert($widget_obj);
-                Assert::assert($widget_obj instanceof InterfaceCRUDTableWidget);
                 $row_html .= $this->csvCellRender($widget_obj->html($obj_obj, $this->crud), $column_delimiter);
             }
             $tsv .= $this->csvRowRender($row_html);
@@ -357,7 +348,11 @@ class CRUDTable
             return null;
         }
 
-        $operation_code = Request::getParsedBodyParam($request, CRUDOperations::FIELD_NAME_OPERATION_CODE);
+        $operation_code = RequestParams::parsedString(
+            $request,
+            CRUDOperations::FIELD_NAME_OPERATION_CODE,
+            ''
+        );
         switch ($operation_code) {
             case CRUDOperations::OPERATION_DELETE_ENTITY:
                 return $this->deleteEntityOperation($request, $response);
@@ -378,17 +373,18 @@ class CRUDTable
      */
     public function deleteEntityOperation(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $entity_class_name = Request::getParsedBodyParam($request, CRUDTableWidgetDelete::FIELD_CLASS_NAME);
-        Assert::assert($entity_class_name);
-
-        $entity_id = Request::getParsedBodyParam($request, CRUDTableWidgetDelete::FIELD_OBJECT_ID);
-        Assert::assert($entity_id);
+        $entity_class_name = self::parsedEntityClass($request, CRUDTableWidgetDelete::FIELD_CLASS_NAME);
+        $entity_id = RequestParams::parsedInt($request, CRUDTableWidgetDelete::FIELD_OBJECT_ID);
 
         $this->crud->deleteObject($entity_class_name, $entity_id);
 
         Messages::setMessage('Удаление выполнено успешно');
 
-        $redirect_url = Request::getParsedBodyParam($request, CRUDTableWidgetDelete::FIELD_REDIRECT_AFTER_DELETE_URL, '');
+        $redirect_url = RequestParams::parsedString(
+            $request,
+            CRUDTableWidgetDelete::FIELD_REDIRECT_AFTER_DELETE_URL,
+            ''
+        );
         if ($redirect_url != '') {
             return Redirect::redirect($response, $redirect_url);
         }
@@ -404,19 +400,14 @@ class CRUDTable
      */
     public function swapEntityWeightOperation(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
-        $entity_class_name = Request::getParsedBodyParam($request, CRUDTableWidgetDelete::FIELD_CLASS_NAME);
-        Assert::assert($entity_class_name);
-
-        $interfaces_arr = class_implements($entity_class_name);
-        Assert::assert(
-            $interfaces_arr && in_array(InterfaceWeight::class, $interfaces_arr),
-            'Class ' . $entity_class_name . ' does not implement interface ' . InterfaceWeight::class
+        $entity_class_name = self::parsedEntityClass(
+            $request,
+            CRUDTableWidgetDelete::FIELD_CLASS_NAME,
+            InterfaceWeight::class
         );
+        $entity_id = RequestParams::parsedInt($request, CRUDTableWidgetDelete::FIELD_OBJECT_ID);
 
-        $entity_id = Request::getParsedBodyParam($request, CRUDTableWidgetDelete::FIELD_OBJECT_ID);
-        Assert::assert($entity_id);
-
-        $context_fields_names_str = Request::getParsedBodyParam($request,
+        $context_fields_names_str = RequestParams::parsedString($request,
             CRUDTableWidgetWeight::FORMFIELD_CONTEXT_FIELDS_NAME,
             ''
         );
@@ -444,20 +435,20 @@ class CRUDTable
      */
     public function updateEntityFieldOperation(ServerRequestInterface $request, ResponseInterface $response): ?ResponseInterface
     {
-        $table_id_from_request = Request::getParsedBodyParam($request, CRUDTable::FIELD_CRUDTABLE_ID, '');
+        $table_id_from_request = RequestParams::parsedString($request, CRUDTable::FIELD_CRUDTABLE_ID, '');
         // проверяем, что операция выполняется для таблицы из запроса, потому что класс модели мы берем из таблицы
         if ($table_id_from_request != $this->table_id) {
             return  null;
         }
 
-        $entity_field_name = Request::getParsedBodyParam($request, CRUDTable::FIELD_FIELD_NAME);
-        Assert::assert(!is_null($entity_field_name));
+        $entity_field_name = RequestParams::parsedString($request, CRUDTable::FIELD_FIELD_NAME);
 
-        $value = Request::getParsedBodyParam($request, CRUDTable::FIELD_FIELD_VALUE);
-        Assert::assert(!is_null($value));
+        $value = RequestParams::parsedBody($request, CRUDTable::FIELD_FIELD_VALUE);
+        if ($value === null) {
+            throw new \InvalidArgumentException('Request field "' . CRUDTable::FIELD_FIELD_VALUE . '" is required');
+        }
 
-        $entity_id = Request::getParsedBodyParam($request, CRUDTable::FIELD_ENTITY_ID);
-        Assert::assert(!is_null($entity_id));
+        $entity_id = RequestParams::parsedInt($request, CRUDTable::FIELD_ENTITY_ID);
 
         // @TODO: owner check!!!
 
@@ -465,6 +456,9 @@ class CRUDTable
 
         $reflect = new \ReflectionClass($obj);
 
+        if (!$reflect->hasProperty($entity_field_name)) {
+            throw new \InvalidArgumentException('Unknown entity field: ' . $entity_field_name);
+        }
         $property_obj = $reflect->getProperty($entity_field_name);
         $property_obj->setValue($obj, $value);
 
@@ -535,36 +529,33 @@ class CRUDTable
 
         $html = CRUDHtml::div('filters-inline', '', function () use (
             $request,
-            $table_index_on_page,
             $filters_arr
         ) {
             echo '<style>.filters-inline {margin-bottom: 10px;}</style>';
 
-            if (!empty($filters_arr)) {
-                echo '<form class="filters-form" style="display: inline;">';
+            echo '<form class="filters-form" style="display: inline;">';
 
-                foreach ($filters_arr as $filter_obj) {
-                    //@TODO check class implements InterfaceCRUDTableFilter
+            foreach ($filters_arr as $filter_obj) {
+                //@TODO check class implements InterfaceCRUDTableFilter
 
-                    if ($filter_obj instanceof InterfaceCRUDTableFilterVisible) {
-                        echo '<div style="display: inline-block; margin-right: 10px;">';
+                if ($filter_obj instanceof InterfaceCRUDTableFilterVisible) {
+                    echo '<div style="display: inline-block; margin-right: 10px;">';
 
-                        if ($filter_obj->getTitle()) {
-                            echo '<label style="display: inline-block; margin-top: 5px; margin-right: 5px;">' .
-                                $filter_obj->getTitle() . '</label>';
-                        }
-
-                        echo '<span style="display: inline-block;">' . $filter_obj->getHtml($request) . '</span>';
-                        echo '</div>';
-                    } elseif ($filter_obj instanceof InterfaceCRUDTableFilterInvisible) {
-                        // do nothing with invisible filters
-                    } else {
-                        throw new \Exception('filter doesnt implement interface ...');
+                    if ($filter_obj->getTitle()) {
+                        echo '<label style="display: inline-block; margin-top: 5px; margin-right: 5px;">' .
+                            $filter_obj->getTitle() . '</label>';
                     }
-                }
 
-                echo '</form>';
+                    echo '<span style="display: inline-block;">' . $filter_obj->getHtml($request) . '</span>';
+                    echo '</div>';
+                } elseif ($filter_obj instanceof InterfaceCRUDTableFilterInvisible) {
+                    // do nothing with invisible filters
+                } else {
+                    throw new \Exception('filter doesnt implement interface ...');
+                }
             }
+
+            echo '</form>';
         });
 
         return $html;
@@ -730,5 +721,29 @@ class CRUDTable
         }
 
         return false;
+    }
+
+    /**
+     * @param class-string $required_interface
+     * @return class-string<InterfaceEntity>
+     */
+    private static function parsedEntityClass(
+        ServerRequestInterface $request,
+        string $key,
+        string $required_interface = InterfaceEntity::class
+    ): string {
+        $class_name = RequestParams::parsedString($request, $key);
+        if (!is_a($class_name, InterfaceEntity::class, true)) {
+            throw new \InvalidArgumentException(
+                'Class ' . $class_name . ' must implement ' . InterfaceEntity::class
+            );
+        }
+        if (!is_a($class_name, $required_interface, true)) {
+            throw new \InvalidArgumentException(
+                'Class ' . $class_name . ' must implement ' . $required_interface
+            );
+        }
+
+        return $class_name;
     }
 }

@@ -15,14 +15,14 @@ class CRUDTableFilterGroupCollapse implements InterfaceCRUDTableFilterGroup
     protected string $filter_uniq_id;
     protected string $title;
 
-    /** @var InterfaceCRUDTableFilter[] */
+    /** @var list<InterfaceCRUDTableFilter> */
     protected array $filters_arr;
 
     /**
      * CRUDTableFilterGroupCollapse constructor.
      * @param string $filter_uniq_id
      * @param string $title
-     * @param array $filters_arr
+     * @param list<InterfaceCRUDTableFilter> $filters_arr
      */
     public function __construct(
         string $filter_uniq_id,
@@ -34,7 +34,7 @@ class CRUDTableFilterGroupCollapse implements InterfaceCRUDTableFilterGroup
         $this->setFiltersArr($filters_arr);
     }
 
-    /** @inheritdoc */
+    /** @return array{string, array<int|string, mixed>} */
     public function sqlConditionAndPlaceholderValue(ServerRequestInterface $request): array
     {
         return ['', []];
@@ -109,7 +109,7 @@ class CRUDTableFilterGroupCollapse implements InterfaceCRUDTableFilterGroup
     }
 
     /**
-     * @return InterfaceCRUDTableFilter[]
+     * @return list<InterfaceCRUDTableFilter>
      */
     public function getFiltersArr(): array
     {
@@ -117,7 +117,7 @@ class CRUDTableFilterGroupCollapse implements InterfaceCRUDTableFilterGroup
     }
 
     /**
-     * @param InterfaceCRUDTableFilter[] $filters_arr
+     * @param list<InterfaceCRUDTableFilter> $filters_arr
      */
     public function setFiltersArr(array $filters_arr): void
     {

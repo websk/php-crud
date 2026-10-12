@@ -22,7 +22,7 @@ class DemoCompanyListAjaxHandler extends BaseHandler
 
     const string FILTER_NAME = 'demo_company_name';
 
-    /** @Inject */
+    #[\DI\Attribute\Inject]
     protected CRUD $crud_service;
 
     /**

@@ -12,13 +12,13 @@ use WebSK\Entity\InterfaceEntity;
 class CRUDCompiler
 {
     /**
-     * @param string|Closure $fieldname_or_closure
+     * @param string|Closure(InterfaceEntity): mixed $fieldname_or_closure
      * @param InterfaceEntity $obj
-     * @return string|Closure
+     * @return mixed
      */
-    public static function fieldValueOrCallableResult($fieldname_or_closure, InterfaceEntity $obj)
+    public static function fieldValueOrCallableResult(string|Closure $fieldname_or_closure, InterfaceEntity $obj): mixed
     {
-        if (self::isClosure($fieldname_or_closure)) {
+        if ($fieldname_or_closure instanceof Closure) {
             return $fieldname_or_closure($obj);
         }
 
@@ -30,11 +30,37 @@ class CRUDCompiler
     }
 
     /**
-     * @param string|Closure $closure
-     * @return bool
+     * @param mixed $closure
      */
-    public static function isClosure($closure): bool
+    public static function isClosure(mixed $closure): bool
     {
         return is_object($closure) && ($closure instanceof \Closure);
+    }
+
+    public static function nullableString(mixed $value, string $description = 'Value'): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        if (!is_scalar($value)) {
+            throw new \UnexpectedValueException($description . ' must be scalar or null');
+        }
+
+        return (string) $value;
+    }
+
+    public static function string(mixed $value, string $description = 'Value'): string
+    {
+        return self::nullableString($value, $description) ?? '';
+    }
+
+    public static function entityId(InterfaceEntity $entity): string
+    {
+        $id = $entity->getId();
+        if ($id === null) {
+            throw new \UnexpectedValueException('Entity must be saved before its ID can be used');
+        }
+
+        return (string) $id;
     }
 }

@@ -42,7 +42,7 @@ class CRUD
 
     /**
      * CRUDTable constructor.
-     * @param string $entity_class_name
+     * @param class-string<InterfaceEntity> $entity_class_name
      * @param null|CRUDForm $create_form_obj
      * @param InterfaceCRUDTableColumn[] $column_obj_arr
      * @param InterfaceCRUDTableFilter[] $filters_arr
@@ -71,8 +71,8 @@ class CRUD
             $this,
             $entity_class_name,
             $create_form_obj,
-            $column_obj_arr,
-            $filters_arr,
+            array_values($column_obj_arr),
+            array_values($filters_arr),
             $order_by,
             $table_id,
             $filters_position,
@@ -83,7 +83,7 @@ class CRUD
     }
 
     /**
-     * @param string $entity_class_name
+     * @param class-string<InterfaceEntity> $entity_class_name
      * @param InterfaceCRUDTableColumn[] $column_obj_arr
      * @param InterfaceCRUDTableFilter[] $filters_arr
      * @param string $order_by
@@ -98,8 +98,8 @@ class CRUD
         return new CRUDTableJSON(
             $this,
             $entity_class_name,
-            $column_obj_arr,
-            $filters_arr,
+            array_values($column_obj_arr),
+            array_values($filters_arr),
             $order_by
         );
     }
@@ -107,10 +107,10 @@ class CRUD
     /**
      * CRUDForm constructor.
      * @param string $form_unique_id
-     * @param $obj
+     * @param InterfaceEntity $obj
      * @param InterfaceCRUDFormRow[] $element_obj_arr
-     * @param string|Closure $url_to_redirect_after_operation
-     * @param array $redirect_get_params_arr
+     * @param string|Closure(InterfaceEntity): string $url_to_redirect_after_operation
+     * @param array<string, scalar|Closure(InterfaceEntity): scalar|null> $redirect_get_params_arr
      * @param string $operation_code
      * @param bool $hide_submit_button
      * @param string $submit_button_title
@@ -119,9 +119,9 @@ class CRUD
      */
     public function createForm(
         string $form_unique_id,
-        $obj,
+        InterfaceEntity $obj,
         array $element_obj_arr,
-        $url_to_redirect_after_operation = '',
+        string|Closure $url_to_redirect_after_operation = '',
         array $redirect_get_params_arr = [],
         string $operation_code = CRUDOperations::OPERATION_SAVE_EDITOR_FORM,
         bool $hide_submit_button = false,
@@ -133,7 +133,7 @@ class CRUD
             $this,
             $form_unique_id,
             $obj,
-            $element_obj_arr,
+            array_values($element_obj_arr),
             $url_to_redirect_after_operation,
             $redirect_get_params_arr,
             $operation_code,
@@ -146,14 +146,14 @@ class CRUD
     /**
      * Возвращает одну страницу списка объектов указанного класса.
      * @param ServerRequestInterface $request
-     * @param string $entity_class_name Имя класса модели
+     * @param class-string<InterfaceEntity> $entity_class_name Имя класса модели
      * @param InterfaceCRUDTableFilter[] $filters_arr
      * @param string $order_by
      * @param int $page_size
      * @param int $start
      * @param bool $execute_total_rows_count_query
      * @param int $total_rows_count
-     * @return array Массив идентификаторов объектов.
+     * @return list<int> Массив идентификаторов объектов.
      * @throws \Exception
      */
     public function getObjIdsArrForClassName(
@@ -209,13 +209,13 @@ class CRUD
             $total_rows_count = $this->getTotalRowsCount($request, $entity_class_name, $filters_arr);
         }
 
-        return $obj_ids_arr;
+        return array_map(static fn (mixed $id): int => self::normalizeInteger($id, 'entity ID'), $obj_ids_arr);
     }
 
     /**
      * @param ServerRequestInterface $request
      * @param InterfaceCRUDTableFilter[] $filters_arr
-     * @return array
+     * @return array{string, array<int|string, mixed>}
      * @throws \Exception
      */
     protected function makeSQLConditionsAndPlaceholderValues(ServerRequestInterface $request, array $filters_arr): array
@@ -224,12 +224,6 @@ class CRUD
         $query_param_values_arr = [];
 
         foreach ($filters_arr as $filter_obj) {
-            $interfaces_arr = class_implements(get_class($filter_obj));
-            Assert::assert(
-                $interfaces_arr && in_array(InterfaceCRUDTableFilter::class, $interfaces_arr),
-                'Class ' . get_class($filter_obj) . ' does not implement interface ' . InterfaceCRUDTableFilter::class
-            );
-
             list($filter_sql_condition, $filter_placeholder_values_arr) =
                 $filter_obj->sqlConditionAndPlaceholderValue($request);
 
@@ -248,7 +242,7 @@ class CRUD
 
     /**
      * @param ServerRequestInterface $request
-     * @param string $entity_class_name
+     * @param class-string<InterfaceEntity> $entity_class_name
      * @param InterfaceCRUDTableFilter[] $filters_arr
      * @return int
      * @throws \Exception
@@ -282,16 +276,16 @@ class CRUD
             return 0;
         }
 
-        return $total_rows_count;
+        return self::normalizeInteger($total_rows_count, 'total rows count');
     }
 
     /**
-     * @param InterfaceEntity $obj
+     * @param InterfaceEntity $entity_obj
      * @param ServerRequestInterface $request
-     * @return null|InterfaceEntity
+     * @return InterfaceEntity
      * @throws \ReflectionException
      */
-    public function saveOrUpdateObjectFromFormRequest(InterfaceEntity $entity_obj, ServerRequestInterface $request): ?InterfaceEntity
+    public function saveOrUpdateObjectFromFormRequest(InterfaceEntity $entity_obj, ServerRequestInterface $request): InterfaceEntity
     {
         $post_fields_arr = (array)$request->getParsedBody();
 
@@ -335,7 +329,7 @@ class CRUD
     }
 
     /**
-     * @param string $entity_class_name
+     * @param class-string<InterfaceEntity> $entity_class_name
      * @param int $entity_id
      * @return InterfaceEntity
      * @throws \Exception
@@ -345,15 +339,20 @@ class CRUD
         /** @var EntityService $entity_service */
         $entity_service = $this->getEntityServiceByClassName($entity_class_name);
 
-        return $entity_service->getById($entity_id);
+        $entity_obj = $entity_service->getById($entity_id);
+        if ($entity_obj === null) {
+            throw new \UnexpectedValueException('Entity was not loaded: ' . $entity_class_name . '#' . $entity_id);
+        }
+
+        return $entity_obj;
     }
 
     /**
-     * @param string $entity_class_name
+     * @param class-string<InterfaceEntity> $entity_class_name
      * @param int $entity_id
      * @throws \Exception
      */
-    public function deleteObject(string $entity_class_name, int $entity_id)
+    public function deleteObject(string $entity_class_name, int $entity_id): void
     {
         $entity_service = $this->getEntityServiceByClassName($entity_class_name);
 
@@ -364,7 +363,7 @@ class CRUD
      * @param InterfaceEntity $entity_obj
      * @throws \Exception
      */
-    public function saveObject(InterfaceEntity $entity_obj)
+    public function saveObject(InterfaceEntity $entity_obj): void
     {
         $entity_class_name = get_class($entity_obj);
 
@@ -374,24 +373,28 @@ class CRUD
     }
 
     /**
-     * @param string $entity_class_name
+     * @param class-string<InterfaceEntity> $entity_class_name
      * @param int $entity_id
-     * @param array $context_arr
+     * @param array<string, mixed> $context_arr
      * @throws \Exception
      */
-    public function swapWeights(string $entity_class_name, int $entity_id, array $context_arr)
+    public function swapWeights(string $entity_class_name, int $entity_id, array $context_arr): void
     {
-        /** @var InterfaceWeight $obj */
         $obj = $this->createAndLoadObject($entity_class_name, $entity_id);
+        if (!$obj instanceof InterfaceWeight) {
+            throw new \UnexpectedValueException($entity_class_name . ' must implement ' . InterfaceWeight::class);
+        }
 
         $entity_service = $this->getEntityServiceByClassName($entity_class_name);
-        Assert::assert($entity_service instanceof WeightService);
+        if (!$entity_service instanceof WeightService) {
+            throw new \UnexpectedValueException($entity_service::class . ' must extend ' . WeightService::class);
+        }
         $entity_service->swapWeights($obj, $context_arr);
     }
 
     /**
-     * @param string $entity_class_name
-     * @return array
+     * @param class-string<InterfaceEntity> $entity_class_name
+     * @return list<int>
      * @throws \Exception
      */
     public function getAllIdsArr(string $entity_class_name): array
@@ -400,15 +403,31 @@ class CRUD
     }
 
     /**
-     * @param string $entity_class_name
+     * @param class-string<InterfaceEntity> $entity_class_name
      * @return EntityService
      * @throws \Exception
      */
     public function getEntityServiceByClassName(string $entity_class_name): EntityService
     {
         $service_container_id = EntityService::getContainerIdByClassName($entity_class_name);
-        Assert::assert($service_container_id);
+        $service = $this->container->get($service_container_id);
+        if (!$service instanceof EntityService) {
+            throw new \UnexpectedValueException($service_container_id . ' must contain an EntityService.');
+        }
 
-        return $this->container->get($service_container_id);
+        return $service;
+    }
+
+    private static function normalizeInteger(mixed $value, string $name): int
+    {
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && preg_match('/^-?\d+$/D', $value) === 1) {
+            return (int)$value;
+        }
+
+        throw new \UnexpectedValueException($name . ' must be an integer.');
     }
 }

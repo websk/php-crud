@@ -36,11 +36,14 @@ class Pager
     public static function getPageOffset(ServerRequestInterface $request, string $table_index_on_page): int
     {
         $page_offset = 0;
-        $page_offset_param = $request->getParam(self::pageOffsetFormFieldName($table_index_on_page), null);
+        $page_offset_param = \WebSK\CRUD\RequestParams::query($request, self::pageOffsetFormFieldName($table_index_on_page), null);
         if (is_null($page_offset_param)) {
             return $page_offset;
         }
 
+        if (!is_scalar($page_offset_param)) {
+            return $page_offset;
+        }
         $page_offset = intval($page_offset_param);
         if ($page_offset < 0) {
             $page_offset = 0;
@@ -60,11 +63,14 @@ class Pager
         int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
     ): int
     {
-        $page_size_param = $request->getParam(self::pageSizeFormFieldName($table_index_on_page), null);
+        $page_size_param = \WebSK\CRUD\RequestParams::query($request, self::pageSizeFormFieldName($table_index_on_page), null);
         if (is_null($page_size_param)) {
             return $default_page_size;
         }
 
+        if (!is_scalar($page_size_param)) {
+            return $default_page_size;
+        }
         $page_size = intval($page_size_param);
         if ($page_size < 1) {
             return $default_page_size;
@@ -138,7 +144,7 @@ class Pager
     protected static function hasNextPage(
         ServerRequestInterface $request,
         string $table_index_on_page,
-        int $elements_count,
+        ?int $elements_count,
         int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
     ): bool
     {

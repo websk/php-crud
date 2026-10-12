@@ -29,7 +29,10 @@ class CRUDTableWidgetHtml implements InterfaceCRUDTableWidget
     /** @inheritdoc */
     public function html(InterfaceEntity $entity_obj, CRUD $crud): string
     {
-        return CRUDCompiler::fieldValueOrCallableResult($this->getHtml(), $entity_obj);
+        return CRUDCompiler::string(
+            CRUDCompiler::fieldValueOrCallableResult($this->getHtml(), $entity_obj),
+            'HTML'
+        );
     }
 
     /**

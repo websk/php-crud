@@ -1,0 +1,9 @@
+parameters:
+    level: max
+    paths:
+        - src
+        - tests
+        - public/index.php
+    tmpDir: /tmp/php-crud-phpstan
+    parallel:
+        maximumNumberOfProcesses: 1

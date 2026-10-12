@@ -19,10 +19,10 @@ class CRUDTableFilterEqualTimestampIntervalInline extends CRUDTableFilterEqualIn
         $placeholder_values_arr = [];
 
         // для этого виджета галка включения не выводится: если в поле пустая строка - он игрорируется
-        $value_start_dt = $request->getParam($this->getFilterStartUniqId());
+        $value_start_dt = \WebSK\CRUD\RequestParams::queryString($request, $this->getFilterStartUniqId());
         $value_start = $value_start_dt ? (new \DateTime($value_start_dt))->getTimestamp() : null;
 
-        $value_end_dt = $request->getParam($this->getFilterEndUniqId());
+        $value_end_dt = \WebSK\CRUD\RequestParams::queryString($request, $this->getFilterEndUniqId());
         $value_end = $value_end_dt ? (new \DateTime($value_end_dt))->getTimestamp() : null;
 
         $column_name = $this->getFieldName();

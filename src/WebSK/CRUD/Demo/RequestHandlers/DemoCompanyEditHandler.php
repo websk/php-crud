@@ -2,11 +2,11 @@
 
 namespace WebSK\CRUD\Demo\RequestHandlers;
 
-use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Demo\DemoCompanyService;
 use WebSK\CRUD\Form\CRUDFormRow;
@@ -23,10 +23,10 @@ use WebSK\Views\PhpRender;
  */
 class DemoCompanyEditHandler extends BaseHandler
 {
-    /** @Inject */
+    #[\DI\Attribute\Inject]
     protected CRUD $crud_service;
 
-    /** @Inject */
+    #[\DI\Attribute\Inject]
     protected DemoCompanyService $demo_company_service;
 
     /**
@@ -39,10 +39,6 @@ class DemoCompanyEditHandler extends BaseHandler
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, int $demo_company_id): ResponseInterface
     {
         $demo_company_obj = $this->demo_company_service->getById($demo_company_id);
-
-        if (!$demo_company_obj) {
-            return $response->withStatus(StatusCodeInterface::STATUS_NOT_FOUND);
-        }
 
         $crud_form = $this->crud_service->createForm(
             'demo_company_edit',
@@ -70,6 +66,6 @@ class DemoCompanyEditHandler extends BaseHandler
         ];
         $layout_dto->setBreadcrumbsDtoArr($breadcrumbs_arr);
 
-        return PhpRender::renderLayout($response, ConfWrapper::value('layout.main'), $layout_dto);
+        return PhpRender::renderLayout($response, CRUDCompiler::string(ConfWrapper::value('layout.main'), 'layout.main'), $layout_dto);
     }
 }

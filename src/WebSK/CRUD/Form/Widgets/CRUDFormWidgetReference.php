@@ -6,6 +6,7 @@ use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\CRUDFieldsAccess;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Form\InterfaceCRUDFormWidget;
 
 /**
@@ -16,6 +17,7 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
 {
     protected string $field_name;
 
+    /** @var class-string<InterfaceEntity> */
     protected string $referenced_class_name;
 
     protected string $referenced_class_title_field;
@@ -23,7 +25,7 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
     /**
      * CRUDFormWidgetReference constructor.
      * @param string $field_name
-     * @param string $referenced_class_name
+     * @param class-string<InterfaceEntity> $referenced_class_name
      * @param string $referenced_class_title_field
      */
     public function __construct(string $field_name, string $referenced_class_name, string $referenced_class_title_field)
@@ -54,7 +56,10 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
         $options_arr = [];
         foreach ($referenced_obj_ids_arr as $id) {
             $entity_obj = $crud->createAndLoadObject($referenced_class_name, $id);
-            $options_arr[$id] = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $referenced_class_title_field);
+            $options_arr[$id] = CRUDCompiler::nullableString(
+                CRUDFieldsAccess::getObjectFieldValue($entity_obj, $referenced_class_title_field),
+                $referenced_class_title_field
+            );
         }
 
         foreach ($options_arr as $value => $title) {
@@ -98,7 +103,7 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
         </script>
 
         <?php
-        $html .= ob_get_clean();
+        $html .= ob_get_clean() ?: '';
 
         return $html;
     }
@@ -120,7 +125,7 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @return string
+     * @return class-string<InterfaceEntity>
      */
     public function getReferencedClassName(): string
     {
@@ -128,7 +133,7 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
     }
 
     /**
-     * @param string $referenced_class_name
+     * @param class-string<InterfaceEntity> $referenced_class_name
      */
     public function setReferencedClassName(string $referenced_class_name): void
     {

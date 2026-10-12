@@ -4,6 +4,7 @@ namespace WebSK\CRUD\Table\Filters;
 
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDHtml;
+use WebSK\CRUD\RequestParams;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -56,7 +57,7 @@ class CRUDTableFilterEqual implements InterfaceCRUDTableFilterVisible
         $placeholder_values_arr = [];
 
         // для этого виджета галка включения не выводится: если в поле пустая строка - он игнорируется
-        $value = $request->getParam($this->getFilterUniqId(), '');
+        $value = RequestParams::queryString($request, $this->getFilterUniqId());
 
         $column_name = $this->getFieldName();
         $column_name = preg_replace("/[^a-zA-Z0-9_]+/", "", $column_name);
@@ -78,7 +79,7 @@ class CRUDTableFilterEqual implements InterfaceCRUDTableFilterVisible
             'name' => $this->getFilterUniqId(),
             'id' => $this->getFilterUniqId(),
             'class' => $this->isInline() ? '' : 'form-control',
-            'value' => $request->getParam($this->getFilterUniqId(), '')
+            'value' => RequestParams::queryString($request, $this->getFilterUniqId())
         ], '');
 
         ob_start();

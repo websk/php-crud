@@ -77,6 +77,6 @@ class CRUDFormCreateScript
     {
         ob_start();
         self::render($form_id, $table_class);
-        return ob_get_clean();
+        return ob_get_clean() ?: '';
     }
 }

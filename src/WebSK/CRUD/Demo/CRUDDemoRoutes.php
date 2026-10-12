@@ -21,7 +21,7 @@ class CRUDDemoRoutes
 {
 
     /**
-     * @param App $app
+     * @param App<\Psr\Container\ContainerInterface|null> $app
      */
     public static function register(App $app): void
     {

@@ -4,7 +4,7 @@ namespace WebSK\CRUD;
 
 class CRUDPreloader
 {
-    public static function preloader()
+    public static function preloader(): string
     {
         static $include_script;
 
@@ -65,7 +65,7 @@ class CRUDPreloader
                 };
             </script>
             <?php
-            $html = ob_get_clean();
+            $html = ob_get_clean() ?: '';
 
         }
         return $html;

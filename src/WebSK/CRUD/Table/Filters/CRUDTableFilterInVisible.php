@@ -4,6 +4,7 @@ namespace WebSK\CRUD\Table\Filters;
 
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\CRUD\CRUDHtml;
+use WebSK\CRUD\RequestParams;
 use WebSK\CRUD\Table\InterfaceCRUDTableFilterVisible;
 
 /**
@@ -56,14 +57,25 @@ class CRUDTableFilterInVisible implements InterfaceCRUDTableFilterVisible
         $placeholder_values_arr = [];
         $where = '';
 
-        $value = $request->getParam($this->getFilterUniqId(), '');
-
-        if ($value != '') {
-            if (!is_array($value)) {
-                $value = explode($this->getSeparator(), $value);
+        $raw_value = RequestParams::query($request, $this->getFilterUniqId(), '');
+        if (is_array($raw_value)) {
+            $value = [];
+            foreach ($raw_value as $item) {
+                if (!is_scalar($item) && $item !== null) {
+                    throw new \InvalidArgumentException('Filter value must be scalar');
+                }
+                $value[] = (string) $item;
             }
+        } else {
+            $string_value = RequestParams::queryString($request, $this->getFilterUniqId());
+            $separator = $this->getSeparator();
+            if ($separator === '') {
+                throw new \InvalidArgumentException('Filter separator cannot be empty');
+            }
+            $value = $string_value === '' ? [] : explode($separator, $string_value);
+        }
 
-            if(count($value) > 0) {
+        if ($value !== []) {
                 $column_name = $this->getFieldName();
                 $column_name = preg_replace("/[^a-zA-Z0-9_]+/", "", $column_name);
 
@@ -73,7 +85,6 @@ class CRUDTableFilterInVisible implements InterfaceCRUDTableFilterVisible
                     $placeholder_values_arr[] = $val;
                 }
                 $where = $column_name . " IN (" . implode(',', $in_arr) . ")";
-            }
         }
 
         return [$where, $placeholder_values_arr];
@@ -88,7 +99,7 @@ class CRUDTableFilterInVisible implements InterfaceCRUDTableFilterVisible
             'name' => $this->getFilterUniqId(),
             'id' => $this->getFilterUniqId(),
             'class' => $this->isInline() ? '' : 'form-control',
-            'value' => $request->getParam($this->getFilterUniqId(), '')
+            'value' => RequestParams::queryString($request, $this->getFilterUniqId())
         ], '');
 
         ob_start();
@@ -117,7 +128,7 @@ class CRUDTableFilterInVisible implements InterfaceCRUDTableFilterVisible
             new CRUDTableFilterInVisible('<?= $this->getFilterUniqId() ?>');
         </script>
         <?php
-        $html .= ob_get_clean();
+        $html .= ob_get_clean() ?: '';
 
         return $html;
     }

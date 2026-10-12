@@ -8,17 +8,24 @@ use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\Demo\CRUDDemoApp;
 use WebSK\Slim\Facade;
 
-require '../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 $config_path = realpath(__DIR__ . '/../config/config.php');
+if ($config_path === false) {
+    throw new RuntimeException('Configuration file config/config.php was not found.');
+}
+
 $config = require_once $config_path;
+if (!is_array($config) || !isset($config['settings']) || !is_array($config['settings'])) {
+    throw new UnexpectedValueException('Configuration must contain a settings array.');
+}
 
 $configuration = new Configuration();
 $configuration->setDefinitions([$config]);
-$configuration->setUseAnnotations(true);
+$configuration->setUseAttributes(true);
 
 $container = ContainerBuilder::build($configuration);
-$container->set(ServerRequestInterface::class, function () {
+$container->set(ServerRequestInterface::class, static function (): ServerRequestInterface {
     return ServerRequestCreatorFactory::create()->createServerRequestFromGlobals();
 });
 ConfWrapper::setConfig($config['settings']);

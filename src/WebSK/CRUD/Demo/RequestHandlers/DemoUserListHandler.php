@@ -6,6 +6,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use WebSK\Config\ConfWrapper;
 use WebSK\CRUD\CRUD;
+use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Demo\DemoUser;
 use WebSK\CRUD\Form\CRUDFormRow;
@@ -32,7 +33,7 @@ use WebSK\Views\PhpRender;
  */
 class DemoUserListHandler extends BaseHandler
 {
-    /** @Inject */
+    #[\DI\Attribute\Inject]
     protected CRUD $crud_service;
 
     const string FILTER_EMAIL = 'user_email';
@@ -69,8 +70,10 @@ class DemoUserListHandler extends BaseHandler
                         )
                     ),
                 ],
-                function(DemoUser $user_obj) {
-                    return Router::urlFor(DemoUserEditHandler::class, ['demo_user_id' => $user_obj->getId()]);
+                function(\WebSK\Entity\InterfaceEntity $user_obj): string {
+                    return Router::urlFor(DemoUserEditHandler::class, [
+                        'demo_user_id' => CRUDCompiler::entityId($user_obj)
+                    ]);
                 }
             ),
             [
@@ -79,8 +82,10 @@ class DemoUserListHandler extends BaseHandler
                     'Имя',
                     new CRUDTableWidgetTextWithLink(
                         DemoUser::_NAME,
-                        function(DemoUser $user_obj) {
-                            return Router::urlFor(DemoUserEditHandler::class, ['demo_user_id' => $user_obj->getId()]);
+                        function(\WebSK\Entity\InterfaceEntity $user_obj): string {
+                            return Router::urlFor(DemoUserEditHandler::class, [
+                                'demo_user_id' => CRUDCompiler::entityId($user_obj)
+                            ]);
                         }
                     )
                 ),
@@ -134,6 +139,6 @@ class DemoUserListHandler extends BaseHandler
         ];
         $layout_dto->setBreadcrumbsDtoArr($breadcrumbs_arr);
 
-        return PhpRender::renderLayout($response, ConfWrapper::value('layout.main'), $layout_dto);
+        return PhpRender::renderLayout($response, CRUDCompiler::string(ConfWrapper::value('layout.main'), 'layout.main'), $layout_dto);
     }
 }
