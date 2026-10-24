@@ -203,9 +203,9 @@ class Pager
                 $first_page_query_params_arr[self::pageOffsetFormFieldName($table_index_on_page)] = 0;
                 $first_page_query_params_arr[self::pageSizeFormFieldName($table_index_on_page)] =
                     self::getPageSize($request, $table_index_on_page, $default_page_size);
-                $html .= '<li><a data-page-offset="0" href="?' .
+                $html .= '<li class="page-item"><a class="page-link" data-page-offset="0" href="?' .
                     http_build_query($first_page_query_params_arr) .
-                    '"><span class="glyphicon glyphicon-home"></span> 0-' .
+                    '"><span class="fa fa-home"></span> 0-' .
                     self::getPageSize($request, $table_index_on_page, $default_page_size) .
                     '</a></li>';
 
@@ -215,18 +215,18 @@ class Pager
                 $previous_page_query_params_arr[self::pageSizeFormFieldName($table_index_on_page)] =
                     self::getPageSize($request, $table_index_on_page, $default_page_size);
 
-                $html .= '<li><a data-page-offset="' . self::getPrevPageStart($request, $table_index_on_page, $default_page_size) .
+                $html .= '<li class="page-item"><a class="page-link" data-page-offset="' . self::getPrevPageStart($request, $table_index_on_page, $default_page_size) .
                     '" href="?' . http_build_query($previous_page_query_params_arr) .
-                    '"><span class="glyphicon glyphicon-arrow-left"></span> ' .
+                    '"><span class="fa fa-arrow-left"></span> ' .
                     self::getPrevPageStart($request, $table_index_on_page, $default_page_size) . '-' .
                     (self::getPrevPageStart($request, $table_index_on_page, $default_page_size) + self::getPageSize($request, $table_index_on_page, $default_page_size)) .
                     '</a></li>';
             } else {
-                $html .= '<li class="disabled"><a href="#"><span class="glyphicon glyphicon-home"></span></a></li>';
-                $html .= '<li class="disabled"><a href="#"><span class="glyphicon glyphicon-arrow-left"></span></a></li>';
+                $html .= '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span class="fa fa-home"></span></a></li>';
+                $html .= '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span class="fa fa-arrow-left"></span></a></li>';
             }
 
-            $html .= '<li class="active"><a data-page-offset="' .
+            $html .= '<li class="page-item active" aria-current="page"><a class="page-link" data-page-offset="' .
                 self::getPageOffset($request, $table_index_on_page) .
                 '" href="#">' . self::getPageOffset($request, $table_index_on_page) . '-' .
                 (self::getPageOffset($request, $table_index_on_page) + self::getPageSize($request, $table_index_on_page, $default_page_size)) .
@@ -239,17 +239,17 @@ class Pager
                 $next_page_query_params_arr[self::pageSizeFormFieldName($table_index_on_page)] =
                     self::getPageSize($request, $table_index_on_page, $default_page_size);
 
-                $html .= '<li><a data-page-offset="' . self::getNextPageStart($request, $table_index_on_page, $default_page_size) .
-                    '" class="next-page" href="?' . http_build_query($next_page_query_params_arr) . '">' .
+                $html .= '<li class="page-item"><a data-page-offset="' . self::getNextPageStart($request, $table_index_on_page, $default_page_size) .
+                    '" class="page-link next-page" href="?' . http_build_query($next_page_query_params_arr) . '">' .
                     self::getNextPageStart($request, $table_index_on_page, $default_page_size) . '-' .
                     (self::getNextPageStart($request, $table_index_on_page, $default_page_size) + self::getPageSize($request, $table_index_on_page, $default_page_size)) .
-                    ' <span class="glyphicon glyphicon-arrow-right"></span></a></a></li>';
+                    ' <span class="fa fa-arrow-right"></span></a></li>';
             } else {
-                $html .= '<li class="disabled"><a href="#"><span class="glyphicon glyphicon-arrow-right"></span></a></li>';
+                $html .= '<li class="page-item disabled"><a class="page-link" href="#" tabindex="-1" aria-disabled="true"><span class="fa fa-arrow-right"></span></a></li>';
             }
 
             if ($display_total_rows_count) {
-                $html .= '<li class="disabled"><a href="#">Всего записей: ' . $total_rows_count . '</a></li>';
+                $html .= '<li class="page-item disabled"><span class="page-link">Всего записей: ' . $total_rows_count . '</span></li>';
             }
         }
 

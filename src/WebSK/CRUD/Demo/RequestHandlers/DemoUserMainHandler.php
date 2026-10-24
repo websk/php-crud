@@ -25,9 +25,9 @@ class DemoUserMainHandler extends BaseHandler
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
     {
         $content_html = '<div class="list-group">';
-        $content_html .= '<a href="' . $this->urlFor(DemoUserListHandler::class) . '" class="list-group-item">Пользователи</a>';
-        $content_html .= '<a href="' . $this->urlFor(DemoCompanyListHandler::class) . '" class="list-group-item">Компании</a>';
-        $content_html .= '<div>';
+        $content_html .= '<a href="' . $this->urlFor(DemoUserListHandler::class) . '" class="list-group-item list-group-item-action">Пользователи</a>';
+        $content_html .= '<a href="' . $this->urlFor(DemoCompanyListHandler::class) . '" class="list-group-item list-group-item-action">Компании</a>';
+        $content_html .= '</div>';
 
         $layout_dto = new LayoutDTO();
         $layout_dto->setTitle('Компании');

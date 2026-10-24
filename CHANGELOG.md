@@ -1,6 +1,24 @@
 # Changelog
 
-## Unreleased
+## [4.0.0](https://github.com/websk/php-crud/releases/tag/4.0.0) - 2026-10-24
+
+### Added
+
+- ESLint checks for the asset manifest, Playwright regressions for the documented frontend behavior baseline, and npm commands for asset reproducibility and dependency audits.
+- A Docker demo browser check for real CRUD create/edit forms, Magnific Popup, Ace synchronization and remote Tokenize2 filtering.
+
+### Changed
+
+- Replaced the copy-only Webpack setup with a deterministic Node.js 24 asset build and reproducibility check.
+- Updated jQuery, jQuery UI, jQuery Validation, Ace and Font Awesome; legacy Font Awesome class names remain available through the official compatibility shim.
+- Updated Bootstrap from 3.4.1 to 5.3.8 and migrated CRUD forms, controls, pagination, modals, collapse triggers and responsive utilities to Bootstrap 5 markup.
+- Replaced external MediumEditor and Blueimp File Upload CDN references with npm-managed local assets and added Tokenize2 1.3.5 as a direct dependency of the deterministic asset build.
+- Replaced Eonasdan Bootstrap Datetimepicker and Moment with native browser controls while preserving SQL date-time and Unix timestamp form values.
+- Applied native required-field validation to the visible date-time and timestamp controls.
+- Used the Ace text editor for comments in the demo user create and edit forms.
+- Corrected generated HTML5 markup, completed the Bootstrap 5 utility migration, improved responsive form and table layouts and control contrast, and moved shared CRUD widget styles into the deterministic asset build.
+- Removed the unused GPL-licensed Fancybox dependency and its demo layout assets.
+- Removed the obsolete Webpack configuration and unused PHP 8.3 ini file from the release archive.
 
 ## [3.0.0](https://github.com/websk/php-crud/releases/tag/3.0.0) - 2026-10-12
 

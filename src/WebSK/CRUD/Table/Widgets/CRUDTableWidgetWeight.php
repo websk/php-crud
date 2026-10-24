@@ -36,7 +36,7 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
     public function __construct(
         array $context_fields_arr,
         string $button_text = '',
-        string $button_class_str = 'btn btn-xs btn-default glyphicon glyphicon-arrow-up'
+        string $button_class_str = 'btn btn-sm btn-secondary fa fa-arrow-up'
     ) {
         $this->setContextFieldsArr($context_fields_arr);
         $this->setButtonText($button_text);
@@ -55,7 +55,7 @@ class CRUDTableWidgetWeight implements InterfaceCRUDTableWidget
         }
 
         $content_html = '';
-        $content_html .= '<form style="display: inline;" method="post">';
+        $content_html .= '<form class="d-inline" method="post">';
         $content_html .= '<input type="hidden" name="' . CRUDOperations::FIELD_NAME_OPERATION_CODE . '" value="' . Sanitize::sanitizeAttrValue(CRUDOperations::OPERATION_SWAP_ENTITY_WEIGHT) . '">';
         $content_html .= '<input type="hidden" name="' . self::FORMFIELD_CONTEXT_FIELDS_NAME . '" value="' .
             Sanitize::sanitizeAttrValue(implode(',', array_keys($this->getContextFieldsArr()))) . '">';

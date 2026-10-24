@@ -52,7 +52,7 @@ class CRUDTableWidgetReferenceSelect implements InterfaceCRUDTableWidget
             $id = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $id_field_name);
         }
 
-        return '<button class="btn btn-xs btn-default js-ajax-form-select" type="submit" ' .
+        return '<button class="btn btn-sm btn-secondary js-ajax-form-select" type="submit" ' .
             'data-id="' . Sanitize::sanitizeAttrValue(CRUDCompiler::nullableString($id, 'Entity ID')) . '" ' .
             'data-title="' . Sanitize::sanitizeAttrValue(CRUDCompiler::nullableString($obj_title, 'Title')) . '">Выбор</button>';
     }

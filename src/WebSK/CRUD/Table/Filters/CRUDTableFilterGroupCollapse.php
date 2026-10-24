@@ -51,20 +51,20 @@ class CRUDTableFilterGroupCollapse implements InterfaceCRUDTableFilterGroup
 
         $html = '';
 
-        $html .= '<div class="form-group">';
-        $html .= '<label class="col-sm-4 text-right control-label"><a data-toggle="collapse" href="#' . $this->getFilterUniqId() . '" aria-expanded="false" aria-controls="report_filters" class="collapsed"><span class="fa fa-angle-down"></span> '. $this->getTitle() .'</a></label>';
+        $html .= '<div class="row mb-3">';
+        $html .= '<div class="col-sm-4 text-sm-end col-form-label"><a data-bs-toggle="collapse" href="#' . $this->getFilterUniqId() . '" aria-expanded="false" aria-controls="' . $this->getFilterUniqId() . '" class="collapsed"><span class="fa fa-angle-down"></span> '. $this->getTitle() .'</a></div>';
         $html .= '</div>';
 
-        $html .= '<div class="form-group collapse" id="' . $this->getFilterUniqId() . '" aria-expanded="false">';
+        $html .= '<div class="collapse" id="' . $this->getFilterUniqId() . '">';
         foreach ($filters_arr as $filter_obj) {
             if (!($filter_obj instanceof InterfaceCRUDTableFilterVisible)) {
                 throw new \Exception('Filter doesnt implement interface');
             }
 
             $html .= '<div class="col-md-12">';
-            $html .= '<div class="form-group">';
+            $html .= '<div class="row mb-3">';
 
-            $html .= '<label class="col-sm-4 text-right control-label">' . $filter_obj->getTitle() . '</label>';
+            $html .= '<div class="col-sm-4 text-sm-end col-form-label">' . $filter_obj->getTitle() . '</div>';
             $html .= '<div class="col-sm-8">' . $filter_obj->getHtml($request) . '</div>';
 
             $html .= '</div>';

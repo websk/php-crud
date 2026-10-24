@@ -19,8 +19,8 @@ class CRUDPreloader
                 var CRUDPage = CRUDPage || {};
                 CRUDPage.preloader = CRUDPage.preloader || {
                     template: function() {
-                        return '<div id="preloader" style="z-index: 100000;position: fixed;top: 0;bottom: 0;left: 0;right: 0;background-color: rgba(255, 255, 255, 0.6);">\
-								<svg style="position: absolute;top: 0;bottom: 0;left: 0;right: 0;display: block;width: 100px;height: 100px;margin: auto;" width="100px" height="100px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="uil-ring-alt">\
+                        return '<div id="preloader" class="crud-preloader">\
+								<svg class="crud-preloader-spinner uil-ring-alt" width="100" height="100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">\
 									<rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect>\
 									<circle cx="50" cy="50" r="40" stroke="rgba(0,0,0,0.5)" fill="none" stroke-width="10" stroke-linecap="round"></circle>\
 									<circle cx="50" cy="50" r="40" stroke="#ffffff" fill="none" stroke-width="6" stroke-linecap="round">\

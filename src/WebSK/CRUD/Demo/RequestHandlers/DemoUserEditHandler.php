@@ -11,10 +11,10 @@ use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Demo\DemoUser;
 use WebSK\CRUD\Demo\DemoUserService;
 use WebSK\CRUD\Form\CRUDFormRow;
+use WebSK\CRUD\Form\Widgets\CRUDFormWidgetAceTextarea;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetDate;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetReferenceAjax;
-use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTextarea;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTimestamp;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetUpload;
 use WebSK\Entity\InterfaceEntity;
@@ -69,7 +69,15 @@ class DemoUserEditHandler extends BaseHandler
                         )
                     )
                 ),
-                new CRUDFormRow('Комментарий', new CRUDFormWidgetTextarea(DemoUser::_COMMENT)),
+                new CRUDFormRow(
+                    'Комментарий',
+                    new CRUDFormWidgetAceTextarea(
+                        DemoUser::_COMMENT,
+                        CRUDFormWidgetAceTextarea::ACE_MODE_TEXT,
+                        false,
+                        true
+                    )
+                ),
                 new CRUDFormRow('Создано', new CRUDFormWidgetTimestamp(DemoUser::_CREATED_AT_TS)),
                 new CRUDFormRow(
                     'Фото',

@@ -1,141 +1,83 @@
-#
-#--------------------------------------------------------------------------
-# Image Setup
-#--------------------------------------------------------------------------
-#
-# To edit the 'php-fpm' base Image, visit its repository on Github
-#    https://github.com/Laradock/php-fpm
-#
-# To change its version, see the available Tags on the Docker Hub:
-#    https://hub.docker.com/r/laradock/php-fpm/tags/
-#
-# Note: Base Image name format {image-tag}-{php-version}
-#
-
-FROM laradock/php-fpm:latest-8.5
-
-# always run apt update when start and after add new source list, then clean up at end.
-RUN set -xe; \
-    apt-get update -yqq && \
-    pecl channel-update pecl.php.net && \
-    apt-get install -yqq \
-      apt-utils \
-      #
-      #--------------------------------------------------------------------------
-      # Mandatory Software's Installation
-      #--------------------------------------------------------------------------
-      #
-      # Mandatory Software's such as ("mcrypt", "pdo_mysql", "libssl-dev", ....)
-      # are installed on the base image 'laradock/php-fpm' image. If you want
-      # to add more Software's or remove existing one, you need to edit the
-      # base image (https://github.com/Laradock/php-fpm).
-      #
-      # next lines are here becase there is no auto build on dockerhub see https://github.com/laradock/laradock/pull/1903#issuecomment-463142846
-      libzip-dev zip unzip && \
-      docker-php-ext-configure zip; \
-      # Install the zip extension
-      docker-php-ext-install zip && \
-      php -m | grep -q 'zip'
-
-###########################################################################
-# Composer:
-###########################################################################
-
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-#
-#--------------------------------------------------------------------------
-# Optional Software's Installation
-#--------------------------------------------------------------------------
-#
-# Optional Software's will only be installed if you set them to `true`
-# in the `docker-compose.yml` before the build.
-# Example:
-#   - INSTALL_ZIP_ARCHIVE=true
-#
-
-#####################################
-# xDebug:
-#####################################
+ARG PHP_VERSION=8.5
+FROM laradock/php-fpm:latest-${PHP_VERSION}@sha256:6e2390fd2a6f811367c34d27ab0021de92eb39ece55eeeda60c8d7e85c38c292
 
 ARG INSTALL_XDEBUG=false
-RUN if [ ${INSTALL_XDEBUG} = true ]; then \
-    # Install the xdebug extension
-    pecl install xdebug && \
-    docker-php-ext-enable xdebug \
-;fi
-
-# Copy xdebug configuration for remote debugging
-COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
-
-#####################################
-# ZipArchive:
-#####################################
-
-ARG INSTALL_ZIP_ARCHIVE=false
-RUN if [ ${INSTALL_ZIP_ARCHIVE} = true ]; then \
-    # Install the zip extension
-    docker-php-ext-install zip \
-;fi
-
-#####################################
-# PHP Memcached:
-#####################################
-
-RUN pecl install memcached \
-        && docker-php-ext-enable memcached
-
-#####################################
-# Mysqli:
-#####################################
-
-RUN docker-php-ext-install mysqli
-
-#####################################
-# Human Language and Character Encoding Support:
-#####################################
-
+ARG INSTALL_MEMCACHED=false
 ARG INSTALL_INTL=false
-RUN if [ ${INSTALL_INTL} = true ]; then \
-    # Install intl and requirements
-    apt-get update -yqq && \
-    apt-get install -y zlib1g-dev libicu-dev g++ && \
-    docker-php-ext-configure intl && \
-    docker-php-ext-install intl \
-;fi
-
-#####################################
-# pcntl extention:
-#####################################
-
 ARG INSTALL_PCNTL=false
-RUN docker-php-ext-install pcntl
 
-#####################################
-# Mailhog:
-#####################################
-RUN apt-get install wget -y && \
-    wget https://github.com/mailhog/mhsendmail/releases/download/v0.2.0/mhsendmail_linux_amd64 && \
-    chmod +x mhsendmail_linux_amd64 && \
-    mv mhsendmail_linux_amd64 /usr/local/bin/mhsendmail
+RUN set -eux; \
+    apt-get update -yqq; \
+    apt-get install -yqq --no-install-recommends \
+        ca-certificates \
+        curl \
+        g++ \
+        libicu-dev \
+        libmemcached-dev \
+        libsasl2-dev \
+        libzip-dev \
+        pkg-config \
+        unzip \
+        zip \
+        zlib1g-dev; \
+    docker-php-ext-configure zip; \
+    docker-php-ext-install -j"$(nproc)" zip mysqli; \
+    if [ "${INSTALL_INTL}" = "true" ]; then \
+        docker-php-ext-configure intl; \
+        docker-php-ext-install -j"$(nproc)" intl; \
+    fi; \
+    if [ "${INSTALL_PCNTL}" = "true" ]; then \
+        docker-php-ext-install -j"$(nproc)" pcntl; \
+    fi; \
+    install_pecl_extension() { \
+        extension="$1"; \
+        attempt=1; \
+        while [ "${attempt}" -le 3 ]; do \
+            if pecl install "${extension}"; then \
+                return 0; \
+            fi; \
+            attempt=$((attempt + 1)); \
+            sleep 5; \
+        done; \
+        return 1; \
+    }; \
+    if [ "${INSTALL_XDEBUG}" = "true" ]; then \
+        install_pecl_extension xdebug; \
+        docker-php-ext-enable xdebug; \
+    fi; \
+    if [ "${INSTALL_MEMCACHED}" = "true" ]; then \
+        install_pecl_extension memcached; \
+        docker-php-ext-enable memcached; \
+    fi; \
+    rm -rf /tmp/pear ~/.pearrc /var/lib/apt/lists/*; \
+    php -m | grep -Fxq zip; \
+    php -m | grep -Fxq mysqli; \
+    if [ "${INSTALL_INTL}" = "true" ]; then php -m | grep -Fxq intl; fi; \
+    if [ "${INSTALL_PCNTL}" = "true" ]; then php -m | grep -Fxq pcntl; fi; \
+    if [ "${INSTALL_XDEBUG}" = "true" ]; then php -m | grep -Fxiq xdebug; fi; \
+    if [ "${INSTALL_MEMCACHED}" = "true" ]; then php -m | grep -Fxq memcached; fi
 
-#####################################
-# Check PHP version:
-#####################################
+RUN set -eux; \
+    expected_checksum="$(curl -fsSL https://composer.github.io/installer.sig)"; \
+    curl -fsSL https://getcomposer.org/installer -o /tmp/composer-setup.php; \
+    actual_checksum="$(php -r "echo hash_file('sha384', '/tmp/composer-setup.php');")"; \
+    [ "${expected_checksum}" = "${actual_checksum}" ]; \
+    php /tmp/composer-setup.php --quiet --install-dir=/usr/local/bin --filename=composer; \
+    rm /tmp/composer-setup.php; \
+    composer --version
 
-RUN php -v | head -n 1 | grep -q "PHP 8.5."
+COPY ./xdebug.ini /tmp/xdebug.ini
+RUN set -eux; \
+    if [ "${INSTALL_XDEBUG}" = "true" ]; then \
+        mv /tmp/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini; \
+    else \
+        rm /tmp/xdebug.ini; \
+    fi
 
-#
-#--------------------------------------------------------------------------
-# Final Touch
-#--------------------------------------------------------------------------
-#
+RUN php -v | head -n 1 | grep -Eq '^PHP 8\.5\.'
 
-ADD ./php.ini /usr/local/etc/php/conf.d
-ADD ./phpfpm.pool.conf /usr/local/etc/php-fpm.d/
-
-#RUN rm -r /var/lib/apt/lists/*
+COPY ./php.ini /usr/local/etc/php/conf.d/99-project.ini
+COPY ./phpfpm.pool.conf /usr/local/etc/php-fpm.d/zz-project.conf
 
 RUN usermod -u 1000 www-data
 

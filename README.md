@@ -7,6 +7,7 @@ CRUD forms, tables, filters and widgets for WebSK applications based on Slim 4 a
 - PHP 8.3 or newer, including PHP 8.5
 - Composer 2
 - PHP extensions: `fileinfo`, `json`, `mbstring`, `pdo`
+- Node.js 24 LTS and npm 11 when rebuilding the demo frontend assets
 
 ## Install
 
@@ -37,7 +38,31 @@ Build static demo assets with:
 ```shell
 npm ci
 npm run build
+npm run check
+npm run audit:production
+npm run audit:high
 ```
+
+The build copies an explicit set of browser files from `node_modules` into the ignored
+`public/assets/libraries` directory. `npm run check` checks the asset-manifest JavaScript,
+verifies every declared source asset, rejects server-side files anywhere under `public/assets`,
+compares the local assets with a temporary rebuild, and runs the documented frontend behavior
+baseline in a real Chromium browser. Install the Playwright browser once with `npx playwright install chromium`;
+set `PLAYWRIGHT_CHANNEL=chrome` to use an installed Google Chrome. `audit:production` fails on any
+production advisory of moderate severity or higher; `audit:high` checks the complete dependency
+tree for high and critical findings.
+
+With the Docker demo running, use `PLAYWRIGHT_CHANNEL=chrome npm run test:browser:docker`
+to exercise the real user list and edit routes, create popup, Ace editor and remote multiple
+autocomplete. The check edits controls in the browser without saving entities.
+
+The demo and generated CRUD markup use Bootstrap 5.3.8. Native browser date controls are used by
+the CRUD date, date-time and timestamp widgets, so Moment and Bootstrap Datetimepicker are no
+longer required. MediumEditor, Blueimp File Upload and Tokenize2 are served from generated local
+assets; the demo no longer relies on third-party frontend CDNs.
+Shared form, popup and filter rules are generated as `/assets/libraries/crud/crud.css`.
+Applications consuming `websk/php-crud` must publish that file together with the npm-managed
+library assets and include it after Bootstrap or their Bootstrap-based theme styles.
 
 ## Demo
 
@@ -109,6 +134,9 @@ npm run build
   ```shell
   npm ci
   npm run build
+  npm run check
+  npm run audit:production
+  npm run audit:high
   ```
 
 * Open `https://php-crud.devbox`.

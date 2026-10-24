@@ -76,7 +76,7 @@ class CRUDFormWidgetReference implements InterfaceCRUDFormWidget
         $select_element_id = 'js_select_' . rand(1, 999999);
 
         $html .= '<select id="' . Sanitize::sanitizeAttrValue($select_element_id) . '" ' .
-            'name="' . Sanitize::sanitizeAttrValue($field_name) . '" class="form-control">' .
+            'name="' . Sanitize::sanitizeAttrValue($field_name) . '" class="form-select">' .
             implode('', $options_html_arr) . '</select>';
         $html .= '<input type="hidden" id="' . Sanitize::sanitizeAttrValue($select_element_id) . '_is_null" ' .
             'name="' . Sanitize::sanitizeAttrValue($field_name) . '___is_null"/>';

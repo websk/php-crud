@@ -101,12 +101,12 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         $content_html = '';
 
         if (!isset($crud_form_widget_blueimp_file_upload_include_script)) {
-            $cdn_blueimp_file_upload_path = 'https://cdnjs.cloudflare.com/ajax/libs/blueimp-file-upload/10.7.0';
+            $blueimp_file_upload_path = '/assets/libraries/blueimp-file-upload';
 
-            $content_html .= '<link rel="stylesheet" href="' . $cdn_blueimp_file_upload_path . '/css/jquery.fileupload.css">' .
-                '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload.js"></script>' .
-                '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload-process.js"></script>' .
-                '<script src="' . $cdn_blueimp_file_upload_path . '/js/jquery.fileupload-validate.js"></script>';
+            $content_html .= '<link rel="stylesheet" href="' . $blueimp_file_upload_path . '/css/jquery.fileupload.css">' .
+                '<script src="' . $blueimp_file_upload_path . '/js/jquery.fileupload.js"></script>' .
+                '<script src="' . $blueimp_file_upload_path . '/js/jquery.fileupload-process.js"></script>' .
+                '<script src="' . $blueimp_file_upload_path . '/js/jquery.fileupload-validate.js"></script>';
 
             $crud_form_widget_blueimp_file_upload_include_script = false;
         }
@@ -125,7 +125,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
         ob_start();
         ?>
         <span class="btn btn-success fileinput-button" id="<?php echo $fileinput_button_id; ?>">
-            <i class="glyphicon glyphicon-plus"></i>
+            <i class="fa fa-plus"></i>
             <span>Выберите файл...</span>
             <input id="<?php echo $element_id; ?>" type="file" name="file_<?php echo $field_name; ?>">
         </span>
@@ -147,7 +147,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
                     if ($file_type == self::FILE_TYPE_IMAGE) {
                     ?>
-                    html += '<img src="' + file_url +'" class="img-responsive img-thumbnail" style="max-width: 200px">';
+                    html += '<img src="' + file_url +'" class="img-fluid img-thumbnail crud-upload-preview" alt="">';
                     <?php
                     } else {
                     ?>
@@ -181,7 +181,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
                         },
                         url: url,
                         type: 'POST'
-                    }).success(function (data) {
+                    }).done(function (data) {
                         if (data.error) {
                             var error_msg = $('<span class="text-danger"/>').text(data.error);
                             $('#<?php echo $files_area_id; ?>').append(error_msg);
@@ -192,7 +192,7 @@ class CRUDFormWidgetUpload implements InterfaceCRUDFormWidget
 
                         link.closest('p').remove();
                         $('#<?php echo $files_area_id; ?>').html('');
-                    }).error(
+                    }).fail(
                         function (xhr, status, error) {
                             var error_msg = $('<span class="text-danger"/>').text(error);
                             $('#<?php echo $files_area_id; ?>').append(error_msg);

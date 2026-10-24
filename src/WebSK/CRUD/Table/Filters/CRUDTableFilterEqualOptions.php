@@ -120,7 +120,7 @@ class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
         $html = '';
 
         $html .= '<select onchange="f' . $input_name . '_selectchange(this);" id="' .
-            $input_name . '" name="' . $input_name . '" class="form-control">';
+            $input_name . '" name="' . $input_name . '" class="form-select">';
 
         $options_arr = $this->getOptionsArr();
         foreach ($options_arr as $value => $title) {
@@ -131,9 +131,9 @@ class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
         $html .= '</select>';
 
         if ($this->isShowNullCheckbox()) {
-            $html .= '<div class="input-group-addon">';
+            $html .= '<div class="input-group-text">';
 
-            $html .= '<input type="checkbox" onchange="f' . $input_name . '_nullchange(this);" '.
+            $html .= '<input class="form-check-input mt-0 me-1" type="checkbox" onchange="f' . $input_name . '_nullchange(this);" '.
                 'value="1" id="' . $this->nullCheckboxInputName() . '" name="' . $this->nullCheckboxInputName() . '" ' .
                 (is_null($field_value) ? ' checked ' : '') . ' /> null';
             $html .= '</div>';
@@ -165,9 +165,9 @@ class CRUDTableFilterEqualOptions implements InterfaceCRUDTableFilterVisible
 
         $html .= $this->widgetHtmlForValue($this->getValue($request), $input_name);
 
-        $html .= '<div class="input-group-addon">';
-        $html .= '<label>';
-        $html .= '<input title="Filter active" onchange="f' . $input_name . '_enabledclick(this);" '.
+        $html .= '<div class="input-group-text">';
+        $html .= '<label class="form-check-label">';
+        $html .= '<input class="form-check-input mt-0" title="Filter active" onchange="f' . $input_name . '_enabledclick(this);" '.
             'type="checkbox" id="' . $this->enabledCheckboxInputName() . '" '.
             'name="' . $this->enabledCheckboxInputName() . '" ' .
             ($this->isEnabled($request) ? 'checked' : '') . ' value="1">';

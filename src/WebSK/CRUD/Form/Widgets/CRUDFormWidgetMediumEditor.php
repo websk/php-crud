@@ -57,20 +57,13 @@ class CRUDFormWidgetMediumEditor implements InterfaceCRUDFormWidget
         $field_value = CRUDFieldsAccess::getObjectFieldValue($entity_obj, $field_name);
         $field_value = CRUDCompiler::nullableString($field_value, $field_name);
 
-        /* @TODO Нужно изменить на нах CDN */
         $script = '';
         $uniqid = $this->getUniqid();
         if (!isset($CRUDFormWidgetMediumEditor_include_script)) {
             $script = '
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/medium-editor/5.23.3/js/medium-editor.min.js"></script>
-				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/medium-editor/5.23.3/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8"/>
-				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/medium-editor/5.23.3/css/themes/default.min.css" type="text/css" media="screen" charset="utf-8"/>
-
-				<style>
-				.medium-editor-element {
-                   min-height: 300px;
-                }				
-                </style>
+                <script src="/assets/libraries/medium-editor/js/medium-editor.min.js"></script>
+				<link rel="stylesheet" href="/assets/libraries/medium-editor/css/medium-editor.min.css" type="text/css" media="screen" charset="utf-8"/>
+				<link rel="stylesheet" href="/assets/libraries/medium-editor/css/themes/default.min.css" type="text/css" media="screen" charset="utf-8"/>
 			';
             $CRUDFormWidgetMediumEditor_include_script = false;
         }
@@ -78,8 +71,9 @@ class CRUDFormWidgetMediumEditor implements InterfaceCRUDFormWidget
         $html = '';
 
         $html .= '<textarea id="' . $uniqid . '_textarea" name="' . Sanitize::sanitizeAttrValue($field_name) . '" '.
-            'style="display: none;">' . $field_value . '</textarea>';
-        $html .= '<div id="' . $uniqid . '" class="form-control" style="height: auto;">' . $field_value . '</div>';
+            'class="crud-widget-target">' . $field_value . '</textarea>';
+        $html .= '<div id="' . $uniqid . '" class="form-control crud-medium-editor">' .
+            $field_value . '</div>';
 
 
         ob_start(); ?>

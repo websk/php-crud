@@ -10,6 +10,7 @@ use WebSK\CRUD\CRUDCompiler;
 use WebSK\CRUD\Demo\DemoCompany;
 use WebSK\CRUD\Demo\DemoUser;
 use WebSK\CRUD\Form\CRUDFormRow;
+use WebSK\CRUD\Form\Widgets\CRUDFormWidgetAceTextarea;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetInput;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetReferenceAjax;
 use WebSK\CRUD\Table\CRUDTable;
@@ -56,6 +57,15 @@ class DemoUserListHandler extends BaseHandler
                     new CRUDFormRow('Имя', new CRUDFormWidgetInput(DemoUser::_FIRST_NAME)),
                     new CRUDFormRow('Фамилия', new CRUDFormWidgetInput(DemoUser::_LAST_NAME)),
                     new CRUDFormRow('Email', new CRUDFormWidgetInput(DemoUser::_EMAIL, false, true)),
+                    new CRUDFormRow(
+                        'Комментарий',
+                        new CRUDFormWidgetAceTextarea(
+                            DemoUser::_COMMENT,
+                            CRUDFormWidgetAceTextarea::ACE_MODE_TEXT,
+                            false,
+                            true
+                        )
+                    ),
                     new CRUDFormRow(
                         'Компания',
                         new CRUDFormWidgetReferenceAjax(

@@ -43,4 +43,18 @@ final class PagerTest extends TestCase
 
         self::assertSame($expected, Pager::getPageSize($request, 'users'));
     }
+
+    public function testPagerUsesBootstrapFiveMarkup(): void
+    {
+        $request = (new ServerRequestFactory())->createServerRequest('GET', '/');
+
+        $html = Pager::renderPager($request, 'users', 100, true, 250);
+
+        self::assertStringContainsString('class="pagination"', $html);
+        self::assertStringContainsString('class="page-item active" aria-current="page"', $html);
+        self::assertStringContainsString('class="page-link next-page"', $html);
+        self::assertStringContainsString('class="page-item disabled"', $html);
+        self::assertStringNotContainsString('<li class="active">', $html);
+        self::assertStringNotContainsString('</a></a>', $html);
+    }
 }

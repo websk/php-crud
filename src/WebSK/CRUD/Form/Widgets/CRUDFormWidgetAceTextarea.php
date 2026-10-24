@@ -74,23 +74,11 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
 
         $editor_element_id = 'editor_' . time() . '_' . Sanitize::sanitizeAttrValue($field_name) . rand(1, 999999);
 
-        $html .= '
-            <style>
-             #' . $editor_element_id . ' {
-                position: relative;
-                top: 0;
-                right: 0;
-                bottom: 0;
-                left: 0;
-                min-height: 500px;
-            }
-            </style>';
-
         // @TODO: is form-control needed?
-        $html .= '<div id="' . $editor_element_id . '" class="form-control">' .
+        $html .= '<div id="' . $editor_element_id . '" class="form-control crud-ace-editor">' .
             Sanitize::sanitizeTagContent($field_value) . '</div>';
         $html .= '<textarea id="' . $editor_element_id . '_target" name="' . Sanitize::sanitizeAttrValue($field_name) .
-            '" style="display: none;">' . Sanitize::sanitizeTagContent($field_value) . '</textarea>';
+            '" class="crud-widget-target">' . Sanitize::sanitizeTagContent($field_value) . '</textarea>';
 
         $html .= '<script>
             var editor' . $editor_element_id . ' = ace.edit("' . $editor_element_id . '");
@@ -102,7 +90,7 @@ class CRUDFormWidgetAceTextarea implements InterfaceCRUDFormWidget
 
             editor' . $editor_element_id . '.getSession().on("change", function() {
                 var target = document.getElementById("' . $editor_element_id . '_target");
-                target.innerHTML = editor' . $editor_element_id . '.getSession().getValue();
+                target.value = editor' . $editor_element_id . '.getSession().getValue();
             });
             </script>';
 

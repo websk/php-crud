@@ -9,3 +9,5 @@ vendor/
 **/.DS_Store
 /.phpunit.cache/
 /dist/
+/playwright-report/
+/test-results/

@@ -22,18 +22,21 @@ class CRUDFormScript
 
             echo CRUDPreloader::preloader();
             ?>
-            <style>
-                .required-class {
-                    border: 1px solid red;
-                }
-
-                .required-class[type="radio"]:before {
-                    font-size: 1em;
-                    content: '*';
-                    color: red;
-                }
-            </style>
             <script>
+                window.CRUDAssets = window.CRUDAssets || {};
+                window.CRUDAssets.loadStyles = window.CRUDAssets.loadStyles || function () {
+                    if (document.querySelector('link[data-crud-styles]')) {
+                        return;
+                    }
+
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = '/assets/libraries/crud/crud.css';
+                    link.dataset.crudStyles = '';
+                    document.head.appendChild(link);
+                };
+                window.CRUDAssets.loadStyles();
+
                 var CRUD = CRUD || {};
 
                 CRUD.Form = CRUD.Form || {
@@ -130,23 +133,11 @@ class CRUDFormScript
     }
 
     /**
-     * @return string
+     * @deprecated Native date controls do not require external scripts.
      */
     public static function includeBootstrapDateTimeScripts(): string
     {
-        static $CRUD_form_bootstrap_date_time_include_script;
-
-        $script = '';
-        if (!isset($CRUD_form_bootstrap_date_time_include_script)) {
-            $script = '
-				<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.js"></script>
-				<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/ru.js"></script>
-				<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/css/bootstrap-datetimepicker.min.css"/>
-				<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
-			';
-            $CRUD_form_bootstrap_date_time_include_script = false;
-        }
-
-        return $script;
+        return '';
     }
+
 }

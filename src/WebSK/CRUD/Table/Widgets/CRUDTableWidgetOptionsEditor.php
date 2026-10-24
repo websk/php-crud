@@ -64,7 +64,7 @@ class CRUDTableWidgetOptionsEditor implements InterfaceCRUDTableWidget
                 if ($value == $obj_value) {
                     $active = ' active';
                 }
-                echo '<button class="btn btn-xs btn-default' . $active . '" type="submit" '.
+                echo '<button class="btn btn-sm btn-secondary' . $active . '" type="submit" '.
                     'name="' . CRUDTable::FIELD_FIELD_VALUE . '" '.
                     'value="' . $value . '">' . $option_name . '</button>';
             }

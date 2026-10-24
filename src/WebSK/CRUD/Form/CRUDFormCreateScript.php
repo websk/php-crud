@@ -48,7 +48,7 @@ class CRUDFormCreateScript
                             type: "POST",
                             url: query,
                             data: data
-                        }).success(function (received_html) {
+                        }).done(function (received_html) {
                             CRUDPage.preloader.hide();
 
                             var $box = $('<div>', {html: received_html});

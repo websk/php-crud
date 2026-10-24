@@ -107,13 +107,13 @@ class CRUDFormWidgetOptions implements InterfaceCRUDFormWidget
         }
 
         $html .= '<div class="input-group">';
-        $html .= '<select name="' . $input_name . '" class="form-control" ' . $is_required_str . $disabled . '>' .
+        $html .= '<select name="' . $input_name . '" class="form-select" ' . $is_required_str . $disabled . '>' .
             $options . '</select>';
 
         if ($this->isShowNullCheckbox()) {
-            $html .= '<div class="input-group-addon checkbox">';
-            $html .= '<label>';
-            $html .= '<input type = "checkbox" value="1" name="' . Sanitize::sanitizeAttrValue($input_name) .
+            $html .= '<div class="input-group-text">';
+            $html .= '<label class="form-check-label">';
+            $html .= '<input class="form-check-input mt-0 me-1" type="checkbox" value="1" name="' . Sanitize::sanitizeAttrValue($input_name) .
                 '___is_null" ' . $is_null_checked . ' /> ' . self::NO_VALUE_TEXT;
             $html .= '</label>';
             $html .= '</div>';

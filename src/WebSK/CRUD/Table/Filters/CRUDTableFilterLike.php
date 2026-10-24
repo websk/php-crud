@@ -70,7 +70,7 @@ class CRUDTableFilterLike implements InterfaceCRUDTableFilterVisible
         ], '');
 
         if ($this->getCommentStr()) {
-            $html .= '<span class="help-block">' . $this->getCommentStr() . '</span>';
+            $html .= '<span class="form-text">' . $this->getCommentStr() . '</span>';
         }
 
         return $html;

@@ -169,7 +169,7 @@ class CRUDTable
 
             echo '<div class="table-responsive">';
 
-            echo '<table class="table table-hover">';
+            echo '<table class="table table-hover crud-table">';
 
             $has_nonempty_th = false;
             foreach ($this->column_obj_arr as $column_obj) {
@@ -209,17 +209,7 @@ class CRUDTable
                 foreach ($this->column_obj_arr as $column_obj) {
                     $widget_obj = $column_obj->getWidgetObj();
 
-                    $col_width_attr = '';
-
-                    if ($widget_obj instanceof CRUDTableWidgetDelete) {
-                        $col_width_attr = ' width="1px" ';
-                    }
-
-                    if ($widget_obj instanceof CRUDTableWidgetWeight) {
-                        $col_width_attr = ' width="1px" ';
-                    }
-
-                    echo '<td ' . $col_width_attr . ' style="word-break: break-all;">';
+                    echo '<td>';
                     echo $widget_obj->html($obj_obj, $this->crud);
                     echo '</td>';
                 }
@@ -478,8 +468,8 @@ class CRUDTable
         $html = '';
 
         if ($filters_arr) {
-            $html .= '<div class="">';
-            $html .= '<form class="filters-form form-horizontal">';
+            $html .= '<div class="crud-filters">';
+            $html .= '<form class="filters-form">';
             $html .= '<div class="row">';
 
             //$filter_index = 0;
@@ -489,9 +479,9 @@ class CRUDTable
 
                 if ($filter_obj instanceof InterfaceCRUDTableFilterVisible) {
                     $html .= '<div class="col-md-12">';
-                    $html .= '<div class="form-group">';
+                    $html .= '<div class="row mb-3">';
 
-                    $html .= '<label class="col-sm-4 text-right control-label">' . $filter_obj->getTitle() . '</label>';
+                    $html .= '<div class="col-sm-4 text-sm-end col-form-label">' . $filter_obj->getTitle() . '</div>';
                     $html .= '<div class="col-sm-8">' . $filter_obj->getHtml($request) . '</div>';
 
                     $html .= '</div>';
@@ -527,26 +517,23 @@ class CRUDTable
             return '';
         }
 
-        $html = CRUDHtml::div('filters-inline', '', function () use (
+        $html = CRUDHtml::div('filters-inline mb-2', '', function () use (
             $request,
             $filters_arr
         ) {
-            echo '<style>.filters-inline {margin-bottom: 10px;}</style>';
-
-            echo '<form class="filters-form" style="display: inline;">';
+            echo '<form class="filters-form d-inline">';
 
             foreach ($filters_arr as $filter_obj) {
                 //@TODO check class implements InterfaceCRUDTableFilter
 
                 if ($filter_obj instanceof InterfaceCRUDTableFilterVisible) {
-                    echo '<div style="display: inline-block; margin-right: 10px;">';
+                    echo '<div class="d-inline-block me-2">';
 
                     if ($filter_obj->getTitle()) {
-                        echo '<label style="display: inline-block; margin-top: 5px; margin-right: 5px;">' .
-                            $filter_obj->getTitle() . '</label>';
+                        echo '<span class="d-inline-block mt-1 me-1">' . $filter_obj->getTitle() . '</span>';
                     }
 
-                    echo '<span style="display: inline-block;">' . $filter_obj->getHtml($request) . '</span>';
+                    echo '<span class="d-inline-block">' . $filter_obj->getHtml($request) . '</span>';
                     echo '</div>';
                 } elseif ($filter_obj instanceof InterfaceCRUDTableFilterInvisible) {
                     // do nothing with invisible filters
@@ -575,10 +562,10 @@ class CRUDTable
         $button_create_position_class_name = '';
         switch ($create_button_position) {
             case self::CREATE_BUTTON_POSITION_LEFT_POPUP:
-                $button_create_position_class_name = ' pull-left';
+                $button_create_position_class_name = ' float-start';
                 break;
             case self::CREATE_BUTTON_POSITION_RIGHT_POPUP:
-                $button_create_position_class_name = ' pull-right';
+                $button_create_position_class_name = ' float-end';
                 break;
         }
 
@@ -587,13 +574,13 @@ class CRUDTable
         $create_form_element_id = 'collapse_' . rand(1, 999999);
         $html .= CRUDMagnificPopup::button(
             $create_form_element_id,
-            'btn btn-sm btn-default' . $button_create_position_class_name,
+            'btn btn-sm btn-secondary' . $button_create_position_class_name,
             self::CREATE_BUTTON_TEXT
         );
         $html .= CRUDMagnificPopup::popupHtml($create_form_element_id, $create_form_html);
 
         if (!$table_has_filters) {
-            $html .= '<div style="display: inline-block; width: 100%"></div>';
+            $html .= '<div class="w-100"></div>';
         }
 
         return $html;
@@ -613,36 +600,33 @@ class CRUDTable
         $button_create_position_class_name = '';
         switch ($create_position_button) {
             case self::CREATE_BUTTON_POSITION_LEFT_TOOLBAR:
-                $button_create_position_class_name = ' pull-left';
+                $button_create_position_class_name = ' float-start';
                 break;
             case self::CREATE_BUTTON_POSITION_RIGHT_TOOLBAR:
-                $button_create_position_class_name = ' pull-right';
+                $button_create_position_class_name = ' float-end';
                 break;
         }
 
         $create_form_element_id = 'collapse_' . rand(1, 999999);
-        $create_from_btn_group_id = '#btn-group-' . $create_form_element_id;
-
-        $html .= '<style>' . $create_from_btn_group_id . ' { margin-bottom: 10px; }</style>';
-        $html .= '<div class="btn-group' . $button_create_position_class_name . '" role="group">';
+        $html .= '<div class="btn-group mb-2' . $button_create_position_class_name . '" role="group">';
         if ($create_form_html) {
             $html .=
                 '<button 
                     type="button" 
-                    class="btn btn-default" 
-                    data-toggle="collapse" 
-                    data-target="#' . $create_form_element_id . '"
+                    class="btn btn-secondary"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#' . $create_form_element_id . '"
                 >' . self::CREATE_BUTTON_TEXT . '</button>';
         }
         $html .= '</div>';
 
         if ($create_form_html) {
             $html .= '<br /><br />';
-            $html .= '<div class="collapse" id="' . $create_form_element_id . '"><div class="well">' .
+            $html .= '<div class="collapse" id="' . $create_form_element_id . '"><div class="border rounded p-3 bg-body-tertiary">' .
                 $create_form_html . '</div></div>';
             $html .= '<script>' .
                 '$("#' . $create_form_element_id . '")
-                    .on("shown.bs.collapse", function () {$(this).find(".form-control").eq(0).focus();})' .
+                    .on("shown.bs.collapse", function () {$(this).find(".form-control, .form-select").eq(0).focus();})' .
                 '</script>';
         }
 

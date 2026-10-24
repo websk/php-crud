@@ -99,9 +99,10 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
                 $is_required_str = ' required ';
             }
 
-            $html .= '<label class="radio-inline"><input type="radio" name="' .
+            $html .= '<label class="form-check form-check-inline"><input class="form-check-input" type="radio" name="' .
                 Sanitize::sanitizeAttrValue($input_name) . '" value="' . Sanitize::sanitizeAttrValue((string) $value) . '" ' .
-                $selected_html_attr . ' ' . $is_required_str . ' ' . $disabled . '> ' . Sanitize::sanitizeTagContent($title) . '</label>';
+                $selected_html_attr . ' ' . $is_required_str . ' ' . $disabled . '> <span class="form-check-label">' .
+                Sanitize::sanitizeTagContent($title) . '</span></label>';
         }
 
         if ($this->isShowNullCheckbox()) {
@@ -110,10 +111,10 @@ class CRUDFormWidgetRadios implements InterfaceCRUDFormWidget
                 $is_null_checked = ' checked ';
             }
             ob_start(); ?>
-            <label class="radio-inline">
-                <input id="<?= $uniqid ?>___is_null" type="checkbox" value="1"
+            <label class="form-check form-check-inline">
+                <input class="form-check-input" id="<?= $uniqid ?>___is_null" type="checkbox" value="1"
                        name="<?= Sanitize::sanitizeAttrValue($input_name) ?>___is_null" <?= $is_null_checked ?>>
-                Нет значения
+                <span class="form-check-label">Нет значения</span>
             </label>
             <script>
                 (function () {

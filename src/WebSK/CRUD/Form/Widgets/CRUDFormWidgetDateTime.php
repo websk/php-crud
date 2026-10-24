@@ -2,7 +2,6 @@
 
 namespace WebSK\CRUD\Form\Widgets;
 
-use WebSK\CRUD\Form\CRUDFormScript;
 use WebSK\Entity\InterfaceEntity;
 use WebSK\Utils\Sanitize;
 use WebSK\CRUD\CRUD;
@@ -58,7 +57,7 @@ class CRUDFormWidgetDateTime implements InterfaceCRUDFormWidget
             if ($timestamp === false) {
                 throw new \UnexpectedValueException($field_name . ' contains an invalid date');
             }
-            $field_value_attr = date('d-m-Y H:i:s', $timestamp);
+            $field_value_attr = date('Y-m-d\TH:i:s', $timestamp);
         }
 
         $uniqid = uniqid('CRUDFormWidgetDateTime_');
@@ -70,25 +69,13 @@ class CRUDFormWidgetDateTime implements InterfaceCRUDFormWidget
 
         ob_start(); ?>
         <input type="hidden" id="<?= $uniqid ?>_input" name="<?= Sanitize::sanitizeAttrValue($field_name) ?>"
-               value="<?= Sanitize::sanitizeTagContent($field_value) ?>"
-               data-field="<?= $uniqid ?>_date" <?= $is_required_str ?>>
-        <div class="input-group date" id="<?= $uniqid ?>">
-            <input id="<?= $uniqid ?>_date" type="text" class="form-control" value="<?= $field_value_attr ?>">
-            <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                </span>
-        </div>
+               value="<?= Sanitize::sanitizeAttrValue($field_value ?? '') ?>"
+               data-field="<?= $uniqid ?>_date">
+        <input id="<?= $uniqid ?>_date" type="datetime-local" step="1" class="form-control"
+               value="<?= Sanitize::sanitizeAttrValue($field_value_attr) ?>" <?= $is_required_str ?>>
         <script>
-            $("#<?= $uniqid ?>").datetimepicker({
-                format: "DD-MM-YYYY HH:mm:ss",
-                sideBySide: true,
-                showTodayButton: true
-            }).on("dp.change", function (obj) {
-                if (obj.date) {
-                    $("#<?= $uniqid ?>_input").val(obj.date.format("YYYY-MM-DD HH:mm:ss")).trigger('change');
-                } else {
-                    $("#<?= $uniqid ?>_input").val('').trigger('change');
-                }
+            $("#<?= $uniqid ?>_date").on('change input', function () {
+                $("#<?= $uniqid ?>_input").val($(this).val().replace('T', ' ')).trigger('change');
             });
         </script>
         <?php
@@ -101,12 +88,12 @@ class CRUDFormWidgetDateTime implements InterfaceCRUDFormWidget
                 $is_null_checked = ' checked ';
             }
             ob_start(); ?>
-            <div class="col-sm-2">
-                <label class="form-control-static">
-                    <input id="<?= $uniqid ?>___is_null" type="checkbox" value="1"
+            <div class="col-sm-2 d-flex align-items-center">
+                <div class="form-check">
+                    <input class="form-check-input" id="<?= $uniqid ?>___is_null" type="checkbox" value="1"
                            name="<?= Sanitize::sanitizeAttrValue($field_name) ?>___is_null" <?= $is_null_checked ?>>
-                    Нет значения
-                </label>
+                    <label class="form-check-label" for="<?= $uniqid ?>___is_null">Нет значения</label>
+                </div>
             </div>
             <script>
                 (function () {
@@ -120,8 +107,7 @@ class CRUDFormWidgetDateTime implements InterfaceCRUDFormWidget
 
                     $input_is_null.on('change', function () {
                         if ($(this).is(':checked')) {
-                            $('#<?= $uniqid ?>').data("DateTimePicker").clear();
-                            $('#<?= $uniqid ?>_input').val('');
+                            $('#<?= $uniqid ?>_date').val('').trigger('change');
                         }
                     });
                 })();
@@ -132,9 +118,7 @@ class CRUDFormWidgetDateTime implements InterfaceCRUDFormWidget
 
         $html .= '</div>';
 
-        $script = CRUDFormScript::includeBootstrapDateTimeScripts();
-
-        return $script . $html;
+        return $html;
     }
 
     /**

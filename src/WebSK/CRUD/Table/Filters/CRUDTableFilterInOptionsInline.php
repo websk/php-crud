@@ -138,7 +138,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
 
             echo '<input type="hidden" name="' . $this->enabledCheckboxInputName() . '" ' .
                 'value="' . ($this->isEnabled($request) ? '1' : '') . '">';
-            echo '<span onclick="f' . $input_name . '_changeFiltres(this);" class="btn btn-xs btn-default ' .
+            echo '<span onclick="f' . $input_name . '_changeFiltres(this);" class="btn btn-sm btn-secondary ' .
                 ($this->isEnabled($request) ? '' : 'active') . '">' . $this->getBtnAllText() . '</span>';
 
             $value_arr = $this->isEnabled($request) ? ($this->getValue($request) ?? []) : [];
@@ -149,7 +149,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
             $options_arr = $this->getOptionsArr();
             foreach ($options_arr as $title => $value) {
                 echo '<span data-value="' . json_encode($value) . '" data-enabled="1" ' .
-                    'onclick="f' . $input_name . '_changeFiltres(this);" class="btn btn-xs btn-default ' .
+                    'onclick="f' . $input_name . '_changeFiltres(this);" class="btn btn-sm btn-secondary ' .
                     (($this->isEnabled($request) && ($this->getValue($request) == $value)) ? 'active' : '') .
                     '">' . $title . '</span>';
             }
@@ -159,7 +159,7 @@ class CRUDTableFilterInOptionsInline implements InterfaceCRUDTableFilterVisible
                     'value="' .
                     ((is_null($this->getValue($request)) && ($this->isEnabled($request))) ? '1' : '') . '">';
                 echo '<span data-isnull="1" data-enabled="1" onclick="f' . $input_name . '_changeFiltres(this);" ' .
-                    'class="btn btn-xs btn-default ' .
+                    'class="btn btn-sm btn-secondary ' .
                     ((is_null($this->getValue($request)) && ($this->isEnabled($request))) ? 'active' : '') . '">' .
                     'Не указано</span>';
             }

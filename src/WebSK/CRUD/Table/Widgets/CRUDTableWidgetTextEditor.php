@@ -53,7 +53,7 @@ class CRUDTableWidgetTextEditor implements InterfaceCRUDTableWidget
                     CRUDFieldsAccess::getObjectFieldValue($entity_obj, $this->getFieldName()),
                     $this->getFieldName()
                 ) . '">';
-            echo '<button class="btn btn-xs btn-default glyphicon glyphicon-ok" type="submit"></button>';
+            echo '<button class="btn btn-sm btn-secondary fa fa-check" type="submit"></button>';
         });
     }
 

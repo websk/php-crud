@@ -37,7 +37,7 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
      */
     public function __construct(
         string $button_text = '',
-        string $button_class_str = 'btn btn-default btn-sm',
+        string $button_class_str = 'btn btn-outline-danger btn-sm',
         string $redirect_after_delete_url = '',
         string $form_action_url = ''
     ) {
@@ -53,7 +53,7 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
         Assert::assert($entity_obj);
 
         $content_html = '';
-        $content_html .= '<form style="display: inline;" method="post"' . ($this->getFormActionUrl() ? ' action=" ' . $this->getFormActionUrl() .  '"' : '') . '>';
+        $content_html .= '<form class="d-inline" method="post"' . ($this->getFormActionUrl() ? ' action="' . Sanitize::sanitizeAttrValue($this->getFormActionUrl()) .  '"' : '') . '>';
         $content_html .= '<input type="hidden" name="' . CRUDOperations::FIELD_NAME_OPERATION_CODE . '" value="' . Sanitize::sanitizeAttrValue(CRUDOperations::OPERATION_DELETE_ENTITY) . '">';
         $content_html .= '<input type="hidden" name="' . self::FIELD_CLASS_NAME . '" ' .
             'value="' . Sanitize::sanitizeAttrValue(get_class($entity_obj)) . '">';
@@ -66,7 +66,8 @@ class CRUDTableWidgetDelete implements InterfaceCRUDTableWidget
         }
 
         $content_html .= '<button class="' . Sanitize::sanitizeAttrValue($this->getButtonClassStr()) . '" ' .
-            'type="submit" onclick="return window.confirm(\'Удалить?\');"><span class="fa fa-trash fa-lg text-danger fa-fw"></span>' .
+            'type="submit" aria-label="Удалить" onclick="return window.confirm(\'Удалить?\');">' .
+            '<span class="fa fa-trash fa-lg fa-fw"></span>' .
             Sanitize::sanitizeTagContent($this->getButtonText()) . '</button>';
 
         $content_html .= '</form>';

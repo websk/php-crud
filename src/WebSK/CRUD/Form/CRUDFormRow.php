@@ -35,14 +35,14 @@ class CRUDFormRow implements InterfaceCRUDFormRow
     {
         $html = '';
 
-        $html .= '<div class="form-group">';
-        $html .= '<label class="col-sm-4 text-right control-label">' . $this->getTitle() . '</label>';
+        $html .= '<div class="row mb-3">';
+        $html .= '<div class="col-sm-4 text-sm-end col-form-label">' . $this->getTitle() . '</div>';
 
         $html .= '<div class="col-sm-8">';
         $html .= $this->getWidgetObj()->html($obj, $crud);
 
         if ($this->getCommentStr()) {
-            $html .= '<span class="help-block">' . $this->getCommentStr() . '</span>';
+            $html .= '<div class="form-text">' . $this->getCommentStr() . '</div>';
         }
 
         $html .= '</div>';

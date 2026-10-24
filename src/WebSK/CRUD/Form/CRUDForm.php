@@ -386,16 +386,15 @@ class CRUDForm
         }
 
         $content_html .= '<div class="row">';
-        $content_html .= '<div class="col-sm-8 col-sm-offset-4">';
+        $content_html .= '<div class="col-sm-8 offset-sm-4">';
         if (!$this->hide_submit_button) {
-            $content_html .= '<button style="width: 100%" type="submit" class="' . $this->submit_button_class . '">' . $this->submit_button_title . '</button>';
+            $content_html .= '<button type="submit" class="w-100 ' . $this->submit_button_class . '">' . $this->submit_button_title . '</button>';
         }
         $content_html .= '</div>';
         $content_html .= '</div>';
 
         $form_html = CRUDHtml::tag('form', [
             'id' => $form_element_id,
-            'class' => 'form-horizontal',
             'role' => 'form',
             'action' => is_string($_SERVER['REQUEST_URI'] ?? null) ? $_SERVER['REQUEST_URI'] : '',
             'method' => 'post'

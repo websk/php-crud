@@ -128,23 +128,20 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
         $html .= '<div class="input-group">';
 
         if ($this->getAjaxActionUrl()) {
-            $html .= '<span class="input-group-btn">';
-            $html .= '<button type="button" class="btn btn-default" data-toggle="modal" data-target="#' .
-                $choose_form_element_id . '"><span class="glyphicon glyphicon-folder-open"></span></button>';
+            $html .= '<button type="button" class="btn btn-secondary" aria-label="Выбрать" ' .
+                'data-bs-toggle="modal" data-bs-target="#' .
+                $choose_form_element_id . '"><span class="fa fa-folder-open"></span></button>';
             $html .= '<button type="button" id="' . Sanitize::sanitizeAttrValue($select_element_id) . '_btn_is_null" ' .
-                'class="btn btn-default"><span class="fa fa-times fa-lg text-danger fa-fw"></span></button>';
-            $html .= '</span>';
+                'class="btn btn-outline-danger" aria-label="Очистить"><span class="fa fa-times fa-lg fa-fw"></span></button>';
         }
 
-        $html .= '<div class="form-control" style="overflow: auto;" '.
+        $html .= '<div class="form-control crud-reference-scroll" '.
             'id="' . Sanitize::sanitizeAttrValue($select_element_id) . '_text">' . Sanitize::sanitizeTagContent($referenced_obj_title) . '</div>';
 
         if ($this->getEditorUrl()) {
-            $html .= '<span class="input-group-btn">';
             $html .= '<button ' . $disabled_btn_link . ' type="button" '.
                 'id="' . Sanitize::sanitizeAttrValue($select_element_id) . '_btn_link" '.
                 'class="btn btn-link">Перейти</button>';
-            $html .= '</span>';
         }
 
         $html .= '</div>';
@@ -162,10 +159,10 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
                 CRUDPage.preloader.show();
                 $.ajax({
                     url: "<?php echo $this->getAjaxActionUrl() ?>"
-                }).success(function (received_html) {
+                }).done(function (received_html) {
                     $('#<?php echo $choose_form_element_id ?> .modal-body').html(received_html);
                     CRUDPage.preloader.hide();
-                }).error(function (err) {
+                }).fail(function (err) {
                     $('#<?php echo $choose_form_element_id ?> .modal-body')
                         .html('<div class="alert alert-danger">' + err.status + ': ' + err.statusText + '</div>');
                     CRUDPage.preloader.hide();
@@ -176,7 +173,9 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
                 e.preventDefault();
                 var select_id = $(this).data('id');
                 var select_title = $(this).data('title');
-                $('#<?php echo $choose_form_element_id ?>').modal('hide');
+                bootstrap.Modal.getOrCreateInstance(
+                    document.getElementById('<?php echo $choose_form_element_id ?>')
+                ).hide();
                 $('#<?php echo $select_element_id ?>_text').text(select_title);
                 $('#<?php echo $select_element_id ?>_btn_link').attr('disabled', false);
                 $('#<?php echo $select_element_id ?>').val(select_id).trigger('change');
@@ -214,14 +213,12 @@ class CRUDFormWidgetReferenceAjax implements InterfaceCRUDFormWidget
      */
     protected static function modal(string $modal_element_id, string $title, string $contents_html = ''): string
     {
-        $html = '<div class="modal fade" id="' . $modal_element_id . '" tabindex="-1" role="dialog" aria-labelledby="gridSystemModalLabel">
-		<div class="modal-dialog" role="document">
+        $html = '<div class="modal fade" id="' . $modal_element_id . '" tabindex="-1" aria-labelledby="' . $modal_element_id . '_label" aria-hidden="true">
+		<div class="modal-dialog">
 		<div class="modal-content">
 		<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		<span aria-hidden="true">&times;</span>
-		</button>
-		<h4 class="modal-title">' . $title . '</h4>
+		<h5 class="modal-title" id="' . $modal_element_id . '_label">' . $title . '</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		</div>
 		<div class="modal-body">' . $contents_html . '</div>
 		</div>

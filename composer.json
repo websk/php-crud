@@ -56,9 +56,12 @@
       "/.phpunit.cache",
       "/config/config.php",
       "/dist",
+      "/frontend",
       "/node_modules",
+      "/playwright-report",
       "/public/assets",
       "/public/files",
+      "/test-results",
       "/var/.DS_Store",
       "/var/docker/.env",
       "/var/docker/data",
@@ -68,6 +71,7 @@
       "/var/docker/nginx/ssl",
       "/var/docker/nginx/sites/*.key",
       "/var/docker/nginx/sites/*.pem",
+      "/var/docker/php-fpm/php8.3.ini",
       "/vendor"
     ]
   }

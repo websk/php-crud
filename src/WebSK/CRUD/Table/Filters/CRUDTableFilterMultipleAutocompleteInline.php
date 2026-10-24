@@ -32,17 +32,19 @@ class CRUDTableFilterMultipleAutocompleteInline extends CRUDTableFilterMultipleA
 
         self::$css_is_loaded = true;
 
-        return
-            '<style>
-                ul.tokens-container {
-                    min-width: 190px;
-                    min-height: unset !important;
-                    margin-top: 0 !important;
-                    margin-bottom: 0 !important;           
+        return '<script>
+            window.CRUDAssets = window.CRUDAssets || {};
+            window.CRUDAssets.loadStyles = window.CRUDAssets.loadStyles || function () {
+                if (document.querySelector("link[data-crud-styles]")) {
+                    return;
                 }
-                ul.tokens-container li {
-                    margin: 1px 0 0 0 !important;
-                }
-            </style>';
+                var link = document.createElement("link");
+                link.rel = "stylesheet";
+                link.href = "/assets/libraries/crud/crud.css";
+                link.dataset.crudStyles = "";
+                document.head.appendChild(link);
+            };
+            window.CRUDAssets.loadStyles();
+        </script>';
     }
 }

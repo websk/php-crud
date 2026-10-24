@@ -31,16 +31,16 @@ class CRUDTableWidgetCheckbox implements InterfaceCRUDTableWidget
     {
         if (CRUDFieldsAccess::objectHasProperty($obj, $this->getFieldName())) {
             if (CRUDFieldsAccess::getObjectFieldValue($obj, $this->getFieldName())) {
-                return '<span style ="text-decoration: none;" class="glyphicon glyphicon-check"></span>';
+                return '<span style ="text-decoration: none;" class="fa fa-check-square"></span>';
             } else {
-                return '<span style ="text-decoration: none;" class="glyphicon glyphicon-unchecked"></span>';
+                return '<span style ="text-decoration: none;" class="fa fa-square"></span>';
             }
         }
 
         if (CRUDCompiler::fieldValueOrCallableResult($this->getFieldName(), $obj)) {
-            return '<span style ="text-decoration: none;" class="glyphicon glyphicon-check"></span>';
+            return '<span style ="text-decoration: none;" class="fa fa-check-square"></span>';
         } else {
-            return '<span style ="text-decoration: none;" class="glyphicon glyphicon-unchecked"></span>';
+            return '<span style ="text-decoration: none;" class="fa fa-square"></span>';
         }
     }
 

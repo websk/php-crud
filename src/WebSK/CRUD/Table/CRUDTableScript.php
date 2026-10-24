@@ -163,12 +163,15 @@ class CRUDTableScript
 
                             var $link = $tr.find("a:first");
                             var url = $link.attr("href");
-                            var link_style = "z-index: 1;position: absolute;top: 0;" +
-                                "bottom: 0;left: 0;right: 0;display: block;";
+                            var link_label = $.trim($link.text()) || 'Открыть строку';
                             $tr.find("> td").each(function () {
-                                var $td = $(this).css({"position": "relative"});
+                                var $td = $(this).addClass('position-relative');
                                 if ($td.find("> *").prop("tagName") != "FORM") {
-                                    $td.prepend('<a href="' + url + '" style="' + link_style + '"></a>');
+                                    $td.prepend($('<a>', {
+                                        href: url,
+                                        class: 'crud-row-link',
+                                        'aria-label': link_label
+                                    }));
                                 }
                             });
                         });
