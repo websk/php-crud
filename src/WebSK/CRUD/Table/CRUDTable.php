@@ -14,6 +14,7 @@ use WebSK\Slim\Redirect;
 use WebSK\Entity\InterfaceWeight;
 use WebSK\CRUD\CRUD;
 use WebSK\CRUD\Form\CRUDForm;
+use WebSK\CRUD\Form\CRUDFormAccessibility;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetDelete;
 use WebSK\CRUD\Table\Widgets\CRUDTableWidgetWeight;
 use WebSK\CRUD\Pager;
@@ -181,7 +182,9 @@ class CRUDTable
             if ($has_nonempty_th) {
                 echo '<thead><tr>';
                 foreach ($this->column_obj_arr as $column_obj) {
-                    echo '<th>' . $column_obj->getTitle() . '</th>';
+                    $column_title = $column_obj->getTitle();
+                    echo '<th scope="col"' . ($column_title === '' ? ' aria-label="Действия"' : '') . '>'
+                        . $column_title . '</th>';
                 }
                 echo '</tr></thead>';
             }
@@ -478,11 +481,17 @@ class CRUDTable
                 //@TODO check class implements InterfaceCRUDTableFilter
 
                 if ($filter_obj instanceof InterfaceCRUDTableFilterVisible) {
+                    $label_id = uniqid('CRUDTableFilterLabel_');
+                    $filter_html = CRUDFormAccessibility::associateFirstControl(
+                        $filter_obj->getHtml($request),
+                        $label_id
+                    );
                     $html .= '<div class="col-md-12">';
                     $html .= '<div class="row mb-3">';
 
-                    $html .= '<div class="col-sm-4 text-sm-end col-form-label">' . $filter_obj->getTitle() . '</div>';
-                    $html .= '<div class="col-sm-8">' . $filter_obj->getHtml($request) . '</div>';
+                    $html .= '<div id="' . $label_id . '" class="col-sm-4 text-sm-end col-form-label">'
+                        . $filter_obj->getTitle() . '</div>';
+                    $html .= '<div class="col-sm-8">' . $filter_html . '</div>';
 
                     $html .= '</div>';
                     $html .= '</div>';
@@ -527,13 +536,20 @@ class CRUDTable
                 //@TODO check class implements InterfaceCRUDTableFilter
 
                 if ($filter_obj instanceof InterfaceCRUDTableFilterVisible) {
+                    $label_id = uniqid('CRUDTableFilterLabel_');
+                    $filter_title = $filter_obj->getTitle();
+                    $filter_html = $filter_obj->getHtml($request);
+                    if ($filter_title) {
+                        $filter_html = CRUDFormAccessibility::associateFirstControl($filter_html, $label_id);
+                    }
                     echo '<div class="d-inline-block me-2">';
 
-                    if ($filter_obj->getTitle()) {
-                        echo '<span class="d-inline-block mt-1 me-1">' . $filter_obj->getTitle() . '</span>';
+                    if ($filter_title) {
+                        echo '<span id="' . $label_id . '" class="d-inline-block mt-1 me-1">'
+                            . $filter_title . '</span>';
                     }
 
-                    echo '<span class="d-inline-block">' . $filter_obj->getHtml($request) . '</span>';
+                    echo '<span class="d-inline-block">' . $filter_html . '</span>';
                     echo '</div>';
                 } elseif ($filter_obj instanceof InterfaceCRUDTableFilterInvisible) {
                     // do nothing with invisible filters
@@ -551,37 +567,33 @@ class CRUDTable
     /**
      * @param string $create_form_html
      * @param string $create_button_position
-     * @param bool $table_has_filters
      * @return string
      */
     protected static function createButtonPopupHtml(
         string $create_form_html,
-        string $create_button_position,
-        bool $table_has_filters = true
+        string $create_button_position
     ) : string {
-        $button_create_position_class_name = '';
+        $button_create_position_class_name = 'justify-content-start';
         switch ($create_button_position) {
             case self::CREATE_BUTTON_POSITION_LEFT_POPUP:
-                $button_create_position_class_name = ' float-start';
+                $button_create_position_class_name = 'justify-content-start';
                 break;
             case self::CREATE_BUTTON_POSITION_RIGHT_POPUP:
-                $button_create_position_class_name = ' float-end';
+                $button_create_position_class_name = 'justify-content-end';
                 break;
         }
 
         $html = '';
 
         $create_form_element_id = 'collapse_' . rand(1, 999999);
+        $html .= '<div class="d-flex ' . $button_create_position_class_name . ' mb-2">';
         $html .= CRUDMagnificPopup::button(
             $create_form_element_id,
-            'btn btn-sm btn-secondary' . $button_create_position_class_name,
+            'btn btn-sm btn-secondary',
             self::CREATE_BUTTON_TEXT
         );
-        $html .= CRUDMagnificPopup::popupHtml($create_form_element_id, $create_form_html);
-
-        if (!$table_has_filters) {
-            $html .= '<div class="w-100"></div>';
-        }
+        $html .= '</div>';
+        $html .= CRUDMagnificPopup::popupHtml($create_form_element_id, $create_form_html, self::CREATE_BUTTON_TEXT);
 
         return $html;
     }
@@ -597,18 +609,19 @@ class CRUDTable
     ): string {
         $html = '';
 
-        $button_create_position_class_name = '';
+        $button_create_position_class_name = 'justify-content-start';
         switch ($create_position_button) {
             case self::CREATE_BUTTON_POSITION_LEFT_TOOLBAR:
-                $button_create_position_class_name = ' float-start';
+                $button_create_position_class_name = 'justify-content-start';
                 break;
             case self::CREATE_BUTTON_POSITION_RIGHT_TOOLBAR:
-                $button_create_position_class_name = ' float-end';
+                $button_create_position_class_name = 'justify-content-end';
                 break;
         }
 
         $create_form_element_id = 'collapse_' . rand(1, 999999);
-        $html .= '<div class="btn-group mb-2' . $button_create_position_class_name . '" role="group">';
+        $html .= '<div class="d-flex ' . $button_create_position_class_name . '">';
+        $html .= '<div class="btn-group mb-2" role="group">';
         if ($create_form_html) {
             $html .=
                 '<button 
@@ -619,9 +632,9 @@ class CRUDTable
                 >' . self::CREATE_BUTTON_TEXT . '</button>';
         }
         $html .= '</div>';
+        $html .= '</div>';
 
         if ($create_form_html) {
-            $html .= '<br /><br />';
             $html .= '<div class="collapse" id="' . $create_form_element_id . '"><div class="border rounded p-3 bg-body-tertiary">' .
                 $create_form_html . '</div></div>';
             $html .= '<script>' .
@@ -671,8 +684,7 @@ class CRUDTable
         ) {
             return self::createButtonPopupHtml(
                 $create_form_html,
-                $this->getCreateButtonPosition(),
-                $table_has_visible_filters
+                $this->getCreateButtonPosition()
             );
         }
 

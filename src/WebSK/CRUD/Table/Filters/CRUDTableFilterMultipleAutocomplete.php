@@ -119,6 +119,7 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
             );
         }
         $config['field_text_name'] = $this->getReferenceFilterText();
+        $config['accessible_label'] = $this->getTitle();
         $config['submit_form'] = true;
 
         $html .= '<script>createMultipleAutocompleteFilter(' . json_encode($config) . ');</script>';
@@ -241,6 +242,7 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
                     field_value_val: '',
                     field_text_name: '',
                     ajax_url: '',
+                    accessible_label: '',
                     tokenize: {}
                 }, config);
 
@@ -306,6 +308,12 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
                 }
 
                 $('#' + config.input_id).tokenize2(config.tokenize);
+                if (config.accessible_label) {
+                    $('#' + config.input_id)
+                        .next('.tokenize')
+                        .find('.token-search input')
+                        .attr('aria-label', config.accessible_label);
+                }
 
                 for (let option in config.options) {
                     $('#' + config.input_id).tokenize2().trigger('tokenize:tokens:add', config.options[option]);

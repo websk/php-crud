@@ -131,8 +131,6 @@ class CRUDTableScript
                     };
 
                     this.initClickRow = function () {
-                        var _this = this;
-
                         this.getTableJqueryObj().find("> tbody > tr").each(function () {
                             var $tr = $(this);
                             // Проверка на наличие ссылки
@@ -163,17 +161,16 @@ class CRUDTableScript
 
                             var $link = $tr.find("a:first");
                             var url = $link.attr("href");
-                            var link_label = $.trim($link.text()) || 'Открыть строку';
-                            $tr.find("> td").each(function () {
-                                var $td = $(this).addClass('position-relative');
-                                if ($td.find("> *").prop("tagName") != "FORM") {
-                                    $td.prepend($('<a>', {
-                                        href: url,
-                                        class: 'crud-row-link',
-                                        'aria-label': link_label
-                                    }));
+                            $tr.addClass('crud-row-clickable')
+                                .off('click.crudRow')
+                                .on('click.crudRow', function (event) {
+                                    if ($(event.target).closest('a, button, input, select, textarea, form, label').length) {
+                                        return;
+                                    }
+
+                                    window.location.assign(url);
                                 }
-                            });
+                            );
                         });
                     };
 

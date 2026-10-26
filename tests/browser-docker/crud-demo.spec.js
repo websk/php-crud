@@ -48,6 +48,11 @@ async function expectValidCrudDom(page) {
                 result.push(`unassociated label: ${label.textContent.trim()}`);
             }
         }
+        for (const control of document.querySelectorAll('input:not([type="hidden"]), select, textarea')) {
+            if (!control.labels?.length && !control.getAttribute('aria-label') && !control.getAttribute('aria-labelledby')) {
+                result.push(`unlabelled control: ${control.getAttribute('name') || control.tagName.toLowerCase()}`);
+            }
+        }
 
         return result;
     });
@@ -62,18 +67,25 @@ test('real CRUD list exercises popup, Ace and multiple autocomplete', async ({pa
 
     await expect(page.getByRole('heading', {name: 'Пользователи'})).toBeVisible();
     await expect(page.locator('.table tbody tr')).not.toHaveCount(0);
+    await expect(page.locator('.table tbody tr').first().locator('a')).toHaveCount(1);
     const deleteButton = page.getByRole('button', {name: 'Удалить'});
     await expect(deleteButton).toHaveClass(/btn-outline-danger/);
     await expect(deleteButton).toHaveCSS('color', 'rgb(220, 53, 69)');
 
-    await page.getByRole('link', {name: 'Создать'}).click();
+    await page.getByRole('button', {name: 'Создать'}).click();
     const popup = page.locator('.mfp-wrap');
-    const createForm = popup.locator('#demo_user_create');
+    const dialog = popup.getByRole('dialog', {name: 'Создать'});
+    const createForm = dialog.locator('#demo_user_create');
     await expect(popup).toBeVisible();
+    await expect(dialog).toBeVisible();
     await expect(createForm).toBeVisible();
     await expect(createForm.locator('input[name="name"]')).toHaveAttribute('required', '');
     await expect(createForm.locator('input[name="email"]')).toHaveAttribute('required', '');
-    await expect(createForm.locator('input[name="name"]')).toHaveCSS('border-color', 'rgb(220, 53, 69)');
+    const requiredName = createForm.getByRole('textbox', {name: 'Имя на сайте'});
+    await expect(requiredName).toBeFocused();
+    await expect(requiredName).not.toHaveCSS('border-color', 'rgb(220, 53, 69)');
+    await requiredName.press('Tab');
+    await expect(requiredName).toHaveCSS('border-color', 'rgb(220, 53, 69)');
     await expect(createForm.getByRole('button', {name: 'Очистить'})).toHaveClass(/btn-outline-danger/);
 
     const popupAce = createForm.locator('.ace_editor');
@@ -87,6 +99,8 @@ test('real CRUD list exercises popup, Ace and multiple autocomplete', async ({pa
 
     const companyFilter = page.locator('select[name="company_id[]"]');
     const tokenize = companyFilter.locator('+ .tokenize');
+    await expect(tokenize.locator('.placeholder')).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+    await expect(tokenize.locator('.placeholder')).toHaveCSS('opacity', '1');
     await tokenize.locator('.token-search input').pressSequentially('ks');
     const result = page.locator('.tokenize-dropdown a[data-value="4"]');
     await expect(result).toHaveText('kssnet');
@@ -128,7 +142,7 @@ test('real CRUD forms remain usable on a mobile viewport', async ({page}) => {
     await page.setViewportSize({width: 390, height: 844});
     await page.goto('/demo_users');
 
-    const createButton = page.getByRole('link', {name: 'Создать'});
+    const createButton = page.getByRole('button', {name: 'Создать'});
     const filters = page.locator('.crud-filters');
     const createBox = await createButton.boundingBox();
     const filtersBox = await filters.boundingBox();

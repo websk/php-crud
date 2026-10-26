@@ -64,6 +64,15 @@ Shared form, popup and filter rules are generated as `/assets/libraries/crud/cru
 Applications consuming `websk/php-crud` must publish that file together with the npm-managed
 library assets and include it after Bootstrap or their Bootstrap-based theme styles.
 
+The canonical Bootstrap script is `/assets/libraries/bootstrap/js/bootstrap.bundle.min.js`.
+The build also keeps `/assets/libraries/bootstrap/js/bootstrap.min.js` as a compatibility alias
+and publishes the referenced Bootstrap JavaScript and CSS source maps, so browser developer tools
+do not request missing `.map` files.
+
+Generated form rows and visible filters associate their captions with the first usable control.
+Popup create forms expose dialog semantics and move focus to their first control. Required fields
+are highlighted after validation, and clickable table rows retain a single accessible link.
+
 ## Demo
 
 * Install [mkcert](https://github.com/FiloSottile/mkcert).

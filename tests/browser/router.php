@@ -13,6 +13,7 @@ use WebSK\CRUD\Form\Widgets\CRUDFormWidgetDateTime;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetReferenceAjax;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTimestamp;
 use WebSK\CRUD\Table\Filters\CRUDTableFilterMultipleAutocomplete;
+use WebSK\CRUD\Table\CRUDTableScript;
 use WebSK\Entity\InterfaceEntity;
 
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
@@ -166,7 +167,15 @@ $multipleAutocomplete = (new CRUDTableFilterMultipleAutocomplete(
     '/__browser-test/company-options',
 ))->getHtml($request);
 $popup = CRUDMagnificPopup::button('popup-form', 'btn btn-secondary', 'Open popup')
-    . CRUDMagnificPopup::popupHtml('popup-form', '<form id="popup-form-content"><input name="popup_value" value="ready"></form>');
+    . CRUDMagnificPopup::popupHtml(
+        'popup-form',
+        '<form id="popup-form-content"><input name="popup_value" value="ready"></form>',
+        'Create record'
+    );
+$rowLinkTable = '<div class="row-link-table"><table class="table"><tbody><tr>'
+    . '<td><a href="#__row-target">Open record</a></td><td id="row-secondary-cell">Description</td>'
+    . '</tr></tbody></table></div>'
+    . CRUDTableScript::getHtml('row-link-table', '/__browser-test');
 $requiredFormScript = CRUDFormScript::getHtml('required-form');
 
 $dateTime = str_replace('type="datetime-local"', 'type="datetime-local" data-test="date-time"', $dateTime);
@@ -191,7 +200,7 @@ header('Content-Type: text/html; charset=UTF-8');
     <link rel="stylesheet" href="/assets/libraries/font-awesome/css/v4-shims.min.css">
     <script src="/assets/libraries/jquery/jquery.min.js"></script>
     <script src="/assets/libraries/jquery-ui/jquery-ui.min.js"></script>
-    <script src="/assets/libraries/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/assets/libraries/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="/assets/libraries/jquery-validation/jquery.validate.min.js"></script>
     <script src="/assets/libraries/tokenize2/tokenize2.min.js"></script>
     <script src="/assets/libraries/medium-editor/js/medium-editor.min.js"></script>
@@ -247,6 +256,7 @@ header('Content-Type: text/html; charset=UTF-8');
     <section id="reference-fixture"><?= $reference ?></section>
     <form id="autocomplete-form"><?= $multipleAutocomplete ?></form>
     <section id="popup-fixture"><?= $popup ?></section>
+    <section id="row-link-fixture"><?= $rowLinkTable ?></section>
 </div>
 <script>
     window.requiredFormSubmissions = 0;

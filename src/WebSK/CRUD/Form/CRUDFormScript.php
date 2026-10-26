@@ -45,10 +45,12 @@ class CRUDFormScript
                         var $form = $('#' + form_id);
                         CRUD.Form.required(form_id);
                         $form.find('[type="submit"]').on('click', function (e) {
-                            if (CRUD.Form.validator(form_id) == true) {
+                            var validation_result = CRUD.Form.validator(form_id);
+                            if (validation_result == true) {
                             } else {
                                 e.preventDefault();
-                                CRUD.Form.errors(CRUD.Form.validator(form_id));
+                                CRUD.Form.highlightInvalid(form_id);
+                                CRUD.Form.errors(validation_result);
                             }
                         });
                     },
@@ -75,7 +77,13 @@ class CRUDFormScript
                                         $form.find('[name="' + radio_name + '"]').addClass(required_class);
                                     }
                                 }
-                            }).trigger('change');
+                            });
+                        });
+                    },
+
+                    highlightInvalid: function (form_id) {
+                        $('#' + form_id).find('[required]').each(function () {
+                            $(this).triggerHandler('blur');
                         });
                     },
 

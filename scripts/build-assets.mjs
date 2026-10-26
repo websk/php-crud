@@ -41,8 +41,11 @@ const copies = [
     ['blueimp-file-upload/js/jquery.fileupload.js', 'blueimp-file-upload/js/jquery.fileupload.js'],
     ['blueimp-file-upload/js/jquery.fileupload-process.js', 'blueimp-file-upload/js/jquery.fileupload-process.js'],
     ['blueimp-file-upload/js/jquery.fileupload-validate.js', 'blueimp-file-upload/js/jquery.fileupload-validate.js'],
+    ['bootstrap/dist/js/bootstrap.bundle.min.js', 'bootstrap/js/bootstrap.bundle.min.js'],
     ['bootstrap/dist/js/bootstrap.bundle.min.js', 'bootstrap/js/bootstrap.min.js'],
+    ['bootstrap/dist/js/bootstrap.bundle.min.js.map', 'bootstrap/js/bootstrap.bundle.min.js.map'],
     ['bootstrap/dist/css/bootstrap.min.css', 'bootstrap/css/bootstrap.min.css'],
+    ['bootstrap/dist/css/bootstrap.min.css.map', 'bootstrap/css/bootstrap.min.css.map'],
     ['jquery/dist/jquery.min.js', 'jquery/jquery.min.js'],
     ['jquery-ui/dist/jquery-ui.min.js', 'jquery-ui/jquery-ui.min.js'],
     ['jquery-ui/dist/themes/base/jquery-ui.min.css', 'jquery-ui/themes/base/jquery-ui.min.css'],
@@ -186,6 +189,31 @@ async function assertManagedAssetsSafe(root) {
     return count;
 }
 
+async function assertSourceMapsExist(root) {
+    const rootPath = path.resolve(root);
+    for (const file of await listFiles(root)) {
+        if (!file.endsWith('.css') && !file.endsWith('.js')) {
+            continue;
+        }
+        const contents = await readFile(path.join(root, file), 'utf8');
+        for (const match of contents.matchAll(/sourceMappingURL=([^\s*]+)/g)) {
+            const reference = match[1].split(/[?#]/, 1)[0];
+            if (reference.startsWith('data:') || reference.includes('://')) {
+                continue;
+            }
+            const sourceMapPath = path.resolve(path.dirname(path.join(root, file)), reference);
+            if (sourceMapPath !== rootPath && !sourceMapPath.startsWith(rootPath + path.sep)) {
+                throw new Error(`Source map escapes the assets directory: ${file} -> ${reference}`);
+            }
+            try {
+                await access(sourceMapPath);
+            } catch {
+                throw new Error(`Missing source map: ${file} -> ${reference}`);
+            }
+        }
+    }
+}
+
 async function assertObsoleteAssetsAbsent(root) {
     for (const directory of obsoleteDirectories) {
         try {
@@ -213,6 +241,7 @@ if (process.argv.includes('--check')) {
             );
         }
         await assertManagedAssetsSafe(temporaryRoot);
+        await assertSourceMapsExist(temporaryRoot);
         await assertNoServerFiles(path.join(projectRoot, 'public', 'assets'));
         await assertObsoleteAssetsAbsent(assetsRoot);
         console.log(`Assets are complete, free of server-side files, and reproducible: ${count} files.`);
@@ -222,6 +251,7 @@ if (process.argv.includes('--check')) {
 } else {
     await build(assetsRoot);
     const count = await assertManagedAssetsSafe(assetsRoot);
+    await assertSourceMapsExist(assetsRoot);
     await assertNoServerFiles(path.join(projectRoot, 'public', 'assets'));
     await assertObsoleteAssetsAbsent(assetsRoot);
     console.log(`Built ${count} managed asset files.`);

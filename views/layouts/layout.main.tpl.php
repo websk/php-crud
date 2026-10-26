@@ -26,7 +26,7 @@ use WebSK\Utils\Url;
 
     <!-- Bootstrap -->
     <link href="/assets/libraries/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
-    <script src="/assets/libraries/bootstrap/js/bootstrap.min.js"></script>
+    <script src="/assets/libraries/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <link href="/assets/libraries/font-awesome/css/all.min.css" rel="stylesheet" type="text/css"/>
     <link href="/assets/libraries/font-awesome/css/v4-shims.min.css" rel="stylesheet" type="text/css"/>

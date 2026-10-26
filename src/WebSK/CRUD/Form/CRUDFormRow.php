@@ -34,12 +34,18 @@ class CRUDFormRow implements InterfaceCRUDFormRow
     public function html(InterfaceEntity $obj, CRUD $crud): string
     {
         $html = '';
+        $label_id = uniqid('CRUDFormRowLabel_');
+        $widget_html = CRUDFormAccessibility::associateFirstControl(
+            $this->getWidgetObj()->html($obj, $crud),
+            $label_id
+        );
 
         $html .= '<div class="row mb-3">';
-        $html .= '<div class="col-sm-4 text-sm-end col-form-label">' . $this->getTitle() . '</div>';
+        $html .= '<div id="' . $label_id . '" class="col-sm-4 text-sm-end col-form-label">'
+            . $this->getTitle() . '</div>';
 
         $html .= '<div class="col-sm-8">';
-        $html .= $this->getWidgetObj()->html($obj, $crud);
+        $html .= $widget_html;
 
         if ($this->getCommentStr()) {
             $html .= '<div class="form-text">' . $this->getCommentStr() . '</div>';

@@ -39,15 +39,28 @@ class CRUDMagnificPopup
             $_magnific_popup_scripts_on_page = true;
         }
 
-        $html .= CRUDHtml::tag('a', [
-            'href' => '#' . $create_form_element_id,
-            'class' => 'open-' . $create_form_element_id . ' ' . $button_classes
+        $html .= CRUDHtml::tag('button', [
+            'type' => 'button',
+            'data-mfp-src' => '#' . $create_form_element_id,
+            'class' => 'open-' . $create_form_element_id . ' ' . $button_classes,
+            'aria-haspopup' => 'dialog',
+            'aria-controls' => $create_form_element_id,
+            'aria-expanded' => 'false',
         ], $button_contents_html);
 
         ob_start(); ?>
         <script>
             $(function () {
-                $(".open-<?= $create_form_element_id ?>").magnificPopup({type: "inline", midClick: true});
+                var $trigger = $(".open-<?= $create_form_element_id ?>");
+                $trigger.magnificPopup({
+                    type: "inline",
+                    midClick: true,
+                    focus: "input:not([type=hidden]):not([disabled]), textarea:not([disabled]), select:not([disabled]), button:not([disabled])",
+                    callbacks: {
+                        open: function () {$trigger.attr("aria-expanded", "true");},
+                        close: function () {$trigger.attr("aria-expanded", "false");}
+                    }
+                });
             });
         </script>
         <?php
@@ -56,11 +69,18 @@ class CRUDMagnificPopup
         return $html;
     }
 
-    public static function popupHtml(string $create_form_element_id, string $create_form_html): string
+    public static function popupHtml(
+        string $create_form_element_id,
+        string $create_form_html,
+        string $dialog_label = 'Диалог'
+    ): string
     {
         return CRUDHtml::tag('div', [
             'id' => $create_form_element_id,
             'class' => 'mfp-hide crud-popup',
+            'role' => 'dialog',
+            'aria-modal' => 'true',
+            'aria-label' => $dialog_label,
         ], $create_form_html);
     }
 }

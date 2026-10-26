@@ -59,6 +59,7 @@
       "/frontend",
       "/node_modules",
       "/playwright-report",
+      "/public/.DS_Store",
       "/public/assets",
       "/public/files",
       "/test-results",

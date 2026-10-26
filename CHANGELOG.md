@@ -1,5 +1,22 @@
 # Changelog
 
+## [4.0.1](https://github.com/websk/php-crud/releases/tag/4.0.1) - 2026-10-26
+
+### Changed
+
+- Associated generated form and filter captions with their controls and added accessible table-column and action headers.
+- Exposed popup create forms as labelled dialogs, moved focus to the first usable control and used a native button for opening them.
+- Kept one accessible link per clickable table row while preserving row-wide pointer navigation.
+- Kept create controls and tables at full available width across desktop and mobile layouts.
+- Delayed required-field error highlighting until validation runs.
+- Excluded macOS metadata from the Composer release archive.
+- Updated the locked PHPStan development dependency to 2.3.2.
+
+### Fixed
+
+- Published the canonical Bootstrap bundle and its JavaScript source map, plus the Bootstrap CSS source map, while retaining the legacy script path as a compatibility alias.
+- Added accessible names to Tokenize2 search controls and prevented Bootstrap's `.placeholder` rule from rendering their hints with a gray background.
+
 ## [4.0.0](https://github.com/websk/php-crud/releases/tag/4.0.0) - 2026-10-24
 
 ### Added

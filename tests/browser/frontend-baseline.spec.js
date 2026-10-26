@@ -11,7 +11,7 @@ test('required CRUD fields are highlighted and block invalid submission', async 
     await page.goto('/__browser-test');
 
     const field = page.locator('#required-field');
-    await expect(field).toHaveClass(/required-class/);
+    await expect(field).not.toHaveClass(/required-class/);
 
     page.once('dialog', async (dialog) => {
         expect(dialog.message()).toContain('required_field');
@@ -19,6 +19,7 @@ test('required CRUD fields are highlighted and block invalid submission', async 
     });
     await page.locator('#required-submit').click();
     expect(await page.evaluate(() => window.requiredFormSubmissions)).toBe(0);
+    await expect(field).toHaveClass(/required-class/);
 
     await field.fill('valid');
     await field.press('Tab');
@@ -93,10 +94,14 @@ test('Magnific Popup opens the inline CRUD form', async ({page}) => {
     const pageErrors = collectPageErrors(page);
     await page.goto('/__browser-test');
 
-    await page.locator('#popup-fixture > a').click();
+    await page.locator('#popup-fixture > button').click();
     const popup = page.locator('.mfp-wrap');
     await expect(popup).toBeVisible();
-    await expect(popup.locator('#popup-form-content input[name="popup_value"]')).toHaveValue('ready');
+    const dialog = popup.getByRole('dialog', {name: 'Create record'});
+    await expect(dialog).toBeVisible();
+    const popupInput = dialog.locator('input[name="popup_value"]');
+    await expect(popupInput).toHaveValue('ready');
+    await expect(popupInput).toBeFocused();
     await popup.locator('.mfp-close').click();
     await expect(popup).toHaveCount(0);
     expect(pageErrors).toEqual([]);
@@ -123,7 +128,7 @@ test('demo layout dependencies load from managed local assets', async ({page}) =
     const requiredAssets = [
         '/assets/libraries/jquery/jquery.min.js',
         '/assets/libraries/jquery-ui/jquery-ui.min.js',
-        '/assets/libraries/bootstrap/js/bootstrap.min.js',
+        '/assets/libraries/bootstrap/js/bootstrap.bundle.min.js',
         '/assets/libraries/bootstrap/css/bootstrap.min.css',
         '/assets/libraries/jquery-validation/jquery.validate.min.js',
         '/assets/libraries/font-awesome/css/all.min.css',
@@ -135,4 +140,13 @@ test('demo layout dependencies load from managed local assets', async ({page}) =
     expect(requestedUrls.every((url) => new URL(url).origin === 'http://127.0.0.1:8123')).toBe(true);
     await expect(page.locator('#font-awesome-fixture')).toHaveCSS('font-family', /Font Awesome/);
     expect(pageErrors).toEqual([]);
+});
+
+test('clickable table rows keep a single accessible link', async ({page}) => {
+    await page.goto('/__browser-test');
+
+    const row = page.locator('#row-link-fixture tbody tr');
+    await expect(row.locator('a')).toHaveCount(1);
+    await page.locator('#row-secondary-cell').click();
+    await expect(page).toHaveURL(/#__row-target$/);
 });
