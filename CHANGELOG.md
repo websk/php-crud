@@ -1,5 +1,11 @@
 # Changelog
 
+## [4.0.3](https://github.com/websk/php-crud/releases/tag/4.0.3) - 2026-11-08
+
+### Fixed
+
+- Read filter and pagination values from AJAX POST bodies while preserving query-string support for initial page loads.
+
 ## [4.0.2](https://github.com/websk/php-crud/releases/tag/4.0.2) - 2026-11-08
 
 ### Fixed

@@ -74,7 +74,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
      */
     public function useValuesFromForm(ServerRequestInterface $request): bool
     {
-        $value = \WebSK\CRUD\RequestParams::query($request, $this->filterIsPassedInputName(), null);
+        $value = \WebSK\CRUD\RequestParams::input($request, $this->filterIsPassedInputName(), null);
 
         if (is_null($value)) {
             return false;
@@ -101,8 +101,8 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
             return $this->getInitialValue();
         }
 
-        $value = RequestParams::queryString($request, $this->getFilterUniqId());
-        $is_null = RequestParams::queryString($request, $this->nullCheckboxInputName());
+        $value = RequestParams::inputString($request, $this->getFilterUniqId());
+        $is_null = RequestParams::inputString($request, $this->nullCheckboxInputName());
 
         if ($is_null != '') {
             $value = null;
@@ -202,7 +202,7 @@ class CRUDTableFilterEqualOptionsInline implements InterfaceCRUDTableFilterVisib
             return $this->isInitialIsEnabled();
         }
 
-        $is_enabled_from_form = \WebSK\CRUD\RequestParams::query($request, $this->enabledCheckboxInputName(), '');
+        $is_enabled_from_form = \WebSK\CRUD\RequestParams::input($request, $this->enabledCheckboxInputName(), '');
 
         if ($is_enabled_from_form != '') {
             return true;

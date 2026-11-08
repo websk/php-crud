@@ -52,8 +52,8 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
         $placeholder_values_arr = [];
 
         // для этого виджета галка включения не выводится: если в поле пустая строка - он игрорируется
-        $value_start = RequestParams::queryString($request, $this->getFilterStartUniqId());
-        $value_end = RequestParams::queryString($request, $this->getFilterEndUniqId());
+        $value_start = RequestParams::inputString($request, $this->getFilterStartUniqId());
+        $value_end = RequestParams::inputString($request, $this->getFilterEndUniqId());
 
         $column_name = $this->getFieldName();
         $column_name = preg_replace("/[^a-zA-Z0-9_]+/", "", $column_name);
@@ -82,7 +82,7 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterStartUniqId(),
             'id' => $this->getFilterStartUniqId(),
-            'value' => RequestParams::queryString($request, $this->getFilterStartUniqId())
+            'value' => RequestParams::inputString($request, $this->getFilterStartUniqId())
         ], '');
 
         $html .= ' по ';
@@ -90,7 +90,7 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
             'placeholder' => $this->getPlaceholder(),
             'name' => $this->getFilterEndUniqId(),
             'id' => $this->getFilterEndUniqId(),
-            'value' => RequestParams::queryString($request, $this->getFilterEndUniqId())
+            'value' => RequestParams::inputString($request, $this->getFilterEndUniqId())
         ], '');
 
         ob_start();

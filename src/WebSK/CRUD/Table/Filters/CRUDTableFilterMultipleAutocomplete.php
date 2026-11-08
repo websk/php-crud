@@ -73,7 +73,7 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
         $placeholder_values_arr = [];
         $where = '';
 
-        $value = RequestParams::queryStringList($request, $this->getFilterUniqId());
+        $value = RequestParams::inputStringList($request, $this->getFilterUniqId());
 
         if ($value !== []) {
                 $column_name = $this->getFieldName();
@@ -111,7 +111,7 @@ class CRUDTableFilterMultipleAutocomplete implements InterfaceCRUDTableFilterVis
         $config['input_id'] = $input_id;
         $config['ajax_url'] = $this->getRemoteDataSourceUrl();
         $config['field_value_name'] = $this->getReferenceFilterValue();
-        $selected_values = RequestParams::queryStringList($request, $this->getFieldName());
+        $selected_values = RequestParams::inputStringList($request, $this->getFieldName());
         if ($selected_values !== []) {
             $config['field_value_val'] = implode(
                 CRUDTableFilterInVisible::DEFAULT_SEPARATOR,

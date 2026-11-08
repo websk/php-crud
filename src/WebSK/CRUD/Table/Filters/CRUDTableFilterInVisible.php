@@ -57,7 +57,7 @@ class CRUDTableFilterInVisible implements InterfaceCRUDTableFilterVisible
         $placeholder_values_arr = [];
         $where = '';
 
-        $raw_value = RequestParams::query($request, $this->getFilterUniqId(), '');
+        $raw_value = RequestParams::input($request, $this->getFilterUniqId(), '');
         if (is_array($raw_value)) {
             $value = [];
             foreach ($raw_value as $item) {
@@ -67,7 +67,7 @@ class CRUDTableFilterInVisible implements InterfaceCRUDTableFilterVisible
                 $value[] = (string) $item;
             }
         } else {
-            $string_value = RequestParams::queryString($request, $this->getFilterUniqId());
+            $string_value = RequestParams::inputString($request, $this->getFilterUniqId());
             $separator = $this->getSeparator();
             if ($separator === '') {
                 throw new \InvalidArgumentException('Filter separator cannot be empty');
@@ -99,7 +99,7 @@ class CRUDTableFilterInVisible implements InterfaceCRUDTableFilterVisible
             'name' => $this->getFilterUniqId(),
             'id' => $this->getFilterUniqId(),
             'class' => $this->isInline() ? '' : 'form-control',
-            'value' => RequestParams::queryString($request, $this->getFilterUniqId())
+            'value' => RequestParams::inputString($request, $this->getFilterUniqId())
         ], '');
 
         ob_start();

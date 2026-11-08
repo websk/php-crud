@@ -68,6 +68,28 @@ test('real CRUD list exercises popup, Ace and multiple autocomplete', async ({pa
     await expect(page.getByRole('heading', {name: 'Пользователи'})).toBeVisible();
     await expect(page.locator('.table tbody tr')).not.toHaveCount(0);
     await expect(page.locator('.table tbody tr').first().locator('a')).toHaveCount(1);
+    const nameCells = page.locator('.table tbody tr td:nth-child(2)');
+    const firstName = (await nameCells.first().innerText()).trim();
+    const nameFilter = page.locator('input[name="user_name"]');
+    await Promise.all([
+        page.waitForResponse((response) => (
+            new URL(response.url()).pathname === '/demo_users'
+            && response.request().method() === 'POST'
+            && response.ok()
+        )),
+        nameFilter.fill(firstName),
+    ]);
+    for (const filteredName of await nameCells.allTextContents()) {
+        expect(filteredName).toContain(firstName);
+    }
+    await Promise.all([
+        page.waitForResponse((response) => (
+            new URL(response.url()).pathname === '/demo_users'
+            && response.request().method() === 'POST'
+            && response.ok()
+        )),
+        nameFilter.fill(''),
+    ]);
     const deleteButton = page.getByRole('button', {name: 'Удалить'});
     await expect(deleteButton).toHaveClass(/btn-outline-danger/);
     await expect(deleteButton).toHaveCSS('color', 'rgb(220, 53, 69)');

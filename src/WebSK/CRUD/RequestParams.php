@@ -28,6 +28,21 @@ final class RequestParams
         return $default;
     }
 
+    public static function input(ServerRequestInterface $request, string $key, mixed $default = null): mixed
+    {
+        $parsed_body = $request->getParsedBody();
+
+        if (is_array($parsed_body) && array_key_exists($key, $parsed_body)) {
+            return $parsed_body[$key];
+        }
+
+        if (is_object($parsed_body) && property_exists($parsed_body, $key)) {
+            return $parsed_body->{$key};
+        }
+
+        return self::query($request, $key, $default);
+    }
+
     public static function parsedString(
         ServerRequestInterface $request,
         string $key,
@@ -80,6 +95,38 @@ final class RequestParams
         foreach ($value as $item) {
             if (!is_scalar($item) && $item !== null) {
                 throw new \InvalidArgumentException('Query parameter "' . $key . '" contains a non-scalar value');
+            }
+            $result[] = (string) $item;
+        }
+
+        return $result;
+    }
+
+    public static function inputString(
+        ServerRequestInterface $request,
+        string $key,
+        string $default = ''
+    ): string {
+        $value = self::input($request, $key, $default);
+        if (!is_scalar($value) && $value !== null) {
+            throw new \InvalidArgumentException('Request parameter "' . $key . '" must be scalar');
+        }
+
+        return $value === null ? $default : (string) $value;
+    }
+
+    /** @return list<string> */
+    public static function inputStringList(ServerRequestInterface $request, string $key): array
+    {
+        $value = self::input($request, $key, []);
+        if (!is_array($value)) {
+            throw new \InvalidArgumentException('Request parameter "' . $key . '" must be an array');
+        }
+
+        $result = [];
+        foreach ($value as $item) {
+            if (!is_scalar($item) && $item !== null) {
+                throw new \InvalidArgumentException('Request parameter "' . $key . '" contains a non-scalar value');
             }
             $result[] = (string) $item;
         }

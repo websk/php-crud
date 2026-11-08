@@ -57,4 +57,17 @@ final class PagerTest extends TestCase
         self::assertStringNotContainsString('<li class="active">', $html);
         self::assertStringNotContainsString('</a></a>', $html);
     }
+
+    public function testPagerReadsAjaxPostBody(): void
+    {
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('POST', '/')
+            ->withParsedBody([
+                'table_users_page_offset' => '50',
+                'table_users_page_size' => '25',
+            ]);
+
+        self::assertSame(50, Pager::getPageOffset($request, 'users'));
+        self::assertSame(25, Pager::getPageSize($request, 'users'));
+    }
 }

@@ -42,7 +42,7 @@ class CRUDTableFilterLike implements InterfaceCRUDTableFilterVisible
         $where = '';
         $placeholder_values_arr = [];
 
-        $value = RequestParams::queryString($request, $this->getFilterUniqId());
+        $value = RequestParams::inputString($request, $this->getFilterUniqId());
 
         $column_name = $this->getFieldName();
         $column_name = preg_replace("/[^a-zA-Z0-9_]+/", "", $column_name);
@@ -64,7 +64,7 @@ class CRUDTableFilterLike implements InterfaceCRUDTableFilterVisible
     {
         $html = CRUDHtml::tag('input', [
             'name' => $this->getFilterUniqId(),
-            'value' => RequestParams::queryString($request, $this->getFilterUniqId()),
+            'value' => RequestParams::inputString($request, $this->getFilterUniqId()),
             'class' => 'form-control',
             'oninput' => '$(this).closest(\'form\').submit();'
         ], '');

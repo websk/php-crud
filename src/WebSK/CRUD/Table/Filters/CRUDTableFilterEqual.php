@@ -57,7 +57,7 @@ class CRUDTableFilterEqual implements InterfaceCRUDTableFilterVisible
         $placeholder_values_arr = [];
 
         // для этого виджета галка включения не выводится: если в поле пустая строка - он игнорируется
-        $value = RequestParams::queryString($request, $this->getFilterUniqId());
+        $value = RequestParams::inputString($request, $this->getFilterUniqId());
 
         $column_name = $this->getFieldName();
         $column_name = preg_replace("/[^a-zA-Z0-9_]+/", "", $column_name);
@@ -79,7 +79,7 @@ class CRUDTableFilterEqual implements InterfaceCRUDTableFilterVisible
             'name' => $this->getFilterUniqId(),
             'id' => $this->getFilterUniqId(),
             'class' => $this->isInline() ? '' : 'form-control',
-            'value' => RequestParams::queryString($request, $this->getFilterUniqId())
+            'value' => RequestParams::inputString($request, $this->getFilterUniqId())
         ], '');
 
         ob_start();

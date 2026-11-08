@@ -36,7 +36,7 @@ class Pager
     public static function getPageOffset(ServerRequestInterface $request, string $table_index_on_page): int
     {
         $page_offset = 0;
-        $page_offset_param = \WebSK\CRUD\RequestParams::query($request, self::pageOffsetFormFieldName($table_index_on_page), null);
+        $page_offset_param = \WebSK\CRUD\RequestParams::input($request, self::pageOffsetFormFieldName($table_index_on_page), null);
         if (is_null($page_offset_param)) {
             return $page_offset;
         }
@@ -63,7 +63,7 @@ class Pager
         int $default_page_size = CRUD::DEFAULT_PAGE_SIZE
     ): int
     {
-        $page_size_param = \WebSK\CRUD\RequestParams::query($request, self::pageSizeFormFieldName($table_index_on_page), null);
+        $page_size_param = \WebSK\CRUD\RequestParams::input($request, self::pageSizeFormFieldName($table_index_on_page), null);
         if (is_null($page_size_param)) {
             return $default_page_size;
         }

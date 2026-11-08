@@ -29,6 +29,34 @@ final class RequestParamsTest extends TestCase
         self::assertNull(RequestParams::parsedBody($object_request, 'missing'));
     }
 
+    public function testInputPrefersParsedBodyAndFallsBackToQuery(): void
+    {
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('POST', '/')
+            ->withQueryParams([
+                'search' => 'query value',
+                'fallback' => 'query fallback',
+            ])
+            ->withParsedBody([
+                'search' => 'body value',
+                'empty' => '',
+            ]);
+
+        self::assertSame('body value', RequestParams::inputString($request, 'search'));
+        self::assertSame('', RequestParams::inputString($request, 'empty', 'default'));
+        self::assertSame('query fallback', RequestParams::inputString($request, 'fallback'));
+        self::assertSame('default', RequestParams::inputString($request, 'missing', 'default'));
+    }
+
+    public function testInputNormalizesListsFromParsedBody(): void
+    {
+        $request = (new ServerRequestFactory())
+            ->createServerRequest('POST', '/')
+            ->withParsedBody(['ids' => [1, '2']]);
+
+        self::assertSame(['1', '2'], RequestParams::inputStringList($request, 'ids'));
+    }
+
     public function testNormalizesValidatedQueryValues(): void
     {
         $request = (new ServerRequestFactory())
