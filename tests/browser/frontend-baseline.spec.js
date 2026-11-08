@@ -90,6 +90,22 @@ test('reference picker and remote autocomplete select and clear values', async (
     expect(pageErrors).toEqual([]);
 });
 
+test('inline text and option filters respond to input and keep buttons separated', async ({page}) => {
+    const pageErrors = collectPageErrors(page);
+    await page.goto('/__browser-test');
+
+    const textFilter = page.locator('#inline_filter_name');
+    await textFilter.fill('Menu');
+    await expect.poll(() => page.evaluate(() => window.inlineFilterSubmissions)).toBe(1);
+
+    const optionFilter = page.locator('#inline-filter-form .js-filter');
+    await expect(optionFilter).toHaveCSS('display', 'inline-flex');
+    await expect(optionFilter).toHaveCSS('flex-wrap', 'wrap');
+    await expect(optionFilter).toHaveCSS('column-gap', '4px');
+    await expect(optionFilter).toHaveCSS('row-gap', '4px');
+    expect(pageErrors).toEqual([]);
+});
+
 test('Magnific Popup opens the inline CRUD form', async ({page}) => {
     const pageErrors = collectPageErrors(page);
     await page.goto('/__browser-test');
@@ -130,6 +146,7 @@ test('demo layout dependencies load from managed local assets', async ({page}) =
         '/assets/libraries/jquery-ui/jquery-ui.min.js',
         '/assets/libraries/bootstrap/js/bootstrap.bundle.min.js',
         '/assets/libraries/bootstrap/css/bootstrap.min.css',
+        '/assets/libraries/crud/crud.css',
         '/assets/libraries/jquery-validation/jquery.validate.min.js',
         '/assets/libraries/font-awesome/css/all.min.css',
         '/assets/libraries/font-awesome/css/v4-shims.min.css',

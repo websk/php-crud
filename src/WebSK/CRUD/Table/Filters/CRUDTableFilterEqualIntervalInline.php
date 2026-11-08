@@ -101,10 +101,10 @@ class CRUDTableFilterEqualIntervalInline implements InterfaceCRUDTableFilterVisi
                 var timer;
                 var value = $input.val();
 
-                $input.on('keyup paste', function (e) {
+                $input.on('input', function () {
                     var $this = $(this);
 
-                    if ((value == $this.val()) && (e.type != 'paste')) {
+                    if (value == $this.val()) {
                         return;
                     }
 

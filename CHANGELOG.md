@@ -1,5 +1,12 @@
 # Changelog
 
+## [4.0.2](https://github.com/websk/php-crud/releases/tag/4.0.2) - 2026-11-08
+
+### Fixed
+
+- Submitted text filters for typing, paste, autofill and other value changes by listening to the standard `input` event.
+- Added responsive spacing and wrapping between inline option-filter buttons.
+
 ## [4.0.1](https://github.com/websk/php-crud/releases/tag/4.0.1) - 2026-10-26
 
 ### Changed

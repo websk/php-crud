@@ -66,7 +66,7 @@ class CRUDTableFilterLike implements InterfaceCRUDTableFilterVisible
             'name' => $this->getFilterUniqId(),
             'value' => RequestParams::queryString($request, $this->getFilterUniqId()),
             'class' => 'form-control',
-            'onkeyup' => '$(this).closest(\'form\').submit();'
+            'oninput' => '$(this).closest(\'form\').submit();'
         ], '');
 
         if ($this->getCommentStr()) {

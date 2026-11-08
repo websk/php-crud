@@ -13,6 +13,8 @@ use WebSK\CRUD\Form\Widgets\CRUDFormWidgetDateTime;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetReferenceAjax;
 use WebSK\CRUD\Form\Widgets\CRUDFormWidgetTimestamp;
 use WebSK\CRUD\Table\Filters\CRUDTableFilterMultipleAutocomplete;
+use WebSK\CRUD\Table\Filters\CRUDTableFilterEqualOptionsInline;
+use WebSK\CRUD\Table\Filters\CRUDTableFilterLikeInline;
 use WebSK\CRUD\Table\CRUDTableScript;
 use WebSK\Entity\InterfaceEntity;
 
@@ -166,6 +168,17 @@ $multipleAutocomplete = (new CRUDTableFilterMultipleAutocomplete(
     'name',
     '/__browser-test/company-options',
 ))->getHtml($request);
+$inlineLikeFilter = (new CRUDTableFilterLikeInline(
+    'inline_filter_name',
+    'Name',
+    'name',
+))->getHtml($request);
+$inlineOptionsFilter = (new CRUDTableFilterEqualOptionsInline(
+    'inline_filter_region',
+    'Region',
+    'region_id',
+    [1 => 'Left column', 2 => 'Right column', 3 => 'Below content'],
+))->getHtml($request);
 $popup = CRUDMagnificPopup::button('popup-form', 'btn btn-secondary', 'Open popup')
     . CRUDMagnificPopup::popupHtml(
         'popup-form',
@@ -194,6 +207,7 @@ header('Content-Type: text/html; charset=UTF-8');
     <meta charset="utf-8">
     <title>CRUD browser integration</title>
     <link rel="stylesheet" href="/assets/libraries/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/libraries/crud/crud.css">
     <link rel="stylesheet" href="/assets/libraries/tokenize2/tokenize2.min.css">
     <link rel="stylesheet" href="/assets/libraries/medium-editor/css/medium-editor.min.css">
     <link rel="stylesheet" href="/assets/libraries/font-awesome/css/all.min.css">
@@ -255,6 +269,10 @@ header('Content-Type: text/html; charset=UTF-8');
     <section id="ace-fixtures"><?= $aceWidgets ?></section>
     <section id="reference-fixture"><?= $reference ?></section>
     <form id="autocomplete-form"><?= $multipleAutocomplete ?></form>
+    <form id="inline-filter-form" class="filters-form">
+        <?= $inlineLikeFilter ?>
+        <?= $inlineOptionsFilter ?>
+    </form>
     <section id="popup-fixture"><?= $popup ?></section>
     <section id="row-link-fixture"><?= $rowLinkTable ?></section>
 </div>
@@ -268,6 +286,11 @@ header('Content-Type: text/html; charset=UTF-8');
     $('#autocomplete-form').on('submit', function (event) {
         event.preventDefault();
         window.autocompleteFormSubmissions += 1;
+    });
+    window.inlineFilterSubmissions = 0;
+    $('#inline-filter-form').on('submit', function (event) {
+        event.preventDefault();
+        window.inlineFilterSubmissions += 1;
     });
     window.bootstrapModalShown = false;
     $('#bootstrap-modal').on('shown.bs.modal', function () {
